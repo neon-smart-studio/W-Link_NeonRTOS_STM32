@@ -2,6 +2,10 @@
 #ifndef PWM_PIN_H
 #define PWM_PIN_H
 
+#ifdef STM32F0
+#include "Pin/PWM_Pin_STM32F0.h"
+#endif //STM32F0
+
 #ifdef STM32F1
 #include "Pin/PWM_Pin_STM32F1.h"
 #endif //STM32F1

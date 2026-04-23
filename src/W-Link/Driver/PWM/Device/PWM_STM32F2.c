@@ -382,7 +382,7 @@ hwPWM_OpResult PWM_Channel_DeInit(hwPWM_Channel channel_index)
                         }
                         if(all_off)
                         {
-                                __HAL_RCC_TIM14_CLK_ENABLE();
+                                __HAL_RCC_TIM14_CLK_DISABLE();
                         }
                         break;
         }

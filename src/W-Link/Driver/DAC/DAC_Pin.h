@@ -2,6 +2,10 @@
 #ifndef DAC_PIN_H
 #define DAC_PIN_H
 
+#ifdef STM32F0
+#include "Pin/DAC_Pin_STM32F0.h"
+#endif //STM32F0
+
 #ifdef STM32F1
 #include "Pin/DAC_Pin_STM32F1.h"
 #endif //STM32F1

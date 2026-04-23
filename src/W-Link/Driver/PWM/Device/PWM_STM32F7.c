@@ -81,7 +81,7 @@ hwPWM_OpResult PWM_Channel_Init(hwPWM_Channel channel_index, bool inverse)
                 return hwPWM_InvalidParameter;
         }
 
-        if(Timer_is_Init(def->timer))
+        if(!Timer_is_Init(def->timer))
         {
                 return hwPWM_HwError;
         }
@@ -382,7 +382,7 @@ hwPWM_OpResult PWM_Channel_DeInit(hwPWM_Channel channel_index)
                         }
                         if(all_off)
                         {
-                                __HAL_RCC_TIM14_CLK_ENABLE();
+                                __HAL_RCC_TIM14_CLK_DISABLE();
                         }
                         break;
         }

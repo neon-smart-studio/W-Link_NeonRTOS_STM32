@@ -6,6 +6,8 @@
 
 typedef enum {
     CAN_Pinset_DEFAULT = 0,
+    CAN_Pinset_ALT1,
+    CAN_Pinset_ALT2,
     CAN_Pinset_MAX
 } CAN_Pinset_t;
 

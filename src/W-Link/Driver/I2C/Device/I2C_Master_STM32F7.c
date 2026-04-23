@@ -355,8 +355,8 @@ hwI2C_OpResult I2C_Master_Init(hwI2C_Index index, hwI2C_Speed_Mode speed_mode)
             return hwI2C_InvalidParameter;
     }
 
-    uint32_t sda_af = STM32_UART_GetAF(index, I2C_Pin_Def_Table[index][I2C_Index_Map_Alt[index]].sda_pin);
-    uint32_t scl_af = STM32_UART_GetAF(index, I2C_Pin_Def_Table[index][I2C_Index_Map_Alt[index]].scl_pin);
+    uint32_t sda_af = STM32_I2C_GetAF(index, I2C_Pin_Def_Table[index][I2C_Index_Map_Alt[index]].sda_pin);
+    uint32_t scl_af = STM32_I2C_GetAF(index, I2C_Pin_Def_Table[index][I2C_Index_Map_Alt[index]].scl_pin);
 
     if(sda_af==0 || scl_af==0)
     {
@@ -473,6 +473,7 @@ hwI2C_OpResult I2C_Master_Init(hwI2C_Index index, hwI2C_Speed_Mode speed_mode)
     gpio_pin_init_status[I2C_Pin_Def_Table[index][I2C_Index_Map_Alt[index]].scl_pin] = true;
 
     I2C_Master_Init_Status[index] = true;
+    I2C_Clock_Speed_Mode[index] = speed_mode;
 
     return hwI2C_OK;
 }

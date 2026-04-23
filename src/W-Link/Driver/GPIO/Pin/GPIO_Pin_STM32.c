@@ -69,6 +69,7 @@ GPIO_TypeDef * GPIO_Map_Soc_Base(hwGPIO_Pin pin)
         case hwGPIO_Pin_C15:
             socBase = GPIOC;
             break;
+#if defined (GPIOD)
         case hwGPIO_Pin_D0:
         case hwGPIO_Pin_D1:
         case hwGPIO_Pin_D2:
@@ -87,6 +88,8 @@ GPIO_TypeDef * GPIO_Map_Soc_Base(hwGPIO_Pin pin)
         case hwGPIO_Pin_D15:
             socBase = GPIOD;
             break;
+#endif //GPIOD
+#if defined (GPIOE)
         case hwGPIO_Pin_E0:
         case hwGPIO_Pin_E1:
         case hwGPIO_Pin_E2:
@@ -105,6 +108,7 @@ GPIO_TypeDef * GPIO_Map_Soc_Base(hwGPIO_Pin pin)
         case hwGPIO_Pin_E15:
             socBase = GPIOE;
             break;
+#endif //GPIOF
 #if defined (GPIOF)
         case hwGPIO_Pin_F0:
         case hwGPIO_Pin_F1:
@@ -433,6 +437,7 @@ GPIO_TypeDef * GPIO_Int_Map_Soc_Base(hwGPIO_Int_Pin pin)
         case hwGPIO_Int_Pin_C15:
             socBase = GPIOC;
             break;
+#if defined (GPIOD)
         case hwGPIO_Int_Pin_D0:
         case hwGPIO_Int_Pin_D1:
         case hwGPIO_Int_Pin_D2:
@@ -451,6 +456,8 @@ GPIO_TypeDef * GPIO_Int_Map_Soc_Base(hwGPIO_Int_Pin pin)
         case hwGPIO_Int_Pin_D15:
             socBase = GPIOD;
             break;
+#endif //GPIOD
+#if defined (GPIOE)
         case hwGPIO_Int_Pin_E0:
         case hwGPIO_Int_Pin_E1:
         case hwGPIO_Int_Pin_E2:
@@ -469,6 +476,7 @@ GPIO_TypeDef * GPIO_Int_Map_Soc_Base(hwGPIO_Int_Pin pin)
         case hwGPIO_Int_Pin_E15:
             socBase = GPIOE;
             break;
+#endif //GPIOE
 #if defined (GPIOF)
         case hwGPIO_Int_Pin_F0:
         case hwGPIO_Int_Pin_F1:
@@ -798,6 +806,7 @@ uint32_t GPIO_Int_Map_Exti_Port(hwGPIO_Int_Pin pin)
         case hwGPIO_Int_Pin_C15:
             extiPort = EXTI_GPIOC;
             break;
+#if defined (EXTI_GPIOD)
         case hwGPIO_Int_Pin_D0:
         case hwGPIO_Int_Pin_D1:
         case hwGPIO_Int_Pin_D2:
@@ -816,6 +825,8 @@ uint32_t GPIO_Int_Map_Exti_Port(hwGPIO_Int_Pin pin)
         case hwGPIO_Int_Pin_D15:
             extiPort = EXTI_GPIOD;
             break;
+#endif //EXTI_GPIOD
+#if defined (EXTI_GPIOE)
         case hwGPIO_Int_Pin_E0:
         case hwGPIO_Int_Pin_E1:
         case hwGPIO_Int_Pin_E2:
@@ -834,6 +845,7 @@ uint32_t GPIO_Int_Map_Exti_Port(hwGPIO_Int_Pin pin)
         case hwGPIO_Int_Pin_E15:
             extiPort = EXTI_GPIOE;
             break;
+#endif //EXTI_GPIOE
 #if defined (EXTI_GPIOF)
         case hwGPIO_Int_Pin_F0:
         case hwGPIO_Int_Pin_F1:

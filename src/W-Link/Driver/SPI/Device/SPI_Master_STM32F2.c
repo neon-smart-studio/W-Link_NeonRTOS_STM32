@@ -176,9 +176,9 @@ hwSPI_OpResult SPI_Master_Init(hwSPI_Index index, uint32_t clock_rate_hz, hwSPI_
                 }
         }
 
-        uint32_t mosi_af = STM32_UART_GetAF(index, SPI_Pin_Def_Table[index][SPI_Index_Map_Alt[index]].mosi_pin);
-        uint32_t miso_af = STM32_UART_GetAF(index, SPI_Pin_Def_Table[index][SPI_Index_Map_Alt[index]].miso_pin);
-        uint32_t sclk_af = STM32_UART_GetAF(index, SPI_Pin_Def_Table[index][SPI_Index_Map_Alt[index]].sclk_pin);
+        uint32_t mosi_af = STM32_SPI_GetAF(index, SPI_Pin_Def_Table[index][SPI_Index_Map_Alt[index]].mosi_pin);
+        uint32_t miso_af = STM32_SPI_GetAF(index, SPI_Pin_Def_Table[index][SPI_Index_Map_Alt[index]].miso_pin);
+        uint32_t sclk_af = STM32_SPI_GetAF(index, SPI_Pin_Def_Table[index][SPI_Index_Map_Alt[index]].sclk_pin);
         uint32_t cs_af = 0;
 
         if(mosi_af==0 || miso_af==0 || sclk_af==0)
@@ -188,7 +188,7 @@ hwSPI_OpResult SPI_Master_Init(hwSPI_Index index, uint32_t clock_rate_hz, hwSPI_
 
         if(SPI_Pin_Def_Table[index][SPI_Index_Map_Alt[index]].cs_pin!=hwGPIO_Pin_NC)
         {
-                cs_af = STM32_UART_GetAF(index, SPI_Pin_Def_Table[index][SPI_Index_Map_Alt[index]].cs_pin);
+                cs_af = STM32_SPI_GetAF(index, SPI_Pin_Def_Table[index][SPI_Index_Map_Alt[index]].cs_pin);
                 
                 if(cs_af==0)
                 {

@@ -2,6 +2,10 @@
 #ifndef SPI_MASTER_PIN_H
 #define SPI_MASTER_PIN_H
 
+#ifdef STM32F0
+#include "Pin/SPI_Pin_STM32F0.h"
+#endif //STM32F0
+
 #ifdef STM32F1
 #include "Pin/SPI_Pin_STM32F1.h"
 #endif //STM32F1

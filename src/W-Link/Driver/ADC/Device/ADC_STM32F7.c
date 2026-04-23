@@ -275,11 +275,7 @@ hwADC_OpStatus hwADC_Read_MiniVolt(hwADC_Channel_Index ch, float *readMv)
     cfg.Rank = ADC_REGULAR_RANK_1;
 #endif
 
-#if defined(ADC_SAMPLETIME_247CYCLES_5)
-    cfg.SamplingTime = ADC_SAMPLETIME_247CYCLES_5;
-#else
-    cfg.SamplingTime = ADC_SAMPLETIME_144CYCLES;
-#endif
+    cfg.SamplingTime = ADC_SAMPLETIME_480CYCLES;
 
     HAL_ADC_ConfigChannel(hadc, &cfg);
 

@@ -21,6 +21,25 @@
 #include "driverlib/flash.h"
 #endif //DEVICE_TM4C1294
 
+#if defined (STM32F030x6) || defined (STM32F030x8) ||                           \
+    defined (STM32F031x6) || defined (STM32F038xx) ||                           \
+    defined (STM32F042x6) || defined (STM32F048xx) || defined (STM32F070x6) || \
+    defined (STM32F051x8) || defined (STM32F058xx) ||                           \
+    defined (STM32F071xB) || defined (STM32F072xB) || defined (STM32F078xx) || defined (STM32F070xB) || \
+    defined (STM32F091xC) || defined (STM32F098xx) || defined (STM32F030xC)
+#include "stm32f0xx.h"
+#include "stm32f0xx_hal_gpio.h"
+#include "stm32f0xx_hal_exti.h"
+#include "stm32f0xx_hal_uart.h"
+#include "stm32f0xx_hal_spi.h"
+#include "stm32f0xx_hal_i2c.h"
+#include "stm32f0xx_hal_dma.h"
+#include "stm32f0xx_hal_rtc.h"
+#include "stm32f0xx_hal_adc.h"
+#include "stm32f0xx_hal_can.h"
+#include "stm32f0xx_hal_dac.h"
+#endif //STM32F0
+
 #if defined (STM32F100xB) || defined (STM32F100xE) || defined (STM32F101x6) || \
     defined (STM32F101xB) || defined (STM32F101xE) || defined (STM32F101xG) || defined (STM32F102x6) || defined (STM32F102xB) || defined (STM32F103x6) || \
     defined (STM32F103xB) || defined (STM32F103xE) || defined (STM32F103xG) || defined (STM32F105xC) || defined (STM32F107xC)

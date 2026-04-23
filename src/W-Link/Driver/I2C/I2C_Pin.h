@@ -2,6 +2,10 @@
 #ifndef I2C_PIN_H
 #define I2C_PIN_H
 
+#ifdef STM32F0
+#include "Pin/I2C_Pin_STM32F0.h"
+#endif //STM32F0
+
 #ifdef STM32F1
 #include "Pin/I2C_Pin_STM32F1.h"
 #endif //STM32F1
