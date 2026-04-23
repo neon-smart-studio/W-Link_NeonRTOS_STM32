@@ -7,11 +7,15 @@
 #include "ADC/ADC.h"
 
 typedef enum {
+#if defined (ADC1_BASE)
     hwADC_Instance_1 = 0,
+#endif
+#if defined (ADC2_BASE)
     hwADC_Instance_2,
-#if defined (ADC3)
+#endif
+#if defined (ADC3_BASE)
     hwADC_Instance_3,
-#endif //ADC3
+#endif
     hwADC_Instance_MAX,
 } hwADC_Instance;
 

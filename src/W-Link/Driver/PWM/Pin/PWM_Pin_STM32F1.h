@@ -1,6 +1,6 @@
 
-#ifndef PWM_PIN_STM32F103xx_H
-#define PWM_PIN_STM32F103xx_H
+#ifndef PWM_PIN_STM32F1_H
+#define PWM_PIN_STM32F1_H
 
 #include "PWM_Pin_STM32.h"
 
@@ -27,55 +27,24 @@ typedef enum {
 #define CONFIG_PWM4_PINSET PWM_Pinset_DEFAULT
 #endif //CONFIG_PWM4_PINSET
 
-#ifndef CONFIG_PWM5_PINSET
-#define CONFIG_PWM5_PINSET PWM_Pinset_DEFAULT
-#endif //CONFIG_PWM5_PINSET
-
-#ifndef CONFIG_PWM8_PINSET
-#define CONFIG_PWM8_PINSET PWM_Pinset_DEFAULT
-#endif //CONFIG_PWM8_PINSET
-
-#ifndef CONFIG_PWM9_PINSET
-#define CONFIG_PWM9_PINSET PWM_Pinset_DEFAULT
-#endif //CONFIG_PWM9_PINSET
-
-#ifndef CONFIG_PWM10_PINSET
-#define CONFIG_PWM10_PINSET PWM_Pinset_DEFAULT
-#endif //CONFIG_PWM10_PINSET
-
-#ifndef CONFIG_PWM11_PINSET
-#define CONFIG_PWM11_PINSET PWM_Pinset_DEFAULT
-#endif //CONFIG_PWM11_PINSET
-
-#ifndef CONFIG_PWM12_PINSET
-#define CONFIG_PWM12_PINSET PWM_Pinset_DEFAULT
-#endif //CONFIG_PWM12_PINSET
-
-#ifndef CONFIG_PWM13_PINSET
-#define CONFIG_PWM13_PINSET PWM_Pinset_DEFAULT
-#endif //CONFIG_PWM13_PINSET
-
-#ifndef CONFIG_PWM14_PINSET
-#define CONFIG_PWM14_PINSET PWM_Pinset_DEFAULT
-#endif //CONFIG_PWM14_PINSET
-
 const PWM_Pinset_t PWM_Index_Map_Alt[hwPWM_Base_MAX] = {
+#if defined(TIM1_BASE)
     CONFIG_PWM1_PINSET,
+#endif
+#if defined(TIM2_BASE)
     CONFIG_PWM2_PINSET,
+#endif
+#if defined(TIM3_BASE)
     CONFIG_PWM3_PINSET,
+#endif
+#if defined(TIM4_BASE)
     CONFIG_PWM4_PINSET,
-    CONFIG_PWM5_PINSET,
-    CONFIG_PWM8_PINSET,
-    CONFIG_PWM9_PINSET,
-    CONFIG_PWM10_PINSET,
-    CONFIG_PWM11_PINSET,
-    CONFIG_PWM12_PINSET,
-    CONFIG_PWM13_PINSET,
-    CONFIG_PWM14_PINSET,
+#endif
 };
 
 const PWM_Pin_Def PWM_Pin_Def_Table[hwPWM_Base_MAX][PWM_Pinset_MAX][4] =
 {
+#if defined(TIM1_BASE)
     /* ================= TIM1 ================= */
     {
         {
@@ -97,7 +66,8 @@ const PWM_Pin_Def PWM_Pin_Def_Table[hwPWM_Base_MAX][PWM_Pinset_MAX][4] =
             { hwPWM_Channel_MAX, hwTimer_Index_0, hwGPIO_Pin_NC,  0, 0 },
         },
     },
-
+#endif
+#if defined(TIM2_BASE)
     /* ================= TIM2 ================= */
     {
         {
@@ -119,7 +89,8 @@ const PWM_Pin_Def PWM_Pin_Def_Table[hwPWM_Base_MAX][PWM_Pinset_MAX][4] =
             { hwPWM_Channel_MAX, hwTimer_Index_1, hwGPIO_Pin_NC, 0, 0 },
         },
     },
-
+#endif
+#if defined(TIM3_BASE)
     /* ================= TIM3 ================= */
     {
         {
@@ -141,7 +112,8 @@ const PWM_Pin_Def PWM_Pin_Def_Table[hwPWM_Base_MAX][PWM_Pinset_MAX][4] =
             { hwPWM_Channel_MAX, hwTimer_Index_2, hwGPIO_Pin_NC, 0, 0 },
         },
     },
-
+#endif
+#if defined(TIM4_BASE)
     /* ================= TIM4 ================= */
     {
         {
@@ -163,7 +135,7 @@ const PWM_Pin_Def PWM_Pin_Def_Table[hwPWM_Base_MAX][PWM_Pinset_MAX][4] =
             { hwPWM_Channel_MAX, hwTimer_Index_3, hwGPIO_Pin_NC, 0, 0 },
         },
     },
-
+#endif
 };
 
-#endif //PWM_PIN_STM32F103xx_H
+#endif //PWM_PIN_STM32F1_H

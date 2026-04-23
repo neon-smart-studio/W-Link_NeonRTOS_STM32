@@ -12,6 +12,8 @@
 
 #ifdef STM32F1
 
+#if defined(CAN1_BASE) || defined(CAN2_BASE)
+
 #include "CAN/CAN_Pin.h"
 
 #include "GPIO/GPIO_STM32.h"
@@ -325,5 +327,7 @@ bool CAN_isInit(hwCAN_Index index)
     }
     return CAN_Init_Status[index];
 }
+
+#endif //CAN1_BASE || CAN2_BASE
 
 #endif //STM32F1

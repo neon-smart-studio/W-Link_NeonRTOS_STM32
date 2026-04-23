@@ -12,6 +12,8 @@
 
 #ifdef STM32F2
 
+#if defined(CAN1_BASE) || defined(CAN2_BASE) || defined(CAN3_BASE)
+
 #include "CAN/CAN_Pin.h"
 
 #include "GPIO/GPIO_STM32.h"
@@ -94,6 +96,12 @@ void CAN1_SCE_IRQHandler(void){ CAN_HAL_IRQHandler(hwCAN_Index_0); }
 void CAN2_RX0_IRQHandler(void){ CAN_HAL_IRQHandler(hwCAN_Index_1); }
 void CAN2_TX_IRQHandler(void){  CAN_HAL_IRQHandler(hwCAN_Index_1); }
 void CAN2_SCE_IRQHandler(void){ CAN_HAL_IRQHandler(hwCAN_Index_1); }
+
+#if defined (CAN3_BASE)
+void CAN3_RX0_IRQHandler(void){ CAN_HAL_IRQHandler(hwCAN_Index_2); }
+void CAN3_TX_IRQHandler(void){  CAN_HAL_IRQHandler(hwCAN_Index_2); }
+void CAN3_SCE_IRQHandler(void){ CAN_HAL_IRQHandler(hwCAN_Index_2); }
+#endif // defined (CAN3_BASE)
 
 hwCAN_OpResult CAN_Init(hwCAN_Index index)
 {
@@ -377,4 +385,6 @@ bool CAN_isInit(hwCAN_Index index)
     return CAN_Init_Status[index];
 }
 
-#endif //STM32
+#endif //CAN1_BASE || CAN2_BASE || CAN3_BASE
+
+#endif //STM32F2

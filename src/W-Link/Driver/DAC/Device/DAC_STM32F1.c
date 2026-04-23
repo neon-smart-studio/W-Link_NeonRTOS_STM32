@@ -13,7 +13,7 @@
 
 #ifdef STM32F1
 
-#if defined(DAC)
+#if defined(DAC_BASE)
 
 #include "DAC/DAC_Pin.h"
 
@@ -187,6 +187,6 @@ hwDAC_OpStatus hwDAC_Write_MiniVolt(hwDAC_Channel_Index ch, float mv)
     return hwDAC_OK;
 }
 
-#endif //DAC
+#endif //DAC_BASE
 
 #endif //STM32

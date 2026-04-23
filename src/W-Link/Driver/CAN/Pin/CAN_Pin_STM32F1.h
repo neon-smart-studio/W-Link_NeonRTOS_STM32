@@ -1,6 +1,6 @@
 
-#ifndef CAN_PIN_STM32F103xx_H
-#define CAN_PIN_STM32F103xx_H
+#ifndef CAN_PIN_STM32F1_H
+#define CAN_PIN_STM32F1_H
 
 #include "CAN_Pin_STM32.h"
 
@@ -18,12 +18,17 @@ typedef enum {
 #endif //CONFIG_CAN1_PINSET
 
 const CAN_Pinset_t CAN_Index_Map_Alt[hwCAN_Index_MAX] = {
+#if defined (CAN1_BASE)
     CONFIG_CAN0_PINSET,
+#endif
+#if defined (CAN1_BASE)
     CONFIG_CAN1_PINSET
+#endif
 };
 
 const CAN_Pin_Def CAN_Pin_Def_Table[hwCAN_Index_MAX][CAN_Pinset_MAX] =
 {
+#if defined (CAN1_BASE)
     /* ================= CAN1 (CAN0) ================= */
     {
         /* DEFAULT */
@@ -35,7 +40,8 @@ const CAN_Pin_Def CAN_Pin_Def_Table[hwCAN_Index_MAX][CAN_Pinset_MAX] =
         /* ALT */
         { hwGPIO_Pin_D1, hwGPIO_Pin_D0 },
     },
-
+#endif
+#if defined (CAN1_BASE)
     /* ================= CAN2 (CAN1) ================= */
     {
         /* DEFAULT */
@@ -47,6 +53,7 @@ const CAN_Pin_Def CAN_Pin_Def_Table[hwCAN_Index_MAX][CAN_Pinset_MAX] =
         /* ALT */
         { hwGPIO_Pin_NC,  hwGPIO_Pin_NC },
     },
+#endif
 };
 
-#endif //CAN_PIN_STM32F103xx_H
+#endif //CAN_PIN_STM32F1_H

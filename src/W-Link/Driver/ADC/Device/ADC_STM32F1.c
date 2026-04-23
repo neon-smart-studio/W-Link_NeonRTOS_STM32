@@ -77,7 +77,9 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)
 void ADC_IRQHandler(void)
 {
     HAL_ADC_IRQHandler(&g_adc[hwADC_Instance_1]);
+#if defined (ADC2_BASE)
     HAL_ADC_IRQHandler(&g_adc[hwADC_Instance_2]);
+#endif
 }
 
 hwADC_OpStatus hwADC_Channel_Init(hwADC_Channel_Index ch)
@@ -122,10 +124,12 @@ hwADC_OpStatus hwADC_Channel_Init(hwADC_Channel_Index ch)
                 __HAL_RCC_ADC1_CLK_ENABLE();
                 g_adc[inst].Instance = ADC1;
                 break;
+#if defined (ADC2_BASE)
             case hwADC_Instance_2:
                 __HAL_RCC_ADC2_CLK_ENABLE();
                 g_adc[inst].Instance = ADC2;
                 break;
+#endif
         }
 
         g_adc[inst].Init.ScanConvMode          = DISABLE;
@@ -220,7 +224,9 @@ hwADC_OpStatus hwADC_Channel_DeInit(hwADC_Channel_Index ch)
             switch (i_inst)
             {
                 case hwADC_Instance_1: __HAL_RCC_ADC1_CLK_DISABLE(); break;
+#if defined (ADC2_BASE)
                 case hwADC_Instance_2: __HAL_RCC_ADC2_CLK_DISABLE(); break;
+#endif
             }
 
             ADC_Instance_Init_Status[i_inst] = false;

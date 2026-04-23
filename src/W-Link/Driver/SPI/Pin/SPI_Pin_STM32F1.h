@@ -1,6 +1,6 @@
 
-#ifndef SPI_PIN_STM32F103xx_H
-#define SPI_PIN_STM32F103xx_H
+#ifndef SPI_PIN_STM32F1_H
+#define SPI_PIN_STM32F1_H
 
 #include "SPI_Pin_STM32.h"
 
@@ -18,18 +18,18 @@ typedef enum {
 #define CONFIG_SPI1_PINSET SPI_Pinset_DEFAULT
 #endif //CONFIG_SPI1_PINSET
 
-#ifndef CONFIG_SPI2_PINSET
-#define CONFIG_SPI2_PINSET SPI_Pinset_DEFAULT
-#endif //CONFIG_SPI2_PINSET
-
 const SPI_Pinset_t SPI_Index_Map_Alt[hwSPI_Index_MAX] = {
+#if defined(SPI1_BASE)
     CONFIG_SPI0_PINSET,
-    CONFIG_SPI1_PINSET,
-    CONFIG_SPI2_PINSET
+#endif
+#if defined(SPI2_BASE)
+    CONFIG_SPI1_PINSET
+#endif
 };
 
 const SPI_Pin_Def SPI_Pin_Def_Table[hwSPI_Index_MAX][SPI_Pinset_MAX] =
 {
+#if defined(SPI1_BASE)
     /* ================= SPI1 (SPI0) ================= */
     {
         /* DEFAULT */
@@ -38,7 +38,8 @@ const SPI_Pin_Def SPI_Pin_Def_Table[hwSPI_Index_MAX][SPI_Pinset_MAX] =
         /* ALT */
         { hwGPIO_Pin_B5, hwGPIO_Pin_B4, hwGPIO_Pin_B3, hwGPIO_Pin_A15 },
     },
-
+#endif
+#if defined(SPI2_BASE)
     /* ================= SPI2 (SPI1) ================= */
     {
         /* DEFAULT */
@@ -47,15 +48,7 @@ const SPI_Pin_Def SPI_Pin_Def_Table[hwSPI_Index_MAX][SPI_Pinset_MAX] =
         /* ALT */
         { hwGPIO_Pin_C3,  hwGPIO_Pin_C2,  hwGPIO_Pin_B10, hwGPIO_Pin_B9  },
     },
-
-    /* ================= SPI3 (SPI2) ================= */
-    {
-        /* DEFAULT */
-        { hwGPIO_Pin_B5,  hwGPIO_Pin_B4,  hwGPIO_Pin_B3,  hwGPIO_Pin_A4 },
-
-        /* ALT */
-        { hwGPIO_Pin_C12, hwGPIO_Pin_C11, hwGPIO_Pin_C10, hwGPIO_Pin_A15 },
-    },
+#endif
 };
 
-#endif //SPI_PIN_STM32F103xx_H
+#endif //SPI_PIN_STM32F1_H
