@@ -8,21 +8,16 @@
 
 #include "NeonRTOS.h"
 
-#include "I2C_Master.h"
+#include "I2C/I2C_Master.h"
 
-#ifdef STM32
+#ifdef STM32F7
 
-#include "I2C_Pin.h"
+#include "I2C/I2C_Pin.h"
 
 #include "GPIO/GPIO_STM32.h"
 
 #define I2C_IRQ_NVIC_PRIORITY 5
 #define I2C_IRQ_NVIC_SUB_PRIORITY 0
-
-#ifdef STM32_I2C_LEGACY_ARCH
-#define I2C_MASTER_STANDARD_MODE_CLK_FREQUENCY      100000
-#define I2C_MASTER_FAST_MODE_CLK_FREQUENCY          400000
-#endif // STM32_I2C_LEGACY_ARCH
 
 #ifdef STM32F0
 #define TIMING_VAL_48M_CLK_100KHZ  0x10805E89  // Standard mode with Rise Time = 400ns and Fall Time = 100ns
@@ -154,7 +149,6 @@ static NeonRTOS_SyncObj_t I2C_Master_Done_SyncHandle[hwI2C_Index_MAX];
 
 static I2C_HandleTypeDef g_i2c[hwI2C_Index_MAX];
 
-#ifdef STM32_I2C_NEW_ARCH
 uint32_t I2C_Get_PCLK(hwI2C_Index index)
 {
     uint32_t clocksource;
@@ -517,7 +511,6 @@ uint32_t I2C_Master_Get_Timing(hwI2C_Index index, hwI2C_Speed_Mode speed_mode)
     
     return tim;
 }
-#endif //STM32_I2C_NEW_ARCH
 
 uint32_t STM32_I2C_GetAF(hwI2C_Index I2C, hwGPIO_Pin pin)
 {
@@ -635,13 +628,6 @@ hwI2C_OpResult I2C_Master_Init(hwI2C_Index index, hwI2C_Speed_Mode speed_mode)
         return hwI2C_InvalidParameter;
     }
     
-#ifdef STM32_I2C_LEGACY_ARCH
-    if(speed_mode==hwI2C_High_Speed_Mode)
-    {
-        return hwI2C_Unsupport;
-    }
-#endif // STM32_I2C_LEGACY_ARCH
-
     GPIO_TypeDef * sda_soc_base = GPIO_Map_Soc_Base(I2C_Pin_Def_Table[index][I2C_Index_Map_Alt[index]].sda_pin);
     GPIO_TypeDef * scl_soc_base = GPIO_Map_Soc_Base(I2C_Pin_Def_Table[index][I2C_Index_Map_Alt[index]].scl_pin);
     uint16_t sda_soc_pin = GPIO_Map_Soc_Pin(I2C_Pin_Def_Table[index][I2C_Index_Map_Alt[index]].sda_pin);
@@ -714,20 +700,7 @@ hwI2C_OpResult I2C_Master_Init(hwI2C_Index index, hwI2C_Speed_Mode speed_mode)
     }
 
     g_i2c[index].Instance = i2c_soc_base;
-#ifdef STM32_I2C_LEGACY_ARCH
-    switch(speed_mode)
-    {
-        case hwI2C_Standard_Mode:
-            g_i2c[index].Init.ClockSpeed = I2C_MASTER_STANDARD_MODE_CLK_FREQUENCY;
-            break;
-        case hwI2C_Fast_Mode:
-            g_i2c[index].Init.ClockSpeed = I2C_MASTER_FAST_MODE_CLK_FREQUENCY;
-            break;
-    }
-#endif
-#ifdef STM32_I2C_NEW_ARCH
     g_i2c[index].Init.Timing = I2C_Master_Get_Timing(index, speed_mode);
-#endif // STM32_I2C_NEW_ARCH
     g_i2c[index].Init.OwnAddress1 = 0;
     g_i2c[index].Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
     g_i2c[index].Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
@@ -973,4 +946,4 @@ bool I2C_Master_isInit(hwI2C_Index index)
     return I2C_Master_Init_Status[index];
 }
 
-#endif //STM32
+#endif //STM32F7

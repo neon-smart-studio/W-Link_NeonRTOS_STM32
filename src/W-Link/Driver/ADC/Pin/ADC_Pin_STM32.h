@@ -9,7 +9,9 @@
 typedef enum {
     hwADC_Instance_1 = 0,
     hwADC_Instance_2,
+#if defined (ADC3)
     hwADC_Instance_3,
+#endif //ADC3
     hwADC_Instance_MAX,
 } hwADC_Instance;
 

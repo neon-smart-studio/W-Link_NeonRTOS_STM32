@@ -2,14 +2,14 @@
 #include <unistd.h>
 #include <string.h>
 
+#include "soc.h"
+
 #include "FreeRTOS.h"
 #include "task.h"
 
 #include "SysCtrl/SysCtrl.h"
 
 #include "NeonRTOS.h"
-#include "NeonTCPIP.h"
-#include "NeonAppInterface.h"
 
 void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName) {
     // 堆疊溢出處理
@@ -35,8 +35,6 @@ int main(void) {
 
     __HAL_RCC_WWDG_CLK_DISABLE();  // 禁用窗口看門狗
     //__HAL_RCC_IWDG_CLK_DISABLE();  // 禁用獨立看門狗
-
-    Neon_App_Init();
 
     // 啟動 NeonRTOS 調度器
     NeonRTOS_start();

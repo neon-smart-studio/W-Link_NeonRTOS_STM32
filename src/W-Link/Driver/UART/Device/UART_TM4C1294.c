@@ -8,11 +8,11 @@
 
 #include "NeonRTOS.h"
 
-#include "UART.h"
+#include "UART/UART.h"
 
 #ifdef DEVICE_TM4C1294
 
-#include "UART_Pin.h"
+#include "UART/UART_Pin.h"
 
 static int UART_BaudRate[hwUART_Index_MAX] = {0};
 

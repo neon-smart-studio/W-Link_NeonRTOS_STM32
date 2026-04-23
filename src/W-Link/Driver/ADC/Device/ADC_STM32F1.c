@@ -11,9 +11,9 @@
 
 #include "ADC/ADC.h"
 
-#include "ADC/ADC_Pin.h"
-
 #ifdef STM32F1
+
+#include "ADC/ADC_Pin.h"
 
 #define ADC_IRQ_NVIC_PRIORITY 5
 #define ADC_IRQ_NVIC_SUB_PRIORITY 0
@@ -78,7 +78,6 @@ void ADC_IRQHandler(void)
 {
     HAL_ADC_IRQHandler(&g_adc[hwADC_Instance_1]);
     HAL_ADC_IRQHandler(&g_adc[hwADC_Instance_2]);
-    HAL_ADC_IRQHandler(&g_adc[hwADC_Instance_3]);
 }
 
 hwADC_OpStatus hwADC_Channel_Init(hwADC_Channel_Index ch)
@@ -127,13 +126,8 @@ hwADC_OpStatus hwADC_Channel_Init(hwADC_Channel_Index ch)
                 __HAL_RCC_ADC2_CLK_ENABLE();
                 g_adc[inst].Instance = ADC2;
                 break;
-            case hwADC_Instance_3:
-                __HAL_RCC_ADC3_CLK_ENABLE();
-                g_adc[inst].Instance = ADC3;
-                break;
         }
 
-        g_adc[inst].Init.Resolution            = ADC_RESOLUTION_12B;
         g_adc[inst].Init.ScanConvMode          = DISABLE;
         g_adc[inst].Init.ContinuousConvMode    = DISABLE;
         g_adc[inst].Init.DiscontinuousConvMode = DISABLE;
@@ -148,10 +142,18 @@ hwADC_OpStatus hwADC_Channel_Init(hwADC_Channel_Index ch)
             return hwADC_HwError;
         }
 
+        /* STM32F1 ADC calibration */
+        if (HAL_ADCEx_Calibration_Start(&g_adc[inst]) != HAL_OK)
+        {
+            HAL_ADC_DeInit(&g_adc[inst]);
+            NeonRTOS_MsgQDelete(&ADC_Channel_SyncQueue[inst]);
+            return hwADC_HwError;
+        }
+
         if(!ADC_NVIC_Init_Status)
         {
-            HAL_NVIC_SetPriority(ADC_IRQn, ADC_IRQ_NVIC_PRIORITY, ADC_IRQ_NVIC_SUB_PRIORITY);
-            HAL_NVIC_EnableIRQ(ADC_IRQn);
+            HAL_NVIC_SetPriority(ADC1_2_IRQn, ADC_IRQ_NVIC_PRIORITY, ADC_IRQ_NVIC_SUB_PRIORITY);
+            HAL_NVIC_EnableIRQ(ADC1_2_IRQn);
 
             ADC_NVIC_Init_Status = true;
         }
@@ -197,36 +199,35 @@ hwADC_OpStatus hwADC_Channel_DeInit(hwADC_Channel_Index ch)
     bool inst_used = false;
 
     /* 檢查 instance 是否還有人在用 */
-    for (hwADC_Instance inst = 0; inst < hwADC_Instance_MAX; inst++)
+    for (hwADC_Instance i_inst = 0; i_inst < hwADC_Instance_MAX; i_inst++)
     {
         bool ch_used = false;
 
         for (size_t i = 0; i < hwADC_Channel_Index_MAX; i++)
         {
-            if (ADC_Channel_Init_Status[i])
+            if (ADC_Channel_Init_Status[i] &&
+                ADC_Channel_Def_Table[i].inst == i_inst)
             {
                 ch_used = true;
                 break;
             }
         }
 
-        if (!ch_used && ADC_Instance_Init_Status[inst])
+        if (!ch_used && ADC_Instance_Init_Status[i_inst])
         {
-            HAL_ADC_DeInit(&g_adc[inst]);
+            HAL_ADC_DeInit(&g_adc[i_inst]);
 
-            switch (inst)
+            switch (i_inst)
             {
                 case hwADC_Instance_1: __HAL_RCC_ADC1_CLK_DISABLE(); break;
                 case hwADC_Instance_2: __HAL_RCC_ADC2_CLK_DISABLE(); break;
-                case hwADC_Instance_3: __HAL_RCC_ADC3_CLK_DISABLE(); break;
             }
 
-            ADC_Instance_Init_Status[inst] = false;
-            
-            NeonRTOS_MsgQDelete(&ADC_Channel_SyncQueue[inst]);
+            ADC_Instance_Init_Status[i_inst] = false;
+            NeonRTOS_MsgQDelete(&ADC_Channel_SyncQueue[i_inst]);
         }
-        
-        if(ADC_Instance_Init_Status[inst])
+
+        if (ADC_Instance_Init_Status[i_inst])
         {
             inst_used = true;
         }
@@ -234,7 +235,7 @@ hwADC_OpStatus hwADC_Channel_DeInit(hwADC_Channel_Index ch)
 
     if(!inst_used && ADC_NVIC_Init_Status)
     {
-        HAL_NVIC_DisableIRQ(ADC_IRQn);
+        HAL_NVIC_DisableIRQ(ADC1_2_IRQn);
         
         ADC_NVIC_Init_Status = false;
     }
@@ -273,11 +274,7 @@ hwADC_OpStatus hwADC_Read_MiniVolt(hwADC_Channel_Index ch, float *readMv)
     cfg.Rank = ADC_REGULAR_RANK_1;
 #endif
 
-#if defined(ADC_SAMPLETIME_247CYCLES_5)
-    cfg.SamplingTime = ADC_SAMPLETIME_247CYCLES_5;
-#else
-    cfg.SamplingTime = ADC_SAMPLETIME_144CYCLES;
-#endif
+    cfg.SamplingTime = ADC_SAMPLETIME_239CYCLES_5;
 
     HAL_ADC_ConfigChannel(hadc, &cfg);
 

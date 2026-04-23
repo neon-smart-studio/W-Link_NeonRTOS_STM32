@@ -6,7 +6,7 @@
 
 #include "soc.h"
 
-#ifdef STM32
+#ifdef DEVICE_STM32
 
 #include "GPIO_Pin_STM32.h"
 
@@ -105,6 +105,7 @@ GPIO_TypeDef * GPIO_Map_Soc_Base(hwGPIO_Pin pin)
         case hwGPIO_Pin_E15:
             socBase = GPIOE;
             break;
+#if defined (GPIOF)
         case hwGPIO_Pin_F0:
         case hwGPIO_Pin_F1:
         case hwGPIO_Pin_F2:
@@ -123,6 +124,8 @@ GPIO_TypeDef * GPIO_Map_Soc_Base(hwGPIO_Pin pin)
         case hwGPIO_Pin_F15:
             socBase = GPIOF;
             break;
+#endif //GPIOF
+#if defined (GPIOG)
         case hwGPIO_Pin_G0:
         case hwGPIO_Pin_G1:
         case hwGPIO_Pin_G2:
@@ -140,6 +143,8 @@ GPIO_TypeDef * GPIO_Map_Soc_Base(hwGPIO_Pin pin)
         case hwGPIO_Pin_G15:
             socBase = GPIOG;
             break;
+#endif //GPIOG
+#if defined (GPIOH)
         case hwGPIO_Pin_H0:
         case hwGPIO_Pin_H1:
         case hwGPIO_Pin_H2:
@@ -158,6 +163,8 @@ GPIO_TypeDef * GPIO_Map_Soc_Base(hwGPIO_Pin pin)
         case hwGPIO_Pin_H15:
             socBase = GPIOH;
             break;
+#endif //GPIOH
+#if defined (GPIOI)
         case hwGPIO_Pin_I0:
         case hwGPIO_Pin_I1:
         case hwGPIO_Pin_I2:
@@ -176,6 +183,7 @@ GPIO_TypeDef * GPIO_Map_Soc_Base(hwGPIO_Pin pin)
         case hwGPIO_Pin_I15:
             socBase = GPIOI;
             break;
+#endif //GPIOI
     }
 
     return socBase;
@@ -461,6 +469,7 @@ GPIO_TypeDef * GPIO_Int_Map_Soc_Base(hwGPIO_Int_Pin pin)
         case hwGPIO_Int_Pin_E15:
             socBase = GPIOE;
             break;
+#if defined (GPIOF)
         case hwGPIO_Int_Pin_F0:
         case hwGPIO_Int_Pin_F1:
         case hwGPIO_Int_Pin_F2:
@@ -479,6 +488,8 @@ GPIO_TypeDef * GPIO_Int_Map_Soc_Base(hwGPIO_Int_Pin pin)
         case hwGPIO_Int_Pin_F15:
             socBase = GPIOF;
             break;
+#endif //GPIOF
+#if defined (GPIOG)
         case hwGPIO_Int_Pin_G0:
         case hwGPIO_Int_Pin_G1:
         case hwGPIO_Int_Pin_G2:
@@ -496,6 +507,8 @@ GPIO_TypeDef * GPIO_Int_Map_Soc_Base(hwGPIO_Int_Pin pin)
         case hwGPIO_Int_Pin_G15:
             socBase = GPIOG;
             break;
+#endif //GPIOG
+#if defined (GPIOH)
         case hwGPIO_Int_Pin_H0:
         case hwGPIO_Int_Pin_H1:
         case hwGPIO_Int_Pin_H2:
@@ -514,6 +527,8 @@ GPIO_TypeDef * GPIO_Int_Map_Soc_Base(hwGPIO_Int_Pin pin)
         case hwGPIO_Int_Pin_H15:
             socBase = GPIOH;
             break;
+#endif //GPIOH
+#if defined (GPIOI)
         case hwGPIO_Int_Pin_I0:
         case hwGPIO_Int_Pin_I1:
         case hwGPIO_Int_Pin_I2:
@@ -532,6 +547,7 @@ GPIO_TypeDef * GPIO_Int_Map_Soc_Base(hwGPIO_Int_Pin pin)
         case hwGPIO_Int_Pin_I15:
             socBase = GPIOI;
             break;
+#endif //GPIOI
     }
 
     return socBase;
@@ -818,6 +834,7 @@ uint32_t GPIO_Int_Map_Exti_Port(hwGPIO_Int_Pin pin)
         case hwGPIO_Int_Pin_E15:
             extiPort = EXTI_GPIOE;
             break;
+#if defined (EXTI_GPIOF)
         case hwGPIO_Int_Pin_F0:
         case hwGPIO_Int_Pin_F1:
         case hwGPIO_Int_Pin_F2:
@@ -836,6 +853,8 @@ uint32_t GPIO_Int_Map_Exti_Port(hwGPIO_Int_Pin pin)
         case hwGPIO_Int_Pin_F15:
             extiPort = EXTI_GPIOF;
             break;
+#endif //EXTI_GPIOF
+#if defined (EXTI_GPIOG)
         case hwGPIO_Int_Pin_G0:
         case hwGPIO_Int_Pin_G1:
         case hwGPIO_Int_Pin_G2:
@@ -853,6 +872,8 @@ uint32_t GPIO_Int_Map_Exti_Port(hwGPIO_Int_Pin pin)
         case hwGPIO_Int_Pin_G15:
             extiPort = EXTI_GPIOG;
             break;
+#endif //EXTI_GPIOG
+#if defined (EXTI_GPIOH)
         case hwGPIO_Int_Pin_H0:
         case hwGPIO_Int_Pin_H1:
         case hwGPIO_Int_Pin_H2:
@@ -871,6 +892,8 @@ uint32_t GPIO_Int_Map_Exti_Port(hwGPIO_Int_Pin pin)
         case hwGPIO_Int_Pin_H15:
             extiPort = EXTI_GPIOH;
             break;
+#endif //EXTI_GPIOH
+#if defined (EXTI_GPIOI)
         case hwGPIO_Int_Pin_I0:
         case hwGPIO_Int_Pin_I1:
         case hwGPIO_Int_Pin_I2:
@@ -889,6 +912,7 @@ uint32_t GPIO_Int_Map_Exti_Port(hwGPIO_Int_Pin pin)
         case hwGPIO_Int_Pin_I15:
             extiPort = EXTI_GPIOI;
             break;
+#endif //EXTI_GPIOI
     }
 
     return extiPort;
@@ -1080,4 +1104,4 @@ uint32_t GPIO_Int_Map_Exti_Line(hwGPIO_Int_Pin pin)
     return extiLine;
 }
 
-#endif //STM32
+#endif // DEVICE_STM32

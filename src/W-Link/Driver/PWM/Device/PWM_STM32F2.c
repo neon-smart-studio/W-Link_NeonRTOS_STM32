@@ -10,11 +10,11 @@
 
 #include "Timer/Timer.h"
 
-#include "PWM.h"
+#include "PWM/PWM.h"
 
-#ifdef STM32
+#ifdef STM32F2
 
-#include "PWM_Pin.h"
+#include "PWM/PWM_Pin.h"
 
 #include "GPIO/GPIO_STM32.h"
 
@@ -792,4 +792,4 @@ bool PWM_is_Init(hwPWM_Channel channel_index)
     return PWM_Channel_Init_Status[channel_index];
 }
 
-#endif //STM32
+#endif //STM32F2

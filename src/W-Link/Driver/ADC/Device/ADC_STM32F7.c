@@ -11,9 +11,9 @@
 
 #include "ADC/ADC.h"
 
-#include "ADC/ADC_Pin.h"
-
 #ifdef STM32F7
+
+#include "ADC/ADC_Pin.h"
 
 #define ADC_IRQ_NVIC_PRIORITY 5
 #define ADC_IRQ_NVIC_SUB_PRIORITY 0
@@ -197,36 +197,36 @@ hwADC_OpStatus hwADC_Channel_DeInit(hwADC_Channel_Index ch)
     bool inst_used = false;
 
     /* 檢查 instance 是否還有人在用 */
-    for (hwADC_Instance inst = 0; inst < hwADC_Instance_MAX; inst++)
+    for (hwADC_Instance i_inst = 0; i_inst < hwADC_Instance_MAX; i_inst++)
     {
         bool ch_used = false;
 
         for (size_t i = 0; i < hwADC_Channel_Index_MAX; i++)
         {
-            if (ADC_Channel_Init_Status[i])
+            if (ADC_Channel_Init_Status[i] &&
+                ADC_Channel_Def_Table[i].inst == i_inst)
             {
                 ch_used = true;
                 break;
             }
         }
 
-        if (!ch_used && ADC_Instance_Init_Status[inst])
+        if (!ch_used && ADC_Instance_Init_Status[i_inst])
         {
-            HAL_ADC_DeInit(&g_adc[inst]);
+            HAL_ADC_DeInit(&g_adc[i_inst]);
 
-            switch (inst)
+            switch (i_inst)
             {
                 case hwADC_Instance_1: __HAL_RCC_ADC1_CLK_DISABLE(); break;
                 case hwADC_Instance_2: __HAL_RCC_ADC2_CLK_DISABLE(); break;
                 case hwADC_Instance_3: __HAL_RCC_ADC3_CLK_DISABLE(); break;
             }
 
-            ADC_Instance_Init_Status[inst] = false;
-            
-            NeonRTOS_MsgQDelete(&ADC_Channel_SyncQueue[inst]);
+            ADC_Instance_Init_Status[i_inst] = false;
+            NeonRTOS_MsgQDelete(&ADC_Channel_SyncQueue[i_inst]);
         }
-        
-        if(ADC_Instance_Init_Status[inst])
+
+        if (ADC_Instance_Init_Status[i_inst])
         {
             inst_used = true;
         }

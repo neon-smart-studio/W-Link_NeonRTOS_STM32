@@ -8,11 +8,11 @@
 
 #include "NeonRTOS.h"
 
-#include "CAN.h"
+#include "CAN/CAN.h"
 
-#ifdef STM32
+#ifdef STM32F1
 
-#include "CAN_Pin.h"
+#include "CAN/CAN_Pin.h"
 
 #include "GPIO/GPIO_STM32.h"
 
@@ -24,16 +24,6 @@ static NeonRTOS_SyncObj_t CAN_TxDone_Sync[hwCAN_Index_MAX];
 static NeonRTOS_MsgQ_t   CAN_RxQueue[hwCAN_Index_MAX];
 
 static CAN_HandleTypeDef g_can[hwCAN_Index_MAX];
-
-uint32_t STM32_CAN_GetAF(hwCAN_Index CAN, hwGPIO_Pin pin)
-{
-    for (size_t i = 0; i < sizeof(CAN_Pin_AF_Map)/sizeof(CAN_Pin_AF_Map[0]); i++) {
-        if (CAN_Pin_AF_Map[i].can == CAN &&
-            CAN_Pin_AF_Map[i].pin  == pin)
-            return CAN_Pin_AF_Map[i].af;
-    }
-    return 0;
-}
 
 static hwCAN_Index CAN_IndexFromHandle(CAN_HandleTypeDef *hCAN)
 {
@@ -48,9 +38,8 @@ CAN_TypeDef * CAN_Map_Soc_Base(hwCAN_Index index)
     switch(index)
     {
         case hwCAN_Index_0: return CAN1;
+#if defined (CAN2_BASE)
         case hwCAN_Index_1: return CAN2;
-#if defined (CAN3_BASE)
-        case hwCAN_Index_2: return CAN3;
 #endif
         default: break;
     }
@@ -91,9 +80,11 @@ void CAN1_RX0_IRQHandler(void){ CAN_HAL_IRQHandler(hwCAN_Index_0); }
 void CAN1_TX_IRQHandler(void){  CAN_HAL_IRQHandler(hwCAN_Index_0); }
 void CAN1_SCE_IRQHandler(void){ CAN_HAL_IRQHandler(hwCAN_Index_0); }
 
+#if defined (CAN2_BASE)
 void CAN2_RX0_IRQHandler(void){ CAN_HAL_IRQHandler(hwCAN_Index_1); }
 void CAN2_TX_IRQHandler(void){  CAN_HAL_IRQHandler(hwCAN_Index_1); }
 void CAN2_SCE_IRQHandler(void){ CAN_HAL_IRQHandler(hwCAN_Index_1); }
+#endif
 
 hwCAN_OpResult CAN_Init(hwCAN_Index index)
 {
@@ -113,14 +104,6 @@ hwCAN_OpResult CAN_Init(hwCAN_Index index)
     uint16_t rx_soc_pin = GPIO_Map_Soc_Pin(CAN_Pin_Def_Table[index][CAN_Index_Map_Alt[index]].rx_pin);
 
     if(tx_soc_pin==0 || tx_soc_base==NULL || rx_soc_pin==0 || rx_soc_base==NULL)
-    {
-            return hwCAN_InvalidParameter;
-    }
-
-    uint32_t tx_af = STM32_CAN_GetAF(index, CAN_Pin_Def_Table[index][CAN_Index_Map_Alt[index]].tx_pin);
-    uint32_t rx_af = STM32_CAN_GetAF(index, CAN_Pin_Def_Table[index][CAN_Index_Map_Alt[index]].rx_pin);
-
-    if(tx_af==0 || rx_af==0)
     {
             return hwCAN_InvalidParameter;
     }
@@ -146,19 +129,15 @@ hwCAN_OpResult CAN_Init(hwCAN_Index index)
     GPIO_Enable_RCC_Clock(rx_soc_base);
 
     GPIO_InitTypeDef g_can_tx = {0};
-    g_can_tx.Pin       = tx_soc_pin;
-    g_can_tx.Mode      = GPIO_MODE_AF_PP;
-    g_can_tx.Pull      = GPIO_NOPULL;
-    g_can_tx.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
-    g_can_tx.Alternate = tx_af;
+    g_can_tx.Pin   = tx_soc_pin;
+    g_can_tx.Mode  = GPIO_MODE_AF_PP;
+    g_can_tx.Speed = GPIO_SPEED_FREQ_HIGH;
     HAL_GPIO_Init(tx_soc_base, &g_can_tx);
 
     GPIO_InitTypeDef g_can_rx = {0};
-    g_can_rx.Pin       = rx_soc_pin;
-    g_can_rx.Mode      = GPIO_MODE_AF_PP;
-    g_can_rx.Pull      = GPIO_NOPULL;
-    g_can_rx.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
-    g_can_rx.Alternate = rx_af;
+    g_can_rx.Pin  = rx_soc_pin;
+    g_can_rx.Mode = GPIO_MODE_AF_INPUT;
+    g_can_rx.Speed = GPIO_SPEED_FREQ_HIGH;
     HAL_GPIO_Init(rx_soc_base, &g_can_rx);
 
     /* CAN */
@@ -167,12 +146,9 @@ hwCAN_OpResult CAN_Init(hwCAN_Index index)
         case hwCAN_Index_0:
             __HAL_RCC_CAN1_CLK_ENABLE();
             break;
+#if defined (CAN2_BASE)
         case hwCAN_Index_1:
             __HAL_RCC_CAN2_CLK_ENABLE();
-            break;
-#if defined (CAN3_BASE)
-        case hwCAN_Index_2:
-            __HAL_RCC_CAN3_CLK_ENABLE();
             break;
 #endif
     }
@@ -219,6 +195,7 @@ hwCAN_OpResult CAN_Init(hwCAN_Index index)
             HAL_NVIC_SetPriority(CAN1_SCE_IRQn, CAN_IRQ_NVIC_PRIORITY, CAN_IRQ_NVIC_SUB_PRIORITY);
             HAL_NVIC_EnableIRQ(CAN1_SCE_IRQn);
             break;
+#if defined (CAN2_BASE)
         case hwCAN_Index_1:
             HAL_NVIC_SetPriority(CAN2_TX_IRQn, CAN_IRQ_NVIC_PRIORITY, CAN_IRQ_NVIC_SUB_PRIORITY);
             HAL_NVIC_EnableIRQ(CAN2_TX_IRQn);
@@ -228,17 +205,6 @@ hwCAN_OpResult CAN_Init(hwCAN_Index index)
             HAL_NVIC_EnableIRQ(CAN2_RX1_IRQn);
             HAL_NVIC_SetPriority(CAN2_SCE_IRQn, CAN_IRQ_NVIC_PRIORITY, CAN_IRQ_NVIC_SUB_PRIORITY);
             HAL_NVIC_EnableIRQ(CAN2_SCE_IRQn);
-            break;
-#if defined (CAN3_BASE)
-        case hwCAN_Index_2:
-            HAL_NVIC_SetPriority(CAN3_TX_IRQn, CAN_IRQ_NVIC_PRIORITY, CAN_IRQ_NVIC_SUB_PRIORITY);
-            HAL_NVIC_EnableIRQ(CAN3_TX_IRQn);
-            HAL_NVIC_SetPriority(CAN3_RX0_IRQn, CAN_IRQ_NVIC_PRIORITY, CAN_IRQ_NVIC_SUB_PRIORITY);
-            HAL_NVIC_EnableIRQ(CAN3_RX0_IRQn);
-            HAL_NVIC_SetPriority(CAN3_RX1_IRQn, CAN_IRQ_NVIC_PRIORITY, CAN_IRQ_NVIC_SUB_PRIORITY);
-            HAL_NVIC_EnableIRQ(CAN3_RX1_IRQn);
-            HAL_NVIC_SetPriority(CAN3_SCE_IRQn, CAN_IRQ_NVIC_PRIORITY, CAN_IRQ_NVIC_SUB_PRIORITY);
-            HAL_NVIC_EnableIRQ(CAN3_SCE_IRQn);
             break;
 #endif
     }
@@ -273,14 +239,6 @@ hwCAN_OpResult CAN_DeInit(hwCAN_Index index)
             return hwCAN_InvalidParameter;
     }
 
-    uint32_t tx_af = STM32_CAN_GetAF(index, CAN_Pin_Def_Table[index][CAN_Index_Map_Alt[index]].tx_pin);
-    uint32_t rx_af = STM32_CAN_GetAF(index, CAN_Pin_Def_Table[index][CAN_Index_Map_Alt[index]].rx_pin);
-
-    if(tx_af==0 || rx_af==0)
-    {
-            return hwCAN_InvalidParameter;
-    }
-
     CAN_TypeDef * can_soc_base = CAN_Map_Soc_Base(index);
     if(can_soc_base==NULL)
     {
@@ -295,18 +253,12 @@ hwCAN_OpResult CAN_DeInit(hwCAN_Index index)
             HAL_NVIC_DisableIRQ(CAN1_RX1_IRQn);
             HAL_NVIC_DisableIRQ(CAN1_SCE_IRQn);
             break;
+#if defined (CAN2_BASE)
         case hwCAN_Index_1:
             HAL_NVIC_DisableIRQ(CAN2_TX_IRQn);
             HAL_NVIC_DisableIRQ(CAN2_RX0_IRQn);
             HAL_NVIC_DisableIRQ(CAN2_RX1_IRQn);
             HAL_NVIC_DisableIRQ(CAN2_SCE_IRQn);
-            break;
-#if defined (CAN3_BASE)
-        case hwCAN_Index_2:
-            HAL_NVIC_DisableIRQ(CAN3_TX_IRQn);
-            HAL_NVIC_DisableIRQ(CAN3_RX0_IRQn);
-            HAL_NVIC_DisableIRQ(CAN3_RX1_IRQn);
-            HAL_NVIC_DisableIRQ(CAN3_SCE_IRQn);
             break;
 #endif
     }
@@ -318,12 +270,9 @@ hwCAN_OpResult CAN_DeInit(hwCAN_Index index)
         case hwCAN_Index_0:
             __HAL_RCC_CAN1_CLK_DISABLE();
             break;
+#if defined (CAN2_BASE)
         case hwCAN_Index_1:
             __HAL_RCC_CAN2_CLK_DISABLE();
-            break;
-#if defined (CAN3_BASE)
-        case hwCAN_Index_2:
-            __HAL_RCC_CAN3_CLK_DISABLE();
             break;
 #endif
     }
@@ -377,4 +326,4 @@ bool CAN_isInit(hwCAN_Index index)
     return CAN_Init_Status[index];
 }
 
-#endif //STM32
+#endif //STM32F1

@@ -7,7 +7,7 @@
 
 #include "soc.h"
 
-#include "DMA.h"
+#include "DMA/DMA.h"
 
 #include "NeonRTOS.h"
 

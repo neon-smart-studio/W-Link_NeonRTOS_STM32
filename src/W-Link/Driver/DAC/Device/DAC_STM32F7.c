@@ -9,11 +9,11 @@
 
 #include "GPIO/GPIO.h"
 
-#include "DAC_Pin.h"
+#include "DAC/DAC.h"
 
-#include "DAC.h"
+#ifdef STM32F7
 
-#ifdef STM32
+#include "DAC/DAC_Pin.h"
 
 #define DAC_VREF_MV     3300.0f
 #define DAC_MAX_COUNT   4095.0f
@@ -34,13 +34,13 @@ static uint32_t DAC_Channel_To_HAL(hwDAC_Channel_Index ch)
 
 hwDAC_OpStatus hwDAC_Channel_Init(hwDAC_Channel_Index ch)
 {
-    hwDAC_Instance inst = DAC_Channel_Def_Table[ch].inst;
-    if (inst >= hwDAC_Instance_MAX)
+    if (ch >= hwDAC_Channel_Index_MAX)
     {
         return hwDAC_InvalidParameter;
     }
 
-    if (ch >= hwDAC_Channel_Index_MAX)
+    hwDAC_Instance inst = DAC_Channel_Def_Table[ch].inst;
+    if (inst >= hwDAC_Instance_MAX)
     {
         return hwDAC_InvalidParameter;
     }
@@ -103,13 +103,13 @@ hwDAC_OpStatus hwDAC_Channel_Init(hwDAC_Channel_Index ch)
 
 hwDAC_OpStatus hwDAC_Channel_DeInit(hwDAC_Channel_Index ch)
 {
-    hwDAC_Instance inst = DAC_Channel_Def_Table[ch].inst;
-    if(inst>=hwDAC_Instance_MAX)
+    if (ch >= hwDAC_Channel_Index_MAX)
     {
         return hwDAC_InvalidParameter;
     }
 
-    if (ch >= hwDAC_Channel_Index_MAX)
+    hwDAC_Instance inst = DAC_Channel_Def_Table[ch].inst;
+    if(inst>=hwDAC_Instance_MAX)
     {
         return hwDAC_InvalidParameter;
     }

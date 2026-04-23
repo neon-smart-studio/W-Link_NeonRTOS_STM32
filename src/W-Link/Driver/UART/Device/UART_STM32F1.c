@@ -8,11 +8,11 @@
 
 #include "NeonRTOS.h"
 
-#include "UART.h"
+#include "UART/UART.h"
 
-#ifdef STM32
+#ifdef STM32F1
 
-#include "UART_Pin.h"
+#include "UART/UART_Pin.h"
 
 #include "GPIO/GPIO_STM32.h"
 
@@ -26,16 +26,6 @@ static NeonRTOS_SyncObj_t UART_Send_SyncHandle[hwUART_Index_MAX];
 static NeonRTOS_SyncObj_t UART_Recv_SyncHandle[hwUART_Index_MAX];
 
 UART_HandleTypeDef g_uart[hwUART_Index_MAX];
-
-uint32_t STM32_UART_GetAF(hwUART_Index uart, hwGPIO_Pin pin)
-{
-    for (size_t i = 0; i < sizeof(UART_Pin_AF_Map)/sizeof(UART_Pin_AF_Map[0]); i++) {
-        if (UART_Pin_AF_Map[i].uart == uart &&
-            UART_Pin_AF_Map[i].pin  == pin)
-            return UART_Pin_AF_Map[i].af;
-    }
-    return 0;
-}
 
 static hwUART_Index UART_IndexFromHandle(UART_HandleTypeDef *huart)
 {
@@ -52,20 +42,11 @@ USART_TypeDef * UART_Map_Soc_Base(hwUART_Index index)
         case hwUART_Index_0: return USART1;
         case hwUART_Index_1: return USART2;
         case hwUART_Index_2: return USART3;
+#if defined(UART4_BASE)
         case hwUART_Index_3: return UART4;
+#endif
+#if defined(UART5_BASE)
         case hwUART_Index_4: return UART5;
-        case hwUART_Index_5: return USART6;
-#if defined(UART7_BASE)
-        case hwUART_Index_6: return UART7;
-#endif
-#if defined(UART8_BASE)
-        case hwUART_Index_7: return UART8;
-#endif
-#if defined(UART9_BASE)
-        case hwUART_Index_8: return UART9;
-#endif
-#if defined(USART10_BASE)
-        case hwUART_Index_9: return USART10;
 #endif
         default: break;
     }
@@ -105,25 +86,12 @@ static void UART_HAL_IRQHandler(hwUART_Index index)
 void USART1_IRQHandler(void){ UART_HAL_IRQHandler(hwUART_Index_0); }
 void USART2_IRQHandler(void){ UART_HAL_IRQHandler(hwUART_Index_1); }
 void USART3_IRQHandler(void){ UART_HAL_IRQHandler(hwUART_Index_2); }
+#if defined(UART4_BASE)
 void UART4_IRQHandler(void) { UART_HAL_IRQHandler(hwUART_Index_3); }
+#endif
+#if defined(UART5_BASE)
 void UART5_IRQHandler(void) { UART_HAL_IRQHandler(hwUART_Index_4); }
-void USART6_IRQHandler(void){ UART_HAL_IRQHandler(hwUART_Index_5); }
-
-#if defined(UART7_BASE)
-void UART7_IRQHandler(void) { UART_HAL_IRQHandler(hwUART_Index_6); }
 #endif
-
-#if defined(UART8_BASE)
-void UART8_IRQHandler(void) { UART_HAL_IRQHandler(hwUART_Index_7); }
-#endif
-
-#if defined(UART9_BASE)
-void UART9_IRQHandler(void) { UART_HAL_IRQHandler(hwUART_Index_8); }
-#endif
-#if defined(USART10_BASE)
-void USART10_IRQHandler(void){ UART_HAL_IRQHandler(hwUART_Index_9); }
-#endif
-
 
 hwUART_OpResult UART_Open(hwUART_Index index, uint32_t baudrate, bool rts_cts)
 {
@@ -226,27 +194,6 @@ hwUART_OpResult UART_Open_Specific_Format(hwUART_Index index, uint32_t baudrate,
         }
     }
 
-    uint32_t tx_af = STM32_UART_GetAF(index, UART_Pin_Def_Table[index][UART_Index_Map_Alt[index]].tx_pin);
-    uint32_t rx_af = STM32_UART_GetAF(index, UART_Pin_Def_Table[index][UART_Index_Map_Alt[index]].rx_pin);
-    uint32_t rts_af = 0;
-    uint32_t cts_af = 0;
-
-    if(tx_af==0 || rx_af==0)
-    {
-        return hwGPIO_InvalidParameter;
-    }
-
-    if(rts_cts)
-    {
-        rts_af = STM32_UART_GetAF(index, UART_Pin_Def_Table[index][UART_Index_Map_Alt[index]].rts_pin);
-        cts_af = STM32_UART_GetAF(index, UART_Pin_Def_Table[index][UART_Index_Map_Alt[index]].cts_pin);
-        
-        if(rts_af==0 || cts_af==0)
-        {
-            return hwGPIO_InvalidParameter;
-        }
-    }
-
     USART_TypeDef * uart_soc_base = UART_Map_Soc_Base(index);
     if(uart_soc_base==NULL)
     {
@@ -268,20 +215,11 @@ hwUART_OpResult UART_Open_Specific_Format(hwUART_Index index, uint32_t baudrate,
         case hwUART_Index_0: __HAL_RCC_USART1_CLK_ENABLE(); break;
         case hwUART_Index_1: __HAL_RCC_USART2_CLK_ENABLE(); break;
         case hwUART_Index_2: __HAL_RCC_USART3_CLK_ENABLE(); break;
+#if defined(UART4_BASE)
         case hwUART_Index_3: __HAL_RCC_UART4_CLK_ENABLE();  break;
+#endif
+#if defined(UART5_BASE)
         case hwUART_Index_4: __HAL_RCC_UART5_CLK_ENABLE();  break;
-        case hwUART_Index_5: __HAL_RCC_USART6_CLK_ENABLE(); break;
-#if defined(UART7_BASE)
-        case hwUART_Index_6: __HAL_RCC_UART7_CLK_ENABLE();  break;
-#endif
-#if defined(UART8_BASE)
-        case hwUART_Index_7: __HAL_RCC_UART8_CLK_ENABLE();  break;
-#endif
-#if defined(UART9_BASE)
-        case hwUART_Index_8: __HAL_RCC_UART9_CLK_ENABLE();  break;
-#endif
-#if defined(USART10_BASE)
-        case hwUART_Index_9: __HAL_RCC_USART10_CLK_ENABLE();break;
 #endif
         default: break;
     }
@@ -290,16 +228,14 @@ hwUART_OpResult UART_Open_Specific_Format(hwUART_Index index, uint32_t baudrate,
     g_uart_tx.Pin       = tx_soc_pin;
     g_uart_tx.Mode      = GPIO_MODE_AF_PP;
     g_uart_tx.Pull      = GPIO_NOPULL;
-    g_uart_tx.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
-    g_uart_tx.Alternate = tx_af;
+    g_uart_tx.Speed     = GPIO_SPEED_FREQ_HIGH;
     HAL_GPIO_Init(tx_soc_base, &g_uart_tx);
 
     GPIO_InitTypeDef g_uart_rx = {0};
     g_uart_rx.Pin       = rx_soc_pin;
-    g_uart_rx.Mode      = GPIO_MODE_AF_PP;
+    g_uart_rx.Mode      = GPIO_MODE_AF_INPUT;
     g_uart_rx.Pull      = GPIO_NOPULL;
-    g_uart_rx.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
-    g_uart_rx.Alternate = rx_af;
+    g_uart_rx.Speed     = GPIO_SPEED_FREQ_HIGH;
     HAL_GPIO_Init(rx_soc_base, &g_uart_rx);
 
     if(rts_cts)
@@ -308,16 +244,14 @@ hwUART_OpResult UART_Open_Specific_Format(hwUART_Index index, uint32_t baudrate,
         g_uart_rts.Pin       = rts_soc_pin;
         g_uart_rts.Mode      = GPIO_MODE_AF_PP;
         g_uart_rts.Pull      = GPIO_NOPULL;
-        g_uart_rts.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
-        g_uart_rts.Alternate = rts_af;
+        g_uart_rts.Speed     = GPIO_SPEED_FREQ_HIGH;
         HAL_GPIO_Init(rts_soc_base, &g_uart_rts);
 
         GPIO_InitTypeDef g_uart_cts = {0};
         g_uart_cts.Pin       = cts_soc_pin;
         g_uart_cts.Mode      = GPIO_MODE_AF_PP;
         g_uart_cts.Pull      = GPIO_NOPULL;
-        g_uart_cts.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
-        g_uart_cts.Alternate = cts_af;
+        g_uart_cts.Speed     = GPIO_SPEED_FREQ_HIGH;
         HAL_GPIO_Init(cts_soc_base, &g_uart_cts);
     }
 
@@ -372,40 +306,16 @@ hwUART_OpResult UART_Open_Specific_Format(hwUART_Index index, uint32_t baudrate,
             HAL_NVIC_SetPriority(USART3_IRQn, UART_IRQ_NVIC_PRIORITY, UART_IRQ_NVIC_SUB_PRIORITY);
             HAL_NVIC_EnableIRQ(USART3_IRQn);
             break;
+#if defined(UART4_BASE)
         case hwUART_Index_3:
             HAL_NVIC_SetPriority(UART4_IRQn, UART_IRQ_NVIC_PRIORITY, UART_IRQ_NVIC_SUB_PRIORITY);
             HAL_NVIC_EnableIRQ(UART4_IRQn);
             break;
+#endif
+#if defined(UART5_BASE)
         case hwUART_Index_4:
             HAL_NVIC_SetPriority(UART5_IRQn, UART_IRQ_NVIC_PRIORITY, UART_IRQ_NVIC_SUB_PRIORITY);
             HAL_NVIC_EnableIRQ(UART5_IRQn);
-            break;
-        case hwUART_Index_5:
-            HAL_NVIC_SetPriority(USART6_IRQn, UART_IRQ_NVIC_PRIORITY, UART_IRQ_NVIC_SUB_PRIORITY);
-            HAL_NVIC_EnableIRQ(USART6_IRQn);
-            break;
-#if defined(UART7_BASE)
-        case hwUART_Index_6:
-            HAL_NVIC_SetPriority(UART7_IRQn, UART_IRQ_NVIC_PRIORITY, UART_IRQ_NVIC_SUB_PRIORITY);
-            HAL_NVIC_EnableIRQ(UART7_IRQn);
-            break;
-#endif
-#if defined(UART8_BASE)
-        case hwUART_Index_7:
-            HAL_NVIC_SetPriority(UART8_IRQn, UART_IRQ_NVIC_PRIORITY, UART_IRQ_NVIC_SUB_PRIORITY);
-            HAL_NVIC_EnableIRQ(UART8_IRQn);
-            break;
-#endif
-#if defined(UART9_BASE)
-        case hwUART_Index_8:
-            HAL_NVIC_SetPriority(UART9_IRQn, UART_IRQ_NVIC_PRIORITY, UART_IRQ_NVIC_SUB_PRIORITY);
-            HAL_NVIC_EnableIRQ(UART9_IRQn);
-            break;
-#endif
-#if defined(USART10_BASE)
-        case hwUART_Index_9:
-            HAL_NVIC_SetPriority(USART10_IRQn, UART_IRQ_NVIC_PRIORITY, UART_IRQ_NVIC_SUB_PRIORITY);
-            HAL_NVIC_EnableIRQ(USART10_IRQn);
             break;
 #endif
     }
@@ -473,33 +383,14 @@ hwUART_OpResult UART_Close(hwUART_Index index)
         case hwUART_Index_2:
             HAL_NVIC_DisableIRQ(USART3_IRQn);
             break;
+#if defined(UART4_BASE)
         case hwUART_Index_3:
             HAL_NVIC_DisableIRQ(UART4_IRQn);
             break;
+#endif
+#if defined(UART5_BASE)
         case hwUART_Index_4:
             HAL_NVIC_DisableIRQ(UART5_IRQn);
-            break;
-        case hwUART_Index_5:
-            HAL_NVIC_DisableIRQ(USART6_IRQn);
-            break;
-#if defined(UART7_BASE)
-        case hwUART_Index_6:
-            HAL_NVIC_DisableIRQ(UART7_IRQn);
-            break;
-#endif
-#if defined(UART8_BASE)
-        case hwUART_Index_7:
-            HAL_NVIC_DisableIRQ(UART8_IRQn);
-            break;
-#endif
-#if defined(UART9_BASE)
-        case hwUART_Index_8:
-            HAL_NVIC_DisableIRQ(UART9_IRQn);
-            break;
-#endif
-#if defined(USART10_BASE)
-        case hwUART_Index_9:
-            HAL_NVIC_DisableIRQ(USART10_IRQn);
             break;
 #endif
     }
@@ -515,20 +406,11 @@ hwUART_OpResult UART_Close(hwUART_Index index)
         case hwUART_Index_0: __HAL_RCC_USART1_CLK_DISABLE(); break;
         case hwUART_Index_1: __HAL_RCC_USART2_CLK_DISABLE(); break;
         case hwUART_Index_2: __HAL_RCC_USART3_CLK_DISABLE(); break;
+#if defined(UART4_BASE)
         case hwUART_Index_3: __HAL_RCC_UART4_CLK_DISABLE();  break;
+#endif
+#if defined(UART5_BASE)
         case hwUART_Index_4: __HAL_RCC_UART5_CLK_DISABLE();  break;
-        case hwUART_Index_5: __HAL_RCC_USART6_CLK_DISABLE(); break;
-#if defined(UART7_BASE)
-        case hwUART_Index_6: __HAL_RCC_UART7_CLK_DISABLE();  break;
-#endif
-#if defined(UART8_BASE)
-        case hwUART_Index_7: __HAL_RCC_UART8_CLK_DISABLE();  break;
-#endif
-#if defined(UART9_BASE)
-        case hwUART_Index_8: __HAL_RCC_UART9_CLK_DISABLE();  break;
-#endif
-#if defined(USART10_BASE)
-        case hwUART_Index_9: __HAL_RCC_USART10_CLK_DISABLE();break;
 #endif
         default: break;
     }
@@ -721,4 +603,4 @@ void UART_Printf(const char *format, ...)
     NeonRTOS_ExitCritical(0);
 }
 
-#endif //STM32
+#endif //STM32F1

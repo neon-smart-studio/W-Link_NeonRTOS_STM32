@@ -10,7 +10,7 @@
 
 #include "GPIO.h"
 
-#ifdef STM32
+#ifdef DEVICE_STM32
 
 #include "GPIO_STM32.h"
 
@@ -95,18 +95,24 @@ void GPIO_Enable_RCC_Clock(GPIO_TypeDef * base)
   {
     __HAL_RCC_GPIOE_CLK_ENABLE();
   }
+#if defined(GPIOF)
   else if(base==GPIOF)
   {
     __HAL_RCC_GPIOF_CLK_ENABLE();
   }
+#endif
+#if defined(GPIOG)
   else if(base==GPIOG)
   {
     __HAL_RCC_GPIOG_CLK_ENABLE();
   }
+#endif
+#if defined(GPIOH)
   else if(base==GPIOH)
   {
     __HAL_RCC_GPIOH_CLK_ENABLE();
   }
+#endif
 }
 
 void GPIO_Disable_RCC_Clock(GPIO_TypeDef * base)
@@ -131,18 +137,24 @@ void GPIO_Disable_RCC_Clock(GPIO_TypeDef * base)
   {
     __HAL_RCC_GPIOE_CLK_DISABLE();
   }
+#if defined(GPIOF)
   else if(base==GPIOF)
   {
     __HAL_RCC_GPIOF_CLK_DISABLE();
   }
+#endif
+#if defined(GPIOG)
   else if(base==GPIOG)
   {
     __HAL_RCC_GPIOG_CLK_DISABLE();
   }
+#endif
+#if defined(GPIOH)
   else if(base==GPIOH)
   {
     __HAL_RCC_GPIOH_CLK_DISABLE();
   }
+#endif
 }
 
 hwGPIO_OpStatus GPIO_Pin_Init(hwGPIO_Pin pin, hwGPIO_Direction dir, hwGPIO_Pull_Mode pull_mode)
@@ -208,7 +220,11 @@ hwGPIO_OpStatus GPIO_Pin_Init(hwGPIO_Pin pin, hwGPIO_Direction dir, hwGPIO_Pull_
             break;
     }
     
+#ifdef GPIO_SPEED_FREQ_VERY_HIGH
     gpio_pin_init.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+#else
+    gpio_pin_init.Speed = GPIO_SPEED_FREQ_HIGH;
+#endif
 
     HAL_GPIO_Init(soc_base, &gpio_pin_init);
 
@@ -301,7 +317,11 @@ hwGPIO_OpStatus GPIO_Pin_Set_Direction(hwGPIO_Pin pin, hwGPIO_Direction dir)
             break;
     }
     
+#ifdef GPIO_SPEED_FREQ_VERY_HIGH
     gpio_pin_init.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+#else
+    gpio_pin_init.Speed = GPIO_SPEED_FREQ_HIGH;
+#endif
 
     HAL_GPIO_Init(soc_base, &gpio_pin_init);
 
@@ -378,7 +398,11 @@ hwGPIO_OpStatus GPIO_Pin_Set_PullMode(hwGPIO_Pin pin, hwGPIO_Pull_Mode pull_mode
             break;
     }
     
+#ifdef GPIO_SPEED_FREQ_VERY_HIGH
     gpio_pin_init.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+#else
+    gpio_pin_init.Speed = GPIO_SPEED_FREQ_HIGH;
+#endif
 
     HAL_GPIO_Init(soc_base, &gpio_pin_init);
 

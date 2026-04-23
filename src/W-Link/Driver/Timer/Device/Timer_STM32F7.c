@@ -9,9 +9,9 @@
 
 #include "NeonRTOS.h"
 
-#include "Timer.h"
+#include "Timer/Timer.h"
 
-#ifdef STM32
+#ifdef STM32F7
 
 #define TIMER_MUTEX_ACCESS_TIMEOUT     500
 
@@ -642,4 +642,4 @@ bool Timer_is_Init(hwTimer_Index hw_index)
     return Timer_Init_Status[hw_index];
 }
 
-#endif //STM32
+#endif //STM32F7

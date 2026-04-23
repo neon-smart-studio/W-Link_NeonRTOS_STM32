@@ -8,11 +8,11 @@
 
 #include "NeonRTOS.h"
 
-#include "PWM.h"
+#include "PWM/PWM.h"
 
 #ifdef DEVICE_TM4C1294
 
-#include "PWM_Pin.h"
+#include "PWM/PWM_Pin.h"
 
 #define PWM_HZ           1000
 

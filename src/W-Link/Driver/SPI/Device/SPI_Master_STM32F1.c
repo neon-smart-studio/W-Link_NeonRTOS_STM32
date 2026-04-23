@@ -8,15 +8,11 @@
 
 #include "NeonRTOS.h"
 
-#include "SPI_Master.h"
+#include "SPI/SPI_Master.h"
 
-#include "DMA/DMA.h"
+#ifdef STM32F1
 
-#ifdef STM32
-
-#include "SPI_Pin.h"
-
-#include "DMA/SPI_DMA_STM32.h"
+#include "SPI/SPI_Pin.h"
 
 #define SPI_MASTER_SYNC_TIMEOUT             100
 #define SPI_MASTER_MUTEX_ACCESS_TIMEOUT     500
@@ -47,16 +43,6 @@ static const uint32_t Spi_Master_Baudrate_Prescaler_Table[] =  {SPI_BAUDRATEPRES
                                                                 SPI_BAUDRATEPRESCALER_256
                                                                 };
 
-uint32_t STM32_SPI_GetAF(hwSPI_Index spi, hwGPIO_Pin pin)
-{
-    for (size_t i = 0; i < sizeof(SPI_Pin_AF_Map)/sizeof(SPI_Pin_AF_Map[0]); i++) {
-        if (SPI_Pin_AF_Map[i].spi == spi &&
-            SPI_Pin_AF_Map[i].pin  == pin)
-            return SPI_Pin_AF_Map[i].af;
-    }
-    return 0;
-}
-
 static hwSPI_Index SPI_IndexFromHandle(SPI_HandleTypeDef *hspi)
 {
     for(int i=0;i<hwSPI_Index_MAX;i++){
@@ -71,16 +57,6 @@ SPI_TypeDef * SPI_Map_Soc_Base(hwSPI_Index index)
     {
         case hwSPI_Index_0: return SPI1;
         case hwSPI_Index_1: return SPI2;
-        case hwSPI_Index_2: return SPI3;
-#if defined (SPI4_BASE)
-        case hwSPI_Index_3: return SPI4;
-#endif
-#if defined (SPI5_BASE)
-        case hwSPI_Index_4: return SPI5;
-#endif
-#if defined (SPI6_BASE)
-        case hwSPI_Index_5: return SPI6;
-#endif
         default: break;
     }
     return NULL;
@@ -121,49 +97,12 @@ static void SPI_HAL_IRQHandler(hwSPI_Index index)
 // ====== 你的 IRQ handler（請確保對應的向量真的存在）======
 void SPI1_IRQHandler(void){ SPI_HAL_IRQHandler(hwSPI_Index_0); }
 void SPI2_IRQHandler(void){ SPI_HAL_IRQHandler(hwSPI_Index_1); }
-void SPI3_IRQHandler(void){ SPI_HAL_IRQHandler(hwSPI_Index_2); }
-#if defined (SPI4_BASE)
-void SPI4_IRQHandler(void){ SPI_HAL_IRQHandler(hwSPI_Index_3); }
-#endif
-#if defined (SPI5_BASE)
-void SPI5_IRQHandler(void){ SPI_HAL_IRQHandler(hwSPI_Index_4); }
-#endif
-#if defined (SPI6_BASE)
-void SPI6_IRQHandler(void){ SPI_HAL_IRQHandler(hwSPI_Index_5); }
-#endif
 
 static int SPI_Master_Get_Clock_Freq(hwSPI_Index index)
 {
     int spi_hz = 0;
 
     /* Get source clock depending on SPI instance */
-#ifdef STM32H7
-    switch (index) {
-        case hwSPI_Index_0:
-        case hwSPI_Index_1:
-        case hwSPI_Index_2:
-            spi_hz = LL_RCC_GetSPIClockFreq(LL_RCC_SPI123_CLKSOURCE);
-            break;
-#if defined (SPI4_BASE)
-        case hwSPI_Index_3:
-            spi_hz = LL_RCC_GetSPIClockFreq(LL_RCC_SPI45_CLKSOURCE);
-            break;
-#endif
-#if defined (SPI5_BASE)
-        case hwSPI_Index_4:
-            spi_hz = LL_RCC_GetSPIClockFreq(LL_RCC_SPI45_CLKSOURCE);
-            break;
-#endif
-#if defined (SPI6_BASE)
-        case hwSPI_Index_5:
-            spi_hz = LL_RCC_GetSPIClockFreq(LL_RCC_SPI6_CLKSOURCE);
-            break;
-#endif
-        default:
-            UART_Printf("CLK: SPI instance not set");
-            break;
-    }
-#else
     switch (index) {
         case hwSPI_Index_0:
 #if defined (SPI4_BASE)
@@ -189,7 +128,6 @@ static int SPI_Master_Get_Clock_Freq(hwSPI_Index index)
             UART_Printf("CLK: SPI instance not set");
             break;
     }
-#endif
     return spi_hz;
 }
 
@@ -236,26 +174,6 @@ hwSPI_OpResult SPI_Master_Init(hwSPI_Index index, uint32_t clock_rate_hz, hwSPI_
                 }
         }
 
-        uint32_t mosi_af = STM32_UART_GetAF(index, SPI_Pin_Def_Table[index][SPI_Index_Map_Alt[index]].mosi_pin);
-        uint32_t miso_af = STM32_UART_GetAF(index, SPI_Pin_Def_Table[index][SPI_Index_Map_Alt[index]].miso_pin);
-        uint32_t sclk_af = STM32_UART_GetAF(index, SPI_Pin_Def_Table[index][SPI_Index_Map_Alt[index]].sclk_pin);
-        uint32_t cs_af = 0;
-
-        if(mosi_af==0 || miso_af==0 || sclk_af==0)
-        {
-                return hwSPI_InvalidParameter;
-        }
-
-        if(SPI_Pin_Def_Table[index][SPI_Index_Map_Alt[index]].cs_pin!=hwGPIO_Pin_NC)
-        {
-                cs_af = STM32_UART_GetAF(index, SPI_Pin_Def_Table[index][SPI_Index_Map_Alt[index]].cs_pin);
-                
-                if(cs_af==0)
-                {
-                        return hwSPI_InvalidParameter;
-                }
-        }
-
         SPI_TypeDef * spi_soc_base = SPI_Map_Soc_Base(index);
         if(spi_soc_base==NULL)
         {
@@ -295,41 +213,28 @@ hwSPI_OpResult SPI_Master_Init(hwSPI_Index index, uint32_t clock_rate_hz, hwSPI_
         {
                 case hwSPI_Index_0: __HAL_RCC_SPI1_CLK_ENABLE(); break;
                 case hwSPI_Index_1: __HAL_RCC_SPI2_CLK_ENABLE(); break;
-                case hwSPI_Index_2: __HAL_RCC_SPI3_CLK_ENABLE(); break;
-#if defined (SPI4_BASE)
-                case hwSPI_Index_3: __HAL_RCC_SPI4_CLK_ENABLE(); break;
-#endif
-#if defined (SPI5_BASE)
-                case hwSPI_Index_4: __HAL_RCC_SPI5_CLK_ENABLE(); break;
-#endif
-#if defined (SPI6_BASE)
-                case hwSPI_Index_5: __HAL_RCC_SPI6_CLK_ENABLE(); break;
-#endif
                 default: break;
         }
 
         GPIO_InitTypeDef g_spi_miso = {0};
         g_spi_miso.Pin       = miso_soc_pin;
-        g_spi_miso.Mode      = GPIO_MODE_AF_PP;
+        g_spi_miso.Mode      = GPIO_MODE_AF_INPUT;
         g_spi_miso.Pull      = GPIO_NOPULL;
-        g_spi_miso.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
-        g_spi_miso.Alternate = miso_af;
+        g_spi_miso.Speed     = GPIO_SPEED_FREQ_HIGH;
         HAL_GPIO_Init(miso_soc_base, &g_spi_miso);
 
         GPIO_InitTypeDef g_spi_mosi = {0};
         g_spi_mosi.Pin       = mosi_soc_pin;
         g_spi_mosi.Mode      = GPIO_MODE_AF_PP;
         g_spi_mosi.Pull      = GPIO_NOPULL;
-        g_spi_mosi.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
-        g_spi_mosi.Alternate = mosi_af;
+        g_spi_mosi.Speed     = GPIO_SPEED_FREQ_HIGH;
         HAL_GPIO_Init(mosi_soc_base, &g_spi_mosi);
 
         GPIO_InitTypeDef g_spi_sclk = {0};
         g_spi_sclk.Pin       = sclk_soc_pin;
         g_spi_sclk.Mode      = GPIO_MODE_AF_PP;
         g_spi_sclk.Pull      = GPIO_NOPULL;
-        g_spi_sclk.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
-        g_spi_sclk.Alternate = sclk_af;
+        g_spi_sclk.Speed     = GPIO_SPEED_FREQ_HIGH;
         HAL_GPIO_Init(sclk_soc_base, &g_spi_sclk);
 
         if(SPI_Pin_Def_Table[index][SPI_Index_Map_Alt[index]].cs_pin!=hwGPIO_Pin_NC)
@@ -338,8 +243,7 @@ hwSPI_OpResult SPI_Master_Init(hwSPI_Index index, uint32_t clock_rate_hz, hwSPI_
                 g_spi_cs.Pin       = cs_soc_pin;
                 g_spi_cs.Mode      = GPIO_MODE_AF_PP;
                 g_spi_cs.Pull      = GPIO_NOPULL;
-                g_spi_cs.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
-                g_spi_cs.Alternate = cs_af;
+                g_spi_cs.Speed     = GPIO_SPEED_FREQ_HIGH;
                 HAL_GPIO_Init(cs_soc_base, &g_spi_cs);
         }
 
@@ -408,72 +312,7 @@ hwSPI_OpResult SPI_Master_Init(hwSPI_Index index, uint32_t clock_rate_hz, hwSPI_
                         HAL_NVIC_SetPriority(SPI2_IRQn, SPI_IRQ_NVIC_PRIORITY, SPI_IRQ_NVIC_SUB_PRIORITY);
                         HAL_NVIC_EnableIRQ(SPI2_IRQn);
                         break;
-                case hwSPI_Index_2:
-                        HAL_NVIC_SetPriority(SPI3_IRQn, SPI_IRQ_NVIC_PRIORITY, SPI_IRQ_NVIC_SUB_PRIORITY);
-                        HAL_NVIC_EnableIRQ(SPI3_IRQn);
-                        break;
-#if defined (SPI4_BASE)
-                case hwSPI_Index_3:
-                        HAL_NVIC_SetPriority(SPI4_IRQn, SPI_IRQ_NVIC_PRIORITY, SPI_IRQ_NVIC_SUB_PRIORITY);
-                        HAL_NVIC_EnableIRQ(SPI4_IRQn);
-                        break;
-#endif
-#if defined (SPI5_BASE)
-                case hwSPI_Index_4:
-                        HAL_NVIC_SetPriority(SPI5_IRQn, SPI_IRQ_NVIC_PRIORITY, SPI_IRQ_NVIC_SUB_PRIORITY);
-                        HAL_NVIC_EnableIRQ(SPI5_IRQn);
-                        break;
-#endif
-#if defined (SPI6_BASE)
-                case hwSPI_Index_5:
-                        HAL_NVIC_SetPriority(SPI6_IRQn, SPI_IRQ_NVIC_PRIORITY, SPI_IRQ_NVIC_SUB_PRIORITY);
-                        HAL_NVIC_EnableIRQ(SPI6_IRQn);
-                        break;
-#endif
         }
-
-        hwDMA_Stream_Index tx_dma_ch = 0;
-        hwDMA_Stream_Index rx_dma_ch = 0;
-
-        switch(index)
-        {
-        case hwSPI_Index_0:
-                tx_dma_ch = SPI0_MASTER_TX_DMA_STREAM;
-                rx_dma_ch = SPI0_MASTER_RX_DMA_STREAM;
-                break;
-        case hwSPI_Index_1:
-                tx_dma_ch = SPI1_MASTER_TX_DMA_STREAM;
-                rx_dma_ch = SPI1_MASTER_RX_DMA_STREAM;
-                break;
-        case hwSPI_Index_2:
-                tx_dma_ch = SPI2_MASTER_TX_DMA_STREAM;
-                rx_dma_ch = SPI2_MASTER_RX_DMA_STREAM;
-                break;
-#if defined (SPI4_BASE)
-        case hwSPI_Index_3:
-                tx_dma_ch = SPI3_MASTER_TX_DMA_STREAM;
-                rx_dma_ch = SPI3_MASTER_RX_DMA_STREAM;
-                break;
-#endif
-#if defined (SPI5_BASE)
-        case hwSPI_Index_4:
-                tx_dma_ch = SPI4_MASTER_TX_DMA_STREAM;
-                rx_dma_ch = SPI4_MASTER_RX_DMA_STREAM;
-                break;
-#endif
-#if defined (SPI6_BASE)
-        case hwSPI_Index_5:
-                tx_dma_ch = SPI5_MASTER_TX_DMA_STREAM;
-                rx_dma_ch = SPI5_MASTER_RX_DMA_STREAM;
-                break;
-#endif
-        }
-        
-        DMA_Stream_Init(tx_dma_ch);
-        DMA_Stream_Init(rx_dma_ch);
-
-        SPI_Config_DMA(index, hwDMA_Peripheral_Direction_TX, tx_dma_ch);
-        SPI_Config_DMA(index, hwDMA_Peripheral_Direction_RX, rx_dma_ch);
 
         gpio_pin_init_status[SPI_Pin_Def_Table[index][SPI_Index_Map_Alt[index]].miso_pin] = true;
         gpio_pin_init_status[SPI_Pin_Def_Table[index][SPI_Index_Map_Alt[index]].mosi_pin] = true;
@@ -528,46 +367,6 @@ hwSPI_OpResult SPI_Master_DeInit(hwSPI_Index index)
                 }
         }
 
-        hwDMA_Stream_Index tx_dma_ch = 0;
-        hwDMA_Stream_Index rx_dma_ch = 0;
-
-        switch(index)
-        {
-        case hwSPI_Index_0:
-                tx_dma_ch = SPI0_MASTER_TX_DMA_STREAM;
-                rx_dma_ch = SPI0_MASTER_RX_DMA_STREAM;
-                break;
-        case hwSPI_Index_1:
-                tx_dma_ch = SPI1_MASTER_TX_DMA_STREAM;
-                rx_dma_ch = SPI1_MASTER_RX_DMA_STREAM;
-                break;
-        case hwSPI_Index_2:
-                tx_dma_ch = SPI2_MASTER_TX_DMA_STREAM;
-                rx_dma_ch = SPI2_MASTER_RX_DMA_STREAM;
-                break;
-#if defined (SPI4_BASE)
-        case hwSPI_Index_3:
-                tx_dma_ch = SPI3_MASTER_TX_DMA_STREAM;
-                rx_dma_ch = SPI3_MASTER_RX_DMA_STREAM;
-                break;
-#endif
-#if defined (SPI5_BASE)
-        case hwSPI_Index_4:
-                tx_dma_ch = SPI4_MASTER_TX_DMA_STREAM;
-                rx_dma_ch = SPI4_MASTER_RX_DMA_STREAM;
-                break;
-#endif
-#if defined (SPI6_BASE)
-        case hwSPI_Index_5:
-                tx_dma_ch = SPI5_MASTER_TX_DMA_STREAM;
-                rx_dma_ch = SPI5_MASTER_RX_DMA_STREAM;
-                break;
-#endif
-        }
-        
-        DMA_Stream_DeInit(tx_dma_ch);
-        DMA_Stream_DeInit(rx_dma_ch);
-
         switch(index)
         {
                 case hwSPI_Index_0:
@@ -576,24 +375,6 @@ hwSPI_OpResult SPI_Master_DeInit(hwSPI_Index index)
                 case hwSPI_Index_1:
                         HAL_NVIC_DisableIRQ(SPI2_IRQn);
                         break;
-                case hwSPI_Index_2:
-                        HAL_NVIC_DisableIRQ(SPI3_IRQn);
-                        break;
-#if defined (SPI4_BASE)
-                case hwSPI_Index_3:
-                        HAL_NVIC_DisableIRQ(SPI4_IRQn);
-                        break;
-#endif
-#if defined (SPI5_BASE)
-                case hwSPI_Index_4:
-                        HAL_NVIC_DisableIRQ(SPI5_IRQn);
-                        break;
-#endif
-#if defined (SPI6_BASE)
-                case hwSPI_Index_5:
-                        HAL_NVIC_DisableIRQ(SPI6_IRQn);
-                        break;
-#endif
         }
 
         HAL_SPI_DeInit(&g_spi[index]);
@@ -612,16 +393,6 @@ hwSPI_OpResult SPI_Master_DeInit(hwSPI_Index index)
         {
                 case hwSPI_Index_0: __HAL_RCC_SPI1_CLK_DISABLE(); break;
                 case hwSPI_Index_1: __HAL_RCC_SPI2_CLK_DISABLE(); break;
-                case hwSPI_Index_2: __HAL_RCC_SPI3_CLK_DISABLE(); break;
-#if defined (SPI4_BASE)
-                case hwSPI_Index_3: __HAL_RCC_SPI4_CLK_DISABLE(); break;
-#endif
-#if defined (SPI5_BASE)
-                case hwSPI_Index_4: __HAL_RCC_SPI5_CLK_DISABLE(); break;
-#endif
-#if defined (SPI6_BASE)
-                case hwSPI_Index_5: __HAL_RCC_SPI6_CLK_DISABLE(); break;
-#endif
                 default: break;
         }
 
@@ -875,4 +646,4 @@ hwSPI_OpResult SPI_Master_DummyByte(hwSPI_Index index)
         return SPI_Master_WriteByte(index, 0);
 }
 
-#endif //STM32
+#endif //STM32F1

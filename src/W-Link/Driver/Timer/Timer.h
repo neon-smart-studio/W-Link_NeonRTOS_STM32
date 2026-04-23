@@ -9,6 +9,8 @@
 
 #include "Timer_Index.h"
 
+typedef void(* onTimerEventHandler)(hwTimer_Index index);
+
 bool Timer_is_Init(hwTimer_Index hw_index);
 hwTimer_OpResult Timer_Init(hwTimer_Index hw_index);
 hwTimer_OpResult Timer_DeInit(hwTimer_Index hw_index);

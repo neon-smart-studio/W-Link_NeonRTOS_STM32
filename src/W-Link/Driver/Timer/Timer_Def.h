@@ -23,6 +23,4 @@ typedef enum hwTimer_OpResult_t
   hwTimer_Unsupport = -6,
 }hwTimer_OpResult;
 
-typedef void(* onTimerEventHandler)(hwTimer_Index index);
-
 #endif //TIMER_DEF_H

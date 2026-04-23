@@ -4,7 +4,7 @@
 
 #include "soc.h"
 
-#include "DMA_Index.h"
+#include "DMA/DMA_Index.h"
 
 extern DMA_HandleTypeDef g_dma[hwDMA_Stream_Index_MAX];
 

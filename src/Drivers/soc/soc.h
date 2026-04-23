@@ -21,6 +21,22 @@
 #include "driverlib/flash.h"
 #endif //DEVICE_TM4C1294
 
+#if defined (STM32F100xB) || defined (STM32F100xE) || defined (STM32F101x6) || \
+    defined (STM32F101xB) || defined (STM32F101xE) || defined (STM32F101xG) || defined (STM32F102x6) || defined (STM32F102xB) || defined (STM32F103x6) || \
+    defined (STM32F103xB) || defined (STM32F103xE) || defined (STM32F103xG) || defined (STM32F105xC) || defined (STM32F107xC)
+#include "stm32f1xx.h"
+#include "stm32f1xx_hal_gpio.h"
+#include "stm32f1xx_hal_exti.h"
+#include "stm32f1xx_hal_uart.h"
+#include "stm32f1xx_hal_spi.h"
+#include "stm32f1xx_hal_i2c.h"
+#include "stm32f1xx_hal_dma.h"
+#include "stm32f1xx_hal_rtc.h"
+#include "stm32f1xx_hal_adc.h"
+#include "stm32f1xx_hal_can.h"
+#include "stm32f1xx_hal_dac.h"
+#endif //STM32F1
+
 #if defined (STM32F205xx) || defined (STM32F215xx) || defined (STM32F207xx) || defined (STM32F217xx)
 #include "stm32f2xx.h"
 #include "stm32f2xx_hal_gpio.h"

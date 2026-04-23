@@ -2,66 +2,47 @@
 #ifndef UART_INDEX_H
 #define UART_INDEX_H
 
-#define DEFAULT_UART_INDEX
-
-#ifdef STM32F207xx
-#undef DEFAULT_UART_INDEX
+#ifdef DEVICE_STM32
 typedef enum hwUART_Index_t
 {
+#if defined(UART1_BASE) || defined(USART1_BASE)
   hwUART_Index_0 = 0,
+#endif
+#if defined(UART2_BASE) || defined(USART2_BASE)
   hwUART_Index_1,
+#endif
+#if defined(UART3_BASE) || defined(USART3_BASE)
   hwUART_Index_2,
+#endif
+#if defined(UART4_BASE) || defined(UART4_BASE)
   hwUART_Index_3,
+#endif
+#if defined(UART5_BASE) || defined(UART5_BASE)
   hwUART_Index_4,
+#endif
+#if defined(UART6_BASE) || defined(USART6_BASE)
   hwUART_Index_5,
-  hwUART_Index_MAX,
-}hwUART_Index;
-// 定義標準輸出的 UART 索引
-#define LOG_UART_INDEX hwUART_Index_2
-#endif //STM32F2
-
-#ifdef STM32F767xx
-#undef DEFAULT_UART_INDEX
-typedef enum hwUART_Index_t
-{
-  hwUART_Index_0 = 0,
-  hwUART_Index_1,
-  hwUART_Index_2,
-  hwUART_Index_3,
-  hwUART_Index_4,
-  hwUART_Index_5,
+#endif
+#if defined(UART7_BASE) || defined(UART7_BASE)
   hwUART_Index_6,
+#endif
+#if defined(UART8_BASE) || defined(UART8_BASE)
   hwUART_Index_7,
-  hwUART_Index_MAX,
-}hwUART_Index;
-// 定義標準輸出的 UART 索引
-#define LOG_UART_INDEX hwUART_Index_2
-#endif //STM32F767xx
-
-#ifdef STM32H7
-#undef DEFAULT_UART_INDEX
-typedef enum hwUART_Index_t
-{
-  hwUART_Index_0 = 0,
-  hwUART_Index_1,
-  hwUART_Index_2,
-  hwUART_Index_3,
-  hwUART_Index_4,
-  hwUART_Index_5,
-  hwUART_Index_6,
-  hwUART_Index_7,
-#if UART9_BASE
+#endif
+#if defined(UART9_BASE) || defined(UART9_BASE)
   hwUART_Index_8,
 #endif
-#if USART10_BASE
+#if defined(USART10_BASE) || defined(UART10_BASE)
   hwUART_Index_9,
 #endif
+#if defined(LPUART1_BASE) || defined(LPUSART1_BASE)
   hwUART_Index_L1,
+#endif
   hwUART_Index_MAX,
 }hwUART_Index;
 // 定義標準輸出的 UART 索引
 #define LOG_UART_INDEX hwUART_Index_2
-#endif //STM32H7
+#endif //DEVICE_STM32
 
 #ifdef DEVICE_TM4C1294
 #undef DEFAULT_UART_INDEX

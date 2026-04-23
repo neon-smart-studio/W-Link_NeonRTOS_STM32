@@ -8,7 +8,9 @@
 
 #include "NeonRTOS.h"
 
-#include "RTC.h"
+#include "RTC/RTC.h"
+
+#ifdef STM32F7
 
 #define RTC_MUTEX_ACCESS_TIMEOUT     500
 
@@ -277,3 +279,5 @@ hwRTC_OpResult RTC_Timer_Clear_Alarm(hwRTC_Index index, hwRTC_Alarm_Channel_Inde
     return hwRTC_OK;
 }
 #endif //RTC_SUPPORT_ALARM
+
+#endif //STM32F7
