@@ -10,13 +10,9 @@
 
 #include "SPI/SPI_Master.h"
 
-#include "DMA/DMA.h"
-
 #ifdef STM32F7
 
 #include "SPI/SPI_Pin.h"
-
-#include "DMA/SPI_DMA_STM32.h"
 
 #define SPI_MASTER_SYNC_TIMEOUT             100
 #define SPI_MASTER_MUTEX_ACCESS_TIMEOUT     500
@@ -432,49 +428,6 @@ hwSPI_OpResult SPI_Master_Init(hwSPI_Index index, uint32_t clock_rate_hz, hwSPI_
 #endif
         }
 
-        hwDMA_Stream_Index tx_dma_ch = 0;
-        hwDMA_Stream_Index rx_dma_ch = 0;
-
-        switch(index)
-        {
-        case hwSPI_Index_0:
-                tx_dma_ch = SPI0_MASTER_TX_DMA_STREAM;
-                rx_dma_ch = SPI0_MASTER_RX_DMA_STREAM;
-                break;
-        case hwSPI_Index_1:
-                tx_dma_ch = SPI1_MASTER_TX_DMA_STREAM;
-                rx_dma_ch = SPI1_MASTER_RX_DMA_STREAM;
-                break;
-        case hwSPI_Index_2:
-                tx_dma_ch = SPI2_MASTER_TX_DMA_STREAM;
-                rx_dma_ch = SPI2_MASTER_RX_DMA_STREAM;
-                break;
-#if defined (SPI4_BASE)
-        case hwSPI_Index_3:
-                tx_dma_ch = SPI3_MASTER_TX_DMA_STREAM;
-                rx_dma_ch = SPI3_MASTER_RX_DMA_STREAM;
-                break;
-#endif
-#if defined (SPI5_BASE)
-        case hwSPI_Index_4:
-                tx_dma_ch = SPI4_MASTER_TX_DMA_STREAM;
-                rx_dma_ch = SPI4_MASTER_RX_DMA_STREAM;
-                break;
-#endif
-#if defined (SPI6_BASE)
-        case hwSPI_Index_5:
-                tx_dma_ch = SPI5_MASTER_TX_DMA_STREAM;
-                rx_dma_ch = SPI5_MASTER_RX_DMA_STREAM;
-                break;
-#endif
-        }
-        
-        DMA_Stream_Init(tx_dma_ch);
-        DMA_Stream_Init(rx_dma_ch);
-
-        SPI_Config_DMA(index, hwDMA_Peripheral_Direction_TX, tx_dma_ch);
-        SPI_Config_DMA(index, hwDMA_Peripheral_Direction_RX, rx_dma_ch);
-
         gpio_pin_init_status[SPI_Pin_Def_Table[index][SPI_Index_Map_Alt[index]].miso_pin] = true;
         gpio_pin_init_status[SPI_Pin_Def_Table[index][SPI_Index_Map_Alt[index]].mosi_pin] = true;
         gpio_pin_init_status[SPI_Pin_Def_Table[index][SPI_Index_Map_Alt[index]].sclk_pin] = true;
@@ -527,46 +480,6 @@ hwSPI_OpResult SPI_Master_DeInit(hwSPI_Index index)
                         return hwSPI_InvalidParameter;
                 }
         }
-
-        hwDMA_Stream_Index tx_dma_ch = 0;
-        hwDMA_Stream_Index rx_dma_ch = 0;
-
-        switch(index)
-        {
-        case hwSPI_Index_0:
-                tx_dma_ch = SPI0_MASTER_TX_DMA_STREAM;
-                rx_dma_ch = SPI0_MASTER_RX_DMA_STREAM;
-                break;
-        case hwSPI_Index_1:
-                tx_dma_ch = SPI1_MASTER_TX_DMA_STREAM;
-                rx_dma_ch = SPI1_MASTER_RX_DMA_STREAM;
-                break;
-        case hwSPI_Index_2:
-                tx_dma_ch = SPI2_MASTER_TX_DMA_STREAM;
-                rx_dma_ch = SPI2_MASTER_RX_DMA_STREAM;
-                break;
-#if defined (SPI4_BASE)
-        case hwSPI_Index_3:
-                tx_dma_ch = SPI3_MASTER_TX_DMA_STREAM;
-                rx_dma_ch = SPI3_MASTER_RX_DMA_STREAM;
-                break;
-#endif
-#if defined (SPI5_BASE)
-        case hwSPI_Index_4:
-                tx_dma_ch = SPI4_MASTER_TX_DMA_STREAM;
-                rx_dma_ch = SPI4_MASTER_RX_DMA_STREAM;
-                break;
-#endif
-#if defined (SPI6_BASE)
-        case hwSPI_Index_5:
-                tx_dma_ch = SPI5_MASTER_TX_DMA_STREAM;
-                rx_dma_ch = SPI5_MASTER_RX_DMA_STREAM;
-                break;
-#endif
-        }
-        
-        DMA_Stream_DeInit(tx_dma_ch);
-        DMA_Stream_DeInit(rx_dma_ch);
 
         switch(index)
         {

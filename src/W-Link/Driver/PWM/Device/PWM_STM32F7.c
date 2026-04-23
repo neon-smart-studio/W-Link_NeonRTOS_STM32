@@ -18,7 +18,7 @@
 
 #include "GPIO/GPIO_STM32.h"
 
-#include "Timer/Timer_STM32.h"
+#include "Timer/Device/Timer_STM32.h"
 
 #define PWM_PERIOD_US    1000
 
