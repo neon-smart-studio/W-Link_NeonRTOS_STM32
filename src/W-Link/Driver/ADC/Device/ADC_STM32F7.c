@@ -9,9 +9,9 @@
 
 #include "GPIO/GPIO.h"
 
-#include "ADC_Pin.h"
+#include "ADC/ADC.h"
 
-#include "ADC.h"
+#include "ADC/ADC_Pin.h"
 
 #ifdef STM32F7
 
