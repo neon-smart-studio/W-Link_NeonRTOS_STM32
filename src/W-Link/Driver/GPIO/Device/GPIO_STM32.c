@@ -8,11 +8,11 @@
 
 #include "NeonRTOS.h"
 
-#include "GPIO.h"
+#include "GPIO/GPIO.h"
 
 #ifdef DEVICE_STM32
 
-#include "GPIO_STM32.h"
+#include "GPIO/Device/GPIO_STM32.h"
 
 #define GPIO_EXTI_NVIC_PRIORITY 5
 #define GPIO_EXTI_NVIC_SUB_PRIORITY 0

@@ -17,6 +17,8 @@
 
 #include "DAC/DAC_Pin.h"
 
+#include "GPIO/Device/GPIO_STM32.h"
+
 #define DAC_VREF_MV     3300.0f
 #define DAC_MAX_COUNT   4095.0f
 

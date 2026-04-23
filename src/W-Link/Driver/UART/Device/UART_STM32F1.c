@@ -14,7 +14,7 @@
 
 #include "UART/UART_Pin.h"
 
-#include "GPIO/GPIO_STM32.h"
+#include "GPIO/Device/GPIO_STM32.h"
 
 #define UART_IRQ_NVIC_PRIORITY 5
 #define UART_IRQ_NVIC_SUB_PRIORITY 0

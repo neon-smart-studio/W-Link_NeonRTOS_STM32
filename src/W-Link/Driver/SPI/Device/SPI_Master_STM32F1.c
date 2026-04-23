@@ -14,6 +14,8 @@
 
 #include "SPI/SPI_Pin.h"
 
+#include "GPIO/Device/GPIO_STM32.h"
+
 #define SPI_MASTER_SYNC_TIMEOUT             100
 #define SPI_MASTER_MUTEX_ACCESS_TIMEOUT     500
 #define SPI_MASTER_OP_TIMEOUT               3000
@@ -105,22 +107,9 @@ static int SPI_Master_Get_Clock_Freq(hwSPI_Index index)
     /* Get source clock depending on SPI instance */
     switch (index) {
         case hwSPI_Index_0:
-#if defined (SPI4_BASE)
-        case hwSPI_Index_3:
-#endif
-#if defined (SPI5_BASE)
-        case hwSPI_Index_4:
-#endif
-#if defined (SPI6_BASE)
-        case hwSPI_Index_5:
-#endif
-            /* SPI_1, SPI_4, SPI_5 and SPI_6. Source CLK is PCKL2 */
             spi_hz = HAL_RCC_GetPCLK2Freq();
             break;
         case hwSPI_Index_1:
-#if defined (SPI3_BASE)
-        case hwSPI_Index_2:
-#endif
             /* SPI_2 and SPI_3. Source CLK is PCKL1 */
             spi_hz = HAL_RCC_GetPCLK1Freq();
             break;

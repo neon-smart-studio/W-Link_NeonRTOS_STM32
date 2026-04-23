@@ -15,6 +15,8 @@
 
 #include "ADC/ADC_Pin.h"
 
+#include "GPIO/Device/GPIO_STM32.h"
+
 #define ADC_IRQ_NVIC_PRIORITY 5
 #define ADC_IRQ_NVIC_SUB_PRIORITY 0
 

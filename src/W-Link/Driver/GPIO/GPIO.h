@@ -8,11 +8,6 @@
 
 #include "GPIO_Def.h"
 
-//internal use
-extern bool gpio_pin_init_status[hwGPIO_Pin_MAX];
-void GPIO_Enable_RCC_Clock(GPIO_TypeDef * base);
-void GPIO_Disable_RCC_Clock(GPIO_TypeDef * base);
-
 bool GPIO_Pin_is_Init(hwGPIO_Pin pin);
 hwGPIO_OpStatus GPIO_Pin_Init(hwGPIO_Pin pin, hwGPIO_Direction dir, hwGPIO_Pull_Mode pull_mode);
 hwGPIO_OpStatus GPIO_Pin_DeInit(hwGPIO_Pin pin);

@@ -14,7 +14,7 @@
 
 #include "I2C/I2C_Pin.h"
 
-#include "GPIO/GPIO_STM32.h"
+#include "GPIO/Device/GPIO_STM32.h"
 
 #define I2C_IRQ_NVIC_PRIORITY 5
 #define I2C_IRQ_NVIC_SUB_PRIORITY 0

@@ -8,7 +8,7 @@
 
 #include "NeonRTOS.h"
 
-#include "GPIO.h"
+#include "GPIO/GPIO.h"
 
 #ifdef DEVICE_TM4C1294
 

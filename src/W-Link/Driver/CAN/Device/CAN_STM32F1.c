@@ -16,7 +16,7 @@
 
 #include "CAN/CAN_Pin.h"
 
-#include "GPIO/GPIO_STM32.h"
+#include "GPIO/Device/GPIO_STM32.h"
 
 #define CAN_IRQ_NVIC_PRIORITY 5
 #define CAN_IRQ_NVIC_SUB_PRIORITY 0

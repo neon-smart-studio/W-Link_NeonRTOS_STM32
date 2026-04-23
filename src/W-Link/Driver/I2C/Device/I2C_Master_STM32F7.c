@@ -10,11 +10,13 @@
 
 #include "I2C/I2C_Master.h"
 
+#include "I2C_Master_STM32.h"
+
 #ifdef STM32F7
 
 #include "I2C/I2C_Pin.h"
 
-#include "GPIO/GPIO_STM32.h"
+#include "GPIO/Device/GPIO_STM32.h"
 
 #define I2C_IRQ_NVIC_PRIORITY 5
 #define I2C_IRQ_NVIC_SUB_PRIORITY 0
@@ -154,79 +156,6 @@ uint32_t I2C_Get_PCLK(hwI2C_Index index)
     uint32_t clocksource;
     uint32_t pclk = 0;
 
-#ifdef STM32H7
-    PLL3_ClocksTypeDef pll3_clocks;
-    if ((index == hwI2C_Index_0) || (index == hwI2C_Index_1) || (index == hwI2C_Index_2)) {
-        clocksource = __HAL_RCC_GET_I2C123_SOURCE();
-        switch (clocksource) {
-            case RCC_I2C123CLKSOURCE_D2PCLK1:
-                pclk = HAL_RCC_GetPCLK1Freq();
-                break;
-            case RCC_I2C123CLKSOURCE_PLL3:
-                HAL_RCCEx_GetPLL3ClockFreq(&pll3_clocks);
-                pclk = pll3_clocks.PLL3_R_Frequency;
-                break;
-            case RCC_I2C123CLKSOURCE_HSI:
-                pclk = HSI_VALUE;
-                break;
-            case RCC_I2C123CLKSOURCE_CSI:
-                pclk = CSI_VALUE;
-                break;
-            default:
-                // should not happend
-                error("I2C123: Invalid clock source");
-                break;
-        }
-    }
-#if defined I2C4_BASE
-    else if (index == hwI2C_Index_3) {
-        clocksource = __HAL_RCC_GET_I2C4_SOURCE();
-        switch (clocksource) {
-            case RCC_I2C4CLKSOURCE_D3PCLK1:
-                pclk = HAL_RCCEx_GetD3PCLK1Freq();
-                break;
-            case RCC_I2C4CLKSOURCE_PLL3:
-                HAL_RCCEx_GetPLL3ClockFreq(&pll3_clocks);
-                pclk = pll3_clocks.PLL3_R_Frequency;
-                break;
-            case RCC_I2C4CLKSOURCE_HSI:
-                pclk = HSI_VALUE;
-                break;
-            case RCC_I2C4CLKSOURCE_CSI:
-                pclk = CSI_VALUE;
-                break;
-            default:
-                // should not happend
-                error("I2C4: Invalid clock source");
-                break;
-        }
-    }
-#endif
-#if defined I2C5_BASE
-    else if (index == hwI2C_Index_4) {
-        clocksource = __HAL_RCC_GET_I2C5_SOURCE();
-        switch (clocksource) {
-            case RCC_I2C5CLKSOURCE_D2PCLK1:
-                pclk = HAL_RCC_GetPCLK1Freq();
-                break;
-            case RCC_I2C5CLKSOURCE_PLL3:
-                HAL_RCCEx_GetPLL3ClockFreq(&pll3_clocks);
-                pclk = pll3_clocks.PLL3_R_Frequency;
-                break;
-            case RCC_I2C5CLKSOURCE_HSI:
-                pclk = HSI_VALUE;
-                break;
-            case RCC_I2C5CLKSOURCE_CSI:
-                pclk = CSI_VALUE;
-                break;
-            default:
-                // should not happend
-                error("I2C5: Invalid clock source");
-                break;
-        }
-    }
-#endif
-#else //STM32H7
     if (index == hwI2C_Index_0) {
         clocksource = __HAL_RCC_GET_I2C1_SOURCE();
         switch (clocksource) {
@@ -243,7 +172,6 @@ uint32_t I2C_Get_PCLK(hwI2C_Index index)
                 break;
         }
     }
-#if defined I2C2_BASE
     else if (index == hwI2C_Index_1) {
         clocksource = __HAL_RCC_GET_I2C2_SOURCE();
         switch (clocksource) {
@@ -260,8 +188,6 @@ uint32_t I2C_Get_PCLK(hwI2C_Index index)
                 break;
         }
     }
-#endif
-#if defined I2C3_BASE
     else if (index == hwI2C_Index_2) {
         clocksource = __HAL_RCC_GET_I2C3_SOURCE();
         switch (clocksource) {
@@ -278,8 +204,7 @@ uint32_t I2C_Get_PCLK(hwI2C_Index index)
                 break;
         }
     }
-#endif
-#if defined I2C4_BASE
+#if defined (I2C4_BASE)
     else if (index == hwI2C_Index_3) {
         clocksource = __HAL_RCC_GET_I2C4_SOURCE();
         switch (clocksource) {
@@ -297,219 +222,11 @@ uint32_t I2C_Get_PCLK(hwI2C_Index index)
         }
     }
 #endif
-#endif //STM32H7
     else {
         // should not happend
         UART_Printf("I2C: unknown instance");
     }
     return pclk;
-}
-
-uint32_t I2C_Master_Get_Timing(hwI2C_Index index, hwI2C_Speed_Mode speed_mode)
-{
-    uint32_t tim = 0;
-
-    uint32_t pclk = I2C_Get_PCLK(index);
-
-    switch (pclk) {
-#if defined (I2C_PCLK_32M)
-        case I2C_PCLK_32M:
-            switch (speed_mode) {
-                case hwI2C_Standard_Mode:
-                    tim = TIMING_VAL_32M_CLK_100KHZ;
-                    break;
-                case hwI2C_Fast_Mode:
-                    tim = TIMING_VAL_32M_CLK_400KHZ;
-                    break;
-                case hwI2C_High_Speed_Mode:
-                    tim = TIMING_VAL_32M_CLK_1MHZ;
-                    break;
-            }
-            break;
-#endif
-#if defined (I2C_PCLK_48M)
-        case I2C_PCLK_48M:
-            switch (speed_mode) {
-                case hwI2C_Standard_Mode:
-                    tim = TIMING_VAL_48M_CLK_100KHZ;
-                    break;
-                case hwI2C_Fast_Mode:
-                    tim = TIMING_VAL_48M_CLK_400KHZ;
-                    break;
-                case hwI2C_High_Speed_Mode:
-                    tim = TIMING_VAL_48M_CLK_1MHZ;
-                    break;
-            }
-            break;
-#endif
-#if defined (I2C_PCLK_54M)
-        case I2C_PCLK_54M:
-            switch (speed_mode) {
-                case hwI2C_Standard_Mode:
-                    tim = TIMING_VAL_54M_CLK_100KHZ;
-                    break;
-                case hwI2C_Fast_Mode:
-                    tim = TIMING_VAL_54M_CLK_400KHZ;
-                    break;
-                case hwI2C_High_Speed_Mode:
-                    tim = TIMING_VAL_54M_CLK_1MHZ;
-                    break;
-            }
-            break;
-#endif
-#if defined(I2C_PCLK_64M)
-        case I2C_PCLK_64M:
-            switch (speed_mode) {
-                case hwI2C_Standard_Mode:
-                    tim = TIMING_VAL_64M_CLK_100KHZ;
-                    break;
-                case hwI2C_Fast_Mode:
-                    tim = TIMING_VAL_64M_CLK_400KHZ;
-                    break;
-                case hwI2C_High_Speed_Mode:
-                    tim = TIMING_VAL_64M_CLK_1MHZ;
-                    break;
-            }
-            break;
-#endif
-#if defined (I2C_PCLK_72M)
-        case I2C_PCLK_72M:
-            switch (speed_mode) {
-                case hwI2C_Standard_Mode:
-                    tim = TIMING_VAL_72M_CLK_100KHZ;
-                    break;
-                case hwI2C_Fast_Mode:
-                    tim = TIMING_VAL_72M_CLK_400KHZ;
-                    break;
-                case hwI2C_High_Speed_Mode:
-                    tim = TIMING_VAL_72M_CLK_1MHZ;
-                    break;
-            }
-            break;
-#endif
-#if defined (I2C_PCLK_80M)
-        case I2C_PCLK_80M:
-            switch (speed_mode) {
-                case hwI2C_Standard_Mode:
-                    tim = TIMING_VAL_80M_CLK_100KHZ;
-                    break;
-                case hwI2C_Fast_Mode:
-                    tim = TIMING_VAL_80M_CLK_400KHZ;
-                    break;
-                case hwI2C_High_Speed_Mode:
-                    tim = TIMING_VAL_80M_CLK_1MHZ;
-                    break;
-            }
-            break;
-#endif
-#if defined (I2C_PCLK_100M)
-        case I2C_PCLK_100M:
-            switch (speed_mode) {
-                case hwI2C_Standard_Mode:
-                    tim = TIMING_VAL_100M_CLK_100KHZ;
-                    break;
-                case hwI2C_Fast_Mode:
-                    tim = TIMING_VAL_100M_CLK_400KHZ;
-                    break;
-                case hwI2C_High_Speed_Mode:
-                    tim = TIMING_VAL_100M_CLK_1MHZ;
-                    break;
-            }
-            break;
-#endif
-#if defined (I2C_PCLK_110M)
-        case I2C_PCLK_110M:
-            switch (speed_mode) {
-                case hwI2C_Standard_Mode:
-                    tim = TIMING_VAL_110M_CLK_100KHZ;
-                    break;
-                case hwI2C_Fast_Mode:
-                    tim = TIMING_VAL_110M_CLK_400KHZ;
-                    break;
-                case hwI2C_High_Speed_Mode:
-                    tim = TIMING_VAL_110M_CLK_1MHZ;
-                    break;
-            }
-            break;
-#endif
-#if defined (I2C_PCLK_112M5)
-        case I2C_PCLK_112M5:
-            switch (speed_mode) {
-                case hwI2C_Standard_Mode:
-                    tim = TIMING_VAL_112M5_CLK_100KHZ;
-                    break;
-                case hwI2C_Fast_Mode:
-                    tim = TIMING_VAL_112M5_CLK_400KHZ;
-                    break;
-                case hwI2C_High_Speed_Mode:
-                    tim = TIMING_VAL_112M5_CLK_1MHZ;
-                    break;
-            }
-            break;
-#endif
-#if defined (I2C_PCLK_120M)
-        case I2C_PCLK_120M:
-            switch (speed_mode) {
-                case hwI2C_Standard_Mode:
-                    tim = TIMING_VAL_120M_CLK_100KHZ;
-                    break;
-                case hwI2C_Fast_Mode:
-                    tim = TIMING_VAL_120M_CLK_400KHZ;
-                    break;
-                case hwI2C_High_Speed_Mode:
-                    tim = TIMING_VAL_120M_CLK_1MHZ;
-                    break;
-            }
-            break;
-#endif
-#if defined (I2C_PCLK_137M5)
-        case I2C_PCLK_137M5:
-            switch (speed_mode) {
-                case hwI2C_Standard_Mode:
-                    tim = TIMING_VAL_137M5_CLK_100KHZ;
-                    break;
-                case hwI2C_Fast_Mode:
-                    tim = TIMING_VAL_137M5_CLK_400KHZ;
-                    break;
-                case hwI2C_High_Speed_Mode:
-                    tim = TIMING_VAL_137M5_CLK_1MHZ;
-                    break;
-            }
-            break;
-#endif
-#if defined (I2C_PCLK_140M)
-        case I2C_PCLK_140M:
-            switch (speed_mode) {
-                case hwI2C_Standard_Mode:
-                    tim = TIMING_VAL_140M_CLK_100KHZ;
-                    break;
-                case hwI2C_Fast_Mode:
-                    tim = TIMING_VAL_140M_CLK_400KHZ;
-                    break;
-                case hwI2C_High_Speed_Mode:
-                    tim = TIMING_VAL_140M_CLK_1MHZ;
-                    break;
-            }
-            break;
-#endif
-#if defined (I2C_PCLK_160M)
-        case I2C_PCLK_160M:
-            switch (speed_mode) {
-                case hwI2C_Standard_Mode:
-                    tim = TIMING_VAL_160M_CLK_100KHZ;
-                    break;
-                case hwI2C_Fast_Mode:
-                    tim = TIMING_VAL_160M_CLK_400KHZ;
-                    break;
-                case hwI2C_High_Speed_Mode:
-                    tim = TIMING_VAL_160M_CLK_1MHZ;
-                    break;
-            }
-            break;
-#endif
-    }
-    
-    return tim;
 }
 
 uint32_t STM32_I2C_GetAF(hwI2C_Index I2C, hwGPIO_Pin pin)

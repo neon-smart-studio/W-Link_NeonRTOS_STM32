@@ -14,6 +14,8 @@
 
 #include "SPI/SPI_Pin.h"
 
+#include "GPIO/Device/GPIO_STM32.h"
+
 #define SPI_MASTER_SYNC_TIMEOUT             100
 #define SPI_MASTER_MUTEX_ACCESS_TIMEOUT     500
 #define SPI_MASTER_OP_TIMEOUT               3000
@@ -68,12 +70,8 @@ SPI_TypeDef * SPI_Map_Soc_Base(hwSPI_Index index)
         case hwSPI_Index_0: return SPI1;
         case hwSPI_Index_1: return SPI2;
         case hwSPI_Index_2: return SPI3;
-#if defined (SPI4_BASE)
         case hwSPI_Index_3: return SPI4;
-#endif
-#if defined (SPI5_BASE)
         case hwSPI_Index_4: return SPI5;
-#endif
 #if defined (SPI6_BASE)
         case hwSPI_Index_5: return SPI6;
 #endif
@@ -118,12 +116,8 @@ static void SPI_HAL_IRQHandler(hwSPI_Index index)
 void SPI1_IRQHandler(void){ SPI_HAL_IRQHandler(hwSPI_Index_0); }
 void SPI2_IRQHandler(void){ SPI_HAL_IRQHandler(hwSPI_Index_1); }
 void SPI3_IRQHandler(void){ SPI_HAL_IRQHandler(hwSPI_Index_2); }
-#if defined (SPI4_BASE)
 void SPI4_IRQHandler(void){ SPI_HAL_IRQHandler(hwSPI_Index_3); }
-#endif
-#if defined (SPI5_BASE)
 void SPI5_IRQHandler(void){ SPI_HAL_IRQHandler(hwSPI_Index_4); }
-#endif
 #if defined (SPI6_BASE)
 void SPI6_IRQHandler(void){ SPI_HAL_IRQHandler(hwSPI_Index_5); }
 #endif
@@ -133,41 +127,10 @@ static int SPI_Master_Get_Clock_Freq(hwSPI_Index index)
     int spi_hz = 0;
 
     /* Get source clock depending on SPI instance */
-#ifdef STM32H7
     switch (index) {
         case hwSPI_Index_0:
-        case hwSPI_Index_1:
-        case hwSPI_Index_2:
-            spi_hz = LL_RCC_GetSPIClockFreq(LL_RCC_SPI123_CLKSOURCE);
-            break;
-#if defined (SPI4_BASE)
         case hwSPI_Index_3:
-            spi_hz = LL_RCC_GetSPIClockFreq(LL_RCC_SPI45_CLKSOURCE);
-            break;
-#endif
-#if defined (SPI5_BASE)
         case hwSPI_Index_4:
-            spi_hz = LL_RCC_GetSPIClockFreq(LL_RCC_SPI45_CLKSOURCE);
-            break;
-#endif
-#if defined (SPI6_BASE)
-        case hwSPI_Index_5:
-            spi_hz = LL_RCC_GetSPIClockFreq(LL_RCC_SPI6_CLKSOURCE);
-            break;
-#endif
-        default:
-            UART_Printf("CLK: SPI instance not set");
-            break;
-    }
-#else
-    switch (index) {
-        case hwSPI_Index_0:
-#if defined (SPI4_BASE)
-        case hwSPI_Index_3:
-#endif
-#if defined (SPI5_BASE)
-        case hwSPI_Index_4:
-#endif
 #if defined (SPI6_BASE)
         case hwSPI_Index_5:
 #endif
@@ -175,9 +138,7 @@ static int SPI_Master_Get_Clock_Freq(hwSPI_Index index)
             spi_hz = HAL_RCC_GetPCLK2Freq();
             break;
         case hwSPI_Index_1:
-#if defined (SPI3_BASE)
         case hwSPI_Index_2:
-#endif
             /* SPI_2 and SPI_3. Source CLK is PCKL1 */
             spi_hz = HAL_RCC_GetPCLK1Freq();
             break;
@@ -185,7 +146,6 @@ static int SPI_Master_Get_Clock_Freq(hwSPI_Index index)
             UART_Printf("CLK: SPI instance not set");
             break;
     }
-#endif
     return spi_hz;
 }
 
@@ -292,12 +252,8 @@ hwSPI_OpResult SPI_Master_Init(hwSPI_Index index, uint32_t clock_rate_hz, hwSPI_
                 case hwSPI_Index_0: __HAL_RCC_SPI1_CLK_ENABLE(); break;
                 case hwSPI_Index_1: __HAL_RCC_SPI2_CLK_ENABLE(); break;
                 case hwSPI_Index_2: __HAL_RCC_SPI3_CLK_ENABLE(); break;
-#if defined (SPI4_BASE)
                 case hwSPI_Index_3: __HAL_RCC_SPI4_CLK_ENABLE(); break;
-#endif
-#if defined (SPI5_BASE)
                 case hwSPI_Index_4: __HAL_RCC_SPI5_CLK_ENABLE(); break;
-#endif
 #if defined (SPI6_BASE)
                 case hwSPI_Index_5: __HAL_RCC_SPI6_CLK_ENABLE(); break;
 #endif
@@ -408,18 +364,14 @@ hwSPI_OpResult SPI_Master_Init(hwSPI_Index index, uint32_t clock_rate_hz, hwSPI_
                         HAL_NVIC_SetPriority(SPI3_IRQn, SPI_IRQ_NVIC_PRIORITY, SPI_IRQ_NVIC_SUB_PRIORITY);
                         HAL_NVIC_EnableIRQ(SPI3_IRQn);
                         break;
-#if defined (SPI4_BASE)
                 case hwSPI_Index_3:
                         HAL_NVIC_SetPriority(SPI4_IRQn, SPI_IRQ_NVIC_PRIORITY, SPI_IRQ_NVIC_SUB_PRIORITY);
                         HAL_NVIC_EnableIRQ(SPI4_IRQn);
                         break;
-#endif
-#if defined (SPI5_BASE)
                 case hwSPI_Index_4:
                         HAL_NVIC_SetPriority(SPI5_IRQn, SPI_IRQ_NVIC_PRIORITY, SPI_IRQ_NVIC_SUB_PRIORITY);
                         HAL_NVIC_EnableIRQ(SPI5_IRQn);
                         break;
-#endif
 #if defined (SPI6_BASE)
                 case hwSPI_Index_5:
                         HAL_NVIC_SetPriority(SPI6_IRQn, SPI_IRQ_NVIC_PRIORITY, SPI_IRQ_NVIC_SUB_PRIORITY);
@@ -492,16 +444,12 @@ hwSPI_OpResult SPI_Master_DeInit(hwSPI_Index index)
                 case hwSPI_Index_2:
                         HAL_NVIC_DisableIRQ(SPI3_IRQn);
                         break;
-#if defined (SPI4_BASE)
                 case hwSPI_Index_3:
                         HAL_NVIC_DisableIRQ(SPI4_IRQn);
                         break;
-#endif
-#if defined (SPI5_BASE)
                 case hwSPI_Index_4:
                         HAL_NVIC_DisableIRQ(SPI5_IRQn);
                         break;
-#endif
 #if defined (SPI6_BASE)
                 case hwSPI_Index_5:
                         HAL_NVIC_DisableIRQ(SPI6_IRQn);
@@ -526,12 +474,8 @@ hwSPI_OpResult SPI_Master_DeInit(hwSPI_Index index)
                 case hwSPI_Index_0: __HAL_RCC_SPI1_CLK_DISABLE(); break;
                 case hwSPI_Index_1: __HAL_RCC_SPI2_CLK_DISABLE(); break;
                 case hwSPI_Index_2: __HAL_RCC_SPI3_CLK_DISABLE(); break;
-#if defined (SPI4_BASE)
                 case hwSPI_Index_3: __HAL_RCC_SPI4_CLK_DISABLE(); break;
-#endif
-#if defined (SPI5_BASE)
                 case hwSPI_Index_4: __HAL_RCC_SPI5_CLK_DISABLE(); break;
-#endif
 #if defined (SPI6_BASE)
                 case hwSPI_Index_5: __HAL_RCC_SPI6_CLK_DISABLE(); break;
 #endif
@@ -596,12 +540,6 @@ hwSPI_OpResult SPI_Change_Frequency(hwSPI_Index index, uint32_t clock_rate_hz)
 
         HAL_SPI_Init(&g_spi[index]);
         
-#ifdef STM32H7
-        __HAL_SPI_DISABLE(&g_spi[index]);                    // 先停
-        MODIFY_REG(spi_soc_base->CFG1, SPI_CFG1_FTHLV, 0);   // FTHLV = 0 → 臨界值 1 byte
-        __HAL_SPI_ENABLE(&g_spi[index]);                     // 再開
-#endif
-
         SPI_MASTER_MUTEX_UNLOCK(index);
         
         return hwSPI_OK;
@@ -654,12 +592,6 @@ hwSPI_OpResult SPI_Change_Mode(hwSPI_Index index, hwSPI_OpMode opMode)
 
         HAL_SPI_Init(&g_spi[index]);
         
-#ifdef STM32H7
-        __HAL_SPI_DISABLE(&g_spi[index]);                    // 先停
-        MODIFY_REG(spi_soc_base->CFG1, SPI_CFG1_FTHLV, 0);   // FTHLV = 0 → 臨界值 1 byte
-        __HAL_SPI_ENABLE(&g_spi[index]);                     // 再開
-#endif
-
         SPI_MASTER_MUTEX_UNLOCK(index);
         
         return hwSPI_OK;

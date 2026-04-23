@@ -16,7 +16,7 @@
 
 #include "CAN/CAN_Pin.h"
 
-#include "GPIO/GPIO_STM32.h"
+#include "GPIO/Device/GPIO_STM32.h"
 
 #define CAN_IRQ_NVIC_PRIORITY 5
 #define CAN_IRQ_NVIC_SUB_PRIORITY 0
@@ -49,8 +49,12 @@ CAN_TypeDef * CAN_Map_Soc_Base(hwCAN_Index index)
 {
     switch(index)
     {
+#if defined (CAN1_BASE)
         case hwCAN_Index_0: return CAN1;
+#endif
+#if defined (CAN2_BASE)
         case hwCAN_Index_1: return CAN2;
+#endif
 #if defined (CAN3_BASE)
         case hwCAN_Index_2: return CAN3;
 #endif
@@ -89,13 +93,21 @@ static void CAN_HAL_IRQHandler(hwCAN_Index index)
     HAL_CAN_IRQHandler(&g_can[index]);
 }
 
+#if defined (CAN1_BASE)
 void CAN1_RX0_IRQHandler(void){ CAN_HAL_IRQHandler(hwCAN_Index_0); }
 void CAN1_TX_IRQHandler(void){  CAN_HAL_IRQHandler(hwCAN_Index_0); }
 void CAN1_SCE_IRQHandler(void){ CAN_HAL_IRQHandler(hwCAN_Index_0); }
-
+#endif
+#if defined (CAN2_BASE)
 void CAN2_RX0_IRQHandler(void){ CAN_HAL_IRQHandler(hwCAN_Index_1); }
 void CAN2_TX_IRQHandler(void){  CAN_HAL_IRQHandler(hwCAN_Index_1); }
 void CAN2_SCE_IRQHandler(void){ CAN_HAL_IRQHandler(hwCAN_Index_1); }
+#endif
+#if defined (CAN3_BASE)
+void CAN3_RX0_IRQHandler(void){ CAN_HAL_IRQHandler(hwCAN_Index_2); }
+void CAN3_TX_IRQHandler(void){  CAN_HAL_IRQHandler(hwCAN_Index_2); }
+void CAN3_SCE_IRQHandler(void){ CAN_HAL_IRQHandler(hwCAN_Index_2); }
+#endif
 
 hwCAN_OpResult CAN_Init(hwCAN_Index index)
 {
@@ -166,12 +178,16 @@ hwCAN_OpResult CAN_Init(hwCAN_Index index)
     /* CAN */
     switch(index)
     {
+#if defined (CAN1_BASE)
         case hwCAN_Index_0:
             __HAL_RCC_CAN1_CLK_ENABLE();
             break;
+#endif
+#if defined (CAN2_BASE)
         case hwCAN_Index_1:
             __HAL_RCC_CAN2_CLK_ENABLE();
             break;
+#endif
 #if defined (CAN3_BASE)
         case hwCAN_Index_2:
             __HAL_RCC_CAN3_CLK_ENABLE();
@@ -211,6 +227,7 @@ hwCAN_OpResult CAN_Init(hwCAN_Index index)
 
     switch(index)
     {       
+#if defined (CAN1_BASE)
         case hwCAN_Index_0:
             HAL_NVIC_SetPriority(CAN1_TX_IRQn, CAN_IRQ_NVIC_PRIORITY, CAN_IRQ_NVIC_SUB_PRIORITY);
             HAL_NVIC_EnableIRQ(CAN1_TX_IRQn);
@@ -221,6 +238,8 @@ hwCAN_OpResult CAN_Init(hwCAN_Index index)
             HAL_NVIC_SetPriority(CAN1_SCE_IRQn, CAN_IRQ_NVIC_PRIORITY, CAN_IRQ_NVIC_SUB_PRIORITY);
             HAL_NVIC_EnableIRQ(CAN1_SCE_IRQn);
             break;
+#endif
+#if defined (CAN2_BASE)
         case hwCAN_Index_1:
             HAL_NVIC_SetPriority(CAN2_TX_IRQn, CAN_IRQ_NVIC_PRIORITY, CAN_IRQ_NVIC_SUB_PRIORITY);
             HAL_NVIC_EnableIRQ(CAN2_TX_IRQn);
@@ -231,6 +250,7 @@ hwCAN_OpResult CAN_Init(hwCAN_Index index)
             HAL_NVIC_SetPriority(CAN2_SCE_IRQn, CAN_IRQ_NVIC_PRIORITY, CAN_IRQ_NVIC_SUB_PRIORITY);
             HAL_NVIC_EnableIRQ(CAN2_SCE_IRQn);
             break;
+#endif
 #if defined (CAN3_BASE)
         case hwCAN_Index_2:
             HAL_NVIC_SetPriority(CAN3_TX_IRQn, CAN_IRQ_NVIC_PRIORITY, CAN_IRQ_NVIC_SUB_PRIORITY);
@@ -291,18 +311,22 @@ hwCAN_OpResult CAN_DeInit(hwCAN_Index index)
 
     switch(index)
     {       
+#if defined (CAN1_BASE)
         case hwCAN_Index_0:
             HAL_NVIC_DisableIRQ(CAN1_TX_IRQn);
             HAL_NVIC_DisableIRQ(CAN1_RX0_IRQn);
             HAL_NVIC_DisableIRQ(CAN1_RX1_IRQn);
             HAL_NVIC_DisableIRQ(CAN1_SCE_IRQn);
             break;
+#endif
+#if defined (CAN2_BASE)
         case hwCAN_Index_1:
             HAL_NVIC_DisableIRQ(CAN2_TX_IRQn);
             HAL_NVIC_DisableIRQ(CAN2_RX0_IRQn);
             HAL_NVIC_DisableIRQ(CAN2_RX1_IRQn);
             HAL_NVIC_DisableIRQ(CAN2_SCE_IRQn);
             break;
+#endif
 #if defined (CAN3_BASE)
         case hwCAN_Index_2:
             HAL_NVIC_DisableIRQ(CAN3_TX_IRQn);
@@ -317,12 +341,16 @@ hwCAN_OpResult CAN_DeInit(hwCAN_Index index)
 
     switch(index)
     {
+#if defined (CAN1_BASE)
         case hwCAN_Index_0:
             __HAL_RCC_CAN1_CLK_DISABLE();
             break;
+#endif
+#if defined (CAN2_BASE)
         case hwCAN_Index_1:
             __HAL_RCC_CAN2_CLK_DISABLE();
             break;
+#endif
 #if defined (CAN3_BASE)
         case hwCAN_Index_2:
             __HAL_RCC_CAN3_CLK_DISABLE();

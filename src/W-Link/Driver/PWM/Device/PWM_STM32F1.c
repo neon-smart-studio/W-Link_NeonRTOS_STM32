@@ -16,7 +16,7 @@
 
 #include "PWM/PWM_Pin.h"
 
-#include "GPIO/GPIO_STM32.h"
+#include "GPIO/Device/GPIO_STM32.h"
 
 #include "Timer/Device/Timer_STM32.h"
 

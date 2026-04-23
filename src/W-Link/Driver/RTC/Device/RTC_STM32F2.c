@@ -19,9 +19,7 @@ static RTC_HandleTypeDef g_rtc[hwRTC_Index_MAX];
 static bool RTC_HW_Init_Status[hwRTC_Index_MAX] = {false};
 static NeonRTOS_LockObj_t rtc_access_mutex[hwRTC_Index_MAX];
 
-#ifdef RTC_SUPPORT_ALARM
 onAlarmEventCallback Alarm_Event_Callback[hwRTC_Alarm_Channel_Index_MAX] = {NULL};
-#endif //RTC_SUPPORT_ALARM
 
 #define RTC_MUTEX_LOCK(a, b)  if (NeonRTOS_LockObjLock(&rtc_access_mutex[a], b)!=NeonRTOS_OK) {return hwRTC_MutexTimeout;}
 #define RTC_MUTEX_UNLOCK(a)   NeonRTOS_LockObjUnlock(&rtc_access_mutex[a]);
@@ -65,7 +63,6 @@ static hwRTC_Index RTC_IndexFromHandle(RTC_HandleTypeDef *hrtc)
     return hwRTC_Index_MAX;
 }
 
-#ifdef RTC_SUPPORT_ALARM
 void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 {
 	hwRTC_Index index = RTC_IndexFromHandle(hrtc);
@@ -75,7 +72,7 @@ void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
         Alarm_Event_Callback[hwRTC_Alarm_Channel_Index_0](index, hwRTC_Alarm_Channel_Index_0);
 	}
 }
-#if defined(RTC_ALARM_B)
+
 void HAL_RTC_AlarmBEventCallback(RTC_HandleTypeDef *hrtc)
 {
 	hwRTC_Index index = RTC_IndexFromHandle(hrtc);
@@ -85,14 +82,11 @@ void HAL_RTC_AlarmBEventCallback(RTC_HandleTypeDef *hrtc)
         Alarm_Event_Callback[hwRTC_Alarm_Channel_Index_1](index, hwRTC_Alarm_Channel_Index_1);
 	}
 }
-#endif
 
 void RTC_Alarm_IRQHandler(void)
 {
     HAL_RTC_AlarmIRQHandler(&g_rtc[hwRTC_Index_0]);
 }
-
-#endif //RTC_SUPPORT_ALARM
 
 hwRTC_OpResult RTC_Timer_Init(hwRTC_Index index)
 {
@@ -147,13 +141,9 @@ hwRTC_OpResult RTC_Timer_DeInit(hwRTC_Index index)
         return hwRTC_OK;
     }
 
-#ifdef RTC_SUPPORT_ALARM
     /* 停用 Alarm A / B（如果有） */
     HAL_RTC_DeactivateAlarm(&g_rtc[index], RTC_ALARM_A);
-#if defined(RTC_ALARM_B)
     HAL_RTC_DeactivateAlarm(&g_rtc[index], RTC_ALARM_B);
-#endif
-#endif
 
     HAL_RTC_DeInit(&g_rtc[index]);
 
@@ -218,7 +208,6 @@ hwRTC_OpResult RTC_Timer_Write(hwRTC_Index index, time_t unix_time)
     return hwRTC_OK;
 }
 
-#ifdef RTC_SUPPORT_ALARM
 hwRTC_OpResult RTC_Timer_Set_Alarm(hwRTC_Index index, hwRTC_Alarm_Channel_Index alarm_ch, time_t alarm_unix_time, onAlarmEventCallback cb)
 {
     RTC_AlarmTypeDef alarm;
@@ -266,18 +255,14 @@ hwRTC_OpResult RTC_Timer_Clear_Alarm(hwRTC_Index index, hwRTC_Alarm_Channel_Inde
         case hwRTC_Alarm_Channel_Index_0:
             HAL_RTC_DeactivateAlarm(&g_rtc[index], RTC_ALARM_A);
             break;
-
-#if defined(RTC_ALARM_B)
         case hwRTC_Alarm_Channel_Index_1:
             HAL_RTC_DeactivateAlarm(&g_rtc[index], RTC_ALARM_B);
             break;
-#endif
     }
 
     RTC_MUTEX_UNLOCK(index);
 
     return hwRTC_OK;
 }
-#endif //RTC_SUPPORT_ALARM
 
 #endif //STM32F2

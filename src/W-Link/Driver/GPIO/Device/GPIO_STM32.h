@@ -4,9 +4,9 @@
 
 #include "soc.h"
 
-#include "Pin/GPIO_Pin.h"
+#include "GPIO/Pin/GPIO_Pin.h"
 
-#include "GPIO_Def.h"
+#include "GPIO/GPIO_Def.h"
 
 //internal use
 extern bool gpio_pin_init_status[hwGPIO_Pin_MAX];
