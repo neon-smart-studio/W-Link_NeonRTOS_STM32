@@ -46,6 +46,24 @@ typedef enum hwTimer_Index_t
 #if defined (TIM14_BASE)
   hwTimer_Index_13,
 #endif
+#if defined (TIM15_BASE)
+  hwTimer_Index_14,
+#endif
+#if defined (TIM16_BASE)
+  hwTimer_Index_15,
+#endif
+#if defined (TIM17_BASE)
+  hwTimer_Index_16,
+#endif
+#if defined (TIM18_BASE)
+  hwTimer_Index_17,
+#endif
+#if defined (TIM19_BASE)
+  hwTimer_Index_18,
+#endif
+#if defined (TIM20_BASE)
+  hwTimer_Index_19,
+#endif
   hwTimer_Index_MAX,
 }hwTimer_Index;
 

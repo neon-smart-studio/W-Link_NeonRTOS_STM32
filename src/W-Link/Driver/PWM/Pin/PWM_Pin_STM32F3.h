@@ -260,14 +260,14 @@ const PWM_Pin_Def PWM_Pin_Def_Table[hwPWM_Base_MAX][PWM_Pinset_MAX][4] =
 #if defined(TIM15_BASE)
     {
         {
-            { hwPWM_Channel_25, hwTimer_Index_14, hwGPIO_Pin_A2, TIM_CHANNEL_1, 0 },
-            { hwPWM_Channel_26, hwTimer_Index_14, hwGPIO_Pin_A3, TIM_CHANNEL_2, 0 },
+            { hwPWM_Channel_33, hwTimer_Index_14, hwGPIO_Pin_A2, TIM_CHANNEL_1, 0 },
+            { hwPWM_Channel_34, hwTimer_Index_14, hwGPIO_Pin_A3, TIM_CHANNEL_2, 0 },
             { hwPWM_Channel_MAX, hwTimer_Index_14, hwGPIO_Pin_NC, 0, 0 },
             { hwPWM_Channel_MAX, hwTimer_Index_14, hwGPIO_Pin_NC, 0, 0 },
         },
         {
-            { hwPWM_Channel_25, hwTimer_Index_14, hwGPIO_Pin_B14, TIM_CHANNEL_1, 0 },
-            { hwPWM_Channel_26, hwTimer_Index_14, hwGPIO_Pin_B15, TIM_CHANNEL_2, 0 },
+            { hwPWM_Channel_33, hwTimer_Index_14, hwGPIO_Pin_B14, TIM_CHANNEL_1, 0 },
+            { hwPWM_Channel_34, hwTimer_Index_14, hwGPIO_Pin_B15, TIM_CHANNEL_2, 0 },
             { hwPWM_Channel_MAX, hwTimer_Index_14, hwGPIO_Pin_NC, 0, 0 },
             { hwPWM_Channel_MAX, hwTimer_Index_14, hwGPIO_Pin_NC, 0, 0 },
         },
@@ -283,13 +283,13 @@ const PWM_Pin_Def PWM_Pin_Def_Table[hwPWM_Base_MAX][PWM_Pinset_MAX][4] =
 #if defined(TIM16_BASE)
     {
         {
-            { hwPWM_Channel_27, hwTimer_Index_15, hwGPIO_Pin_A6, TIM_CHANNEL_1, 0 },
+            { hwPWM_Channel_35, hwTimer_Index_15, hwGPIO_Pin_A6, TIM_CHANNEL_1, 0 },
             { hwPWM_Channel_MAX, hwTimer_Index_15, hwGPIO_Pin_NC, 0, 0 },
             { hwPWM_Channel_MAX, hwTimer_Index_15, hwGPIO_Pin_NC, 0, 0 },
             { hwPWM_Channel_MAX, hwTimer_Index_15, hwGPIO_Pin_NC, 0, 0 },
         },
         {
-            { hwPWM_Channel_27, hwTimer_Index_15, hwGPIO_Pin_B8, TIM_CHANNEL_1, 0 },
+            { hwPWM_Channel_35, hwTimer_Index_15, hwGPIO_Pin_B8, TIM_CHANNEL_1, 0 },
             { hwPWM_Channel_MAX, hwTimer_Index_15, hwGPIO_Pin_NC, 0, 0 },
             { hwPWM_Channel_MAX, hwTimer_Index_15, hwGPIO_Pin_NC, 0, 0 },
             { hwPWM_Channel_MAX, hwTimer_Index_15, hwGPIO_Pin_NC, 0, 0 },
@@ -306,13 +306,13 @@ const PWM_Pin_Def PWM_Pin_Def_Table[hwPWM_Base_MAX][PWM_Pinset_MAX][4] =
 #if defined(TIM17_BASE)
     {
         {
-            { hwPWM_Channel_28, hwTimer_Index_16, hwGPIO_Pin_A7, TIM_CHANNEL_1, 0 },
+            { hwPWM_Channel_36, hwTimer_Index_16, hwGPIO_Pin_A7, TIM_CHANNEL_1, 0 },
             { hwPWM_Channel_MAX, hwTimer_Index_16, hwGPIO_Pin_NC, 0, 0 },
             { hwPWM_Channel_MAX, hwTimer_Index_16, hwGPIO_Pin_NC, 0, 0 },
             { hwPWM_Channel_MAX, hwTimer_Index_16, hwGPIO_Pin_NC, 0, 0 },
         },
         {
-            { hwPWM_Channel_28, hwTimer_Index_16, hwGPIO_Pin_B9, TIM_CHANNEL_1, 0 },
+            { hwPWM_Channel_36, hwTimer_Index_16, hwGPIO_Pin_B9, TIM_CHANNEL_1, 0 },
             { hwPWM_Channel_MAX, hwTimer_Index_16, hwGPIO_Pin_NC, 0, 0 },
             { hwPWM_Channel_MAX, hwTimer_Index_16, hwGPIO_Pin_NC, 0, 0 },
             { hwPWM_Channel_MAX, hwTimer_Index_16, hwGPIO_Pin_NC, 0, 0 },

@@ -39,27 +39,17 @@ const CAN_Pin_Def CAN_Pin_Def_Table[hwCAN_Index_MAX][CAN_Pinset_MAX] =
 
 static const CAN_AF_Map CAN_Pin_AF_Map[] = {
 #if defined(CAN1_BASE)
-
-#if defined(GPIO_AF9_CAN) || defined(GPIO_AF9_CAN1)
-    #if defined(GPIO_AF9_CAN1)
-        #define STM32F3_GPIO_AF_CAN1 GPIO_AF9_CAN1
-    #else
-        #define STM32F3_GPIO_AF_CAN1 GPIO_AF9_CAN
-    #endif
-
     /* CAN1 DEFAULT */
-    { hwCAN_Index_0, hwGPIO_Pin_A12, STM32F3_GPIO_AF_CAN1 },
-    { hwCAN_Index_0, hwGPIO_Pin_A11, STM32F3_GPIO_AF_CAN1 },
+    { hwCAN_Index_0, hwGPIO_Pin_A12, GPIO_AF9_CAN1 },
+    { hwCAN_Index_0, hwGPIO_Pin_A11, GPIO_AF9_CAN1 },
 
     /* CAN1 ALT1 */
-    { hwCAN_Index_0, hwGPIO_Pin_B9,  STM32F3_GPIO_AF_CAN1 },
-    { hwCAN_Index_0, hwGPIO_Pin_B8,  STM32F3_GPIO_AF_CAN1 },
+    { hwCAN_Index_0, hwGPIO_Pin_B9,  GPIO_AF9_CAN1 },
+    { hwCAN_Index_0, hwGPIO_Pin_B8,  GPIO_AF9_CAN1 },
 
     /* CAN1 ALT2 */
-    { hwCAN_Index_0, hwGPIO_Pin_D1,  STM32F3_GPIO_AF_CAN1 },
-    { hwCAN_Index_0, hwGPIO_Pin_D0,  STM32F3_GPIO_AF_CAN1 },
-#endif
-
+    { hwCAN_Index_0, hwGPIO_Pin_D1,  GPIO_AF9_CAN1 },
+    { hwCAN_Index_0, hwGPIO_Pin_D0,  GPIO_AF9_CAN1 },
 #endif
 };
 

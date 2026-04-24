@@ -14,6 +14,9 @@
 
 #define RTC_MUTEX_ACCESS_TIMEOUT     500
 
+#define RTC_IRQ_NVIC_PRIORITY               5
+#define RTC_IRQ_NVIC_SUB_PRIORITY           0
+
 static RTC_HandleTypeDef g_rtc[hwRTC_Index_MAX];
 
 static bool RTC_HW_Init_Status[hwRTC_Index_MAX] = {false};
@@ -124,6 +127,9 @@ hwRTC_OpResult RTC_Timer_Init(hwRTC_Index index)
         return hwRTC_HwError;
 	}
 
+    HAL_NVIC_SetPriority(RTC_Alarm_IRQn, RTC_IRQ_NVIC_PRIORITY, RTC_IRQ_NVIC_SUB_PRIORITY);
+    HAL_NVIC_EnableIRQ(RTC_Alarm_IRQn);
+
     RTC_HW_Init_Status[index] = true;
 
     return hwRTC_OK;
@@ -140,6 +146,8 @@ hwRTC_OpResult RTC_Timer_DeInit(hwRTC_Index index)
     {
         return hwRTC_OK;
     }
+
+    HAL_NVIC_DisableIRQ(RTC_Alarm_IRQn);
 
     /* 停用 Alarm A / B（如果有） */
     HAL_RTC_DeactivateAlarm(&g_rtc[index], RTC_ALARM_A);

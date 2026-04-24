@@ -257,18 +257,21 @@ hwCAN_OpResult CAN_Init(hwCAN_Index index)
     GPIO_Enable_RCC_Clock(tx_soc_base);
     GPIO_Enable_RCC_Clock(rx_soc_base);
 
-    GPIO_InitTypeDef gpio = {0};
-    gpio.Mode      = GPIO_MODE_AF_PP;
-    gpio.Pull      = GPIO_NOPULL;
-    gpio.Speed     = GPIO_SPEED_FREQ_HIGH;
+    GPIO_InitTypeDef g_can_tx = {0};
+    g_can_tx.Pin       = tx_soc_pin;
+    g_can_tx.Mode      = GPIO_MODE_AF_PP;
+    g_can_tx.Pull      = GPIO_NOPULL;
+    g_can_tx.Speed     = GPIO_SPEED_FREQ_HIGH;
+    g_can_tx.Alternate = tx_af;
+    HAL_GPIO_Init(tx_soc_base, &g_can_tx);
 
-    gpio.Pin       = tx_soc_pin;
-    gpio.Alternate = tx_af;
-    HAL_GPIO_Init(tx_soc_base, &gpio);
-
-    gpio.Pin       = rx_soc_pin;
-    gpio.Alternate = rx_af;
-    HAL_GPIO_Init(rx_soc_base, &gpio);
+    GPIO_InitTypeDef g_can_rx = {0};
+    g_can_rx.Pin       = rx_soc_pin;
+    g_can_rx.Mode      = GPIO_MODE_AF_PP;
+    g_can_rx.Pull      = GPIO_NOPULL;
+    g_can_rx.Speed     = GPIO_SPEED_FREQ_HIGH;
+    g_can_rx.Alternate = rx_af;
+    HAL_GPIO_Init(rx_soc_base, &g_can_rx);
 
     __HAL_RCC_CAN1_CLK_ENABLE();
 

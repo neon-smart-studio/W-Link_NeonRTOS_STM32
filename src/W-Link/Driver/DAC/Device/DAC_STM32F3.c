@@ -10,7 +10,7 @@
 
 #ifdef STM32F3
 
-#if defined(DAC_BASE) || defined(DAC1_BASE)
+#if defined(DAC_BASE)
 
 #include "DAC/DAC_Pin.h"
 #include "GPIO/Device/GPIO_STM32.h"
@@ -34,21 +34,6 @@ static uint32_t DAC_Channel_To_HAL(hwDAC_Channel_Index ch)
         case hwDAC_Channel_Index_1: return DAC_CHANNEL_2;
 #endif
         default: return 0;
-    }
-}
-
-static DAC_TypeDef *DAC_Map_Soc_Base(hwDAC_Instance inst)
-{
-    switch (inst)
-    {
-        case hwDAC_Instance_1:
-#if defined(DAC1_BASE)
-            return DAC1;
-#elif defined(DAC_BASE)
-            return DAC;
-#endif
-        default:
-            return NULL;
     }
 }
 
@@ -81,26 +66,9 @@ hwDAC_OpStatus hwDAC_Channel_Init(hwDAC_Channel_Index ch)
 
     if (!DAC_Instance_Init_Status[inst])
     {
-        DAC_TypeDef *dac_base = DAC_Map_Soc_Base(inst);
+        __HAL_RCC_DAC1_CLK_ENABLE();
 
-        if (dac_base == NULL)
-            return hwDAC_InvalidParameter;
-
-        switch (inst)
-        {
-            case hwDAC_Instance_1:
-#if defined(DAC1_BASE)
-                __HAL_RCC_DAC1_CLK_ENABLE();
-#elif defined(DAC_BASE)
-                __HAL_RCC_DAC_CLK_ENABLE();
-#endif
-                break;
-
-            default:
-                break;
-        }
-
-        g_dac[inst].Instance = dac_base;
+        g_dac[inst].Instance = DAC;
 
         if (HAL_DAC_Init(&g_dac[inst]) != HAL_OK)
             return hwDAC_HwError;
@@ -161,19 +129,7 @@ hwDAC_OpStatus hwDAC_Channel_DeInit(hwDAC_Channel_Index ch)
     {
         HAL_DAC_DeInit(&g_dac[inst]);
 
-        switch (inst)
-        {
-            case hwDAC_Instance_1:
-#if defined(DAC1_BASE)
-                __HAL_RCC_DAC1_CLK_DISABLE();
-#elif defined(DAC_BASE)
-                __HAL_RCC_DAC_CLK_DISABLE();
-#endif
-                break;
-
-            default:
-                break;
-        }
+        __HAL_RCC_DAC1_CLK_DISABLE();
 
         DAC_Instance_Init_Status[inst] = false;
     }
@@ -211,6 +167,6 @@ hwDAC_OpStatus hwDAC_Write_MiniVolt(hwDAC_Channel_Index ch, float mv)
     return hwDAC_OK;
 }
 
-#endif /* DAC_BASE || DAC1_BASE */
+#endif // DAC_BASE
 
-#endif /* STM32F3 */
+#endif // STM32F3

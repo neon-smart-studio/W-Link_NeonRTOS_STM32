@@ -76,9 +76,7 @@ I2C_TypeDef *I2C_Map_Soc_Base(hwI2C_Index index)
 {
     switch(index)
     {
-#if defined(I2C1_BASE)
         case hwI2C_Index_0: return I2C1;
-#endif
 #if defined(I2C2_BASE)
         case hwI2C_Index_1: return I2C2;
 #endif
@@ -137,10 +135,8 @@ static void I2C_HAL_ER_IRQHandler(hwI2C_Index index)
     HAL_I2C_ER_IRQHandler(&g_i2c[index]);
 }
 
-#if defined(I2C1_BASE)
 void I2C1_EV_IRQHandler(void){ I2C_HAL_EV_IRQHandler(hwI2C_Index_0); }
 void I2C1_ER_IRQHandler(void){ I2C_HAL_ER_IRQHandler(hwI2C_Index_0); }
-#endif
 
 #if defined(I2C2_BASE)
 void I2C2_EV_IRQHandler(void){ I2C_HAL_EV_IRQHandler(hwI2C_Index_1); }
@@ -211,11 +207,7 @@ hwI2C_OpResult I2C_Master_Init(hwI2C_Index index, hwI2C_Speed_Mode speed_mode)
     g_i2c_sda.Pin       = sda_soc_pin;
     g_i2c_sda.Mode      = GPIO_MODE_AF_OD;
     g_i2c_sda.Pull      = GPIO_PULLUP;
-#if defined(GPIO_SPEED_FREQ_VERY_HIGH)
-    g_i2c_sda.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
-#else
     g_i2c_sda.Speed     = GPIO_SPEED_FREQ_HIGH;
-#endif
     g_i2c_sda.Alternate = sda_af;
     HAL_GPIO_Init(sda_soc_base, &g_i2c_sda);
 
@@ -223,21 +215,15 @@ hwI2C_OpResult I2C_Master_Init(hwI2C_Index index, hwI2C_Speed_Mode speed_mode)
     g_i2c_scl.Pin       = scl_soc_pin;
     g_i2c_scl.Mode      = GPIO_MODE_AF_OD;
     g_i2c_scl.Pull      = GPIO_PULLUP;
-#if defined(GPIO_SPEED_FREQ_VERY_HIGH)
-    g_i2c_scl.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
-#else
     g_i2c_scl.Speed     = GPIO_SPEED_FREQ_HIGH;
-#endif
     g_i2c_scl.Alternate = scl_af;
     HAL_GPIO_Init(scl_soc_base, &g_i2c_scl);
 
     switch(index)
     {
-#if defined(I2C1_BASE)
         case hwI2C_Index_0:
             __HAL_RCC_I2C1_CLK_ENABLE();
             break;
-#endif
 #if defined(I2C2_BASE)
         case hwI2C_Index_1:
             __HAL_RCC_I2C2_CLK_ENABLE();
@@ -276,24 +262,18 @@ hwI2C_OpResult I2C_Master_Init(hwI2C_Index index, hwI2C_Speed_Mode speed_mode)
         return hwI2C_HwError;
     }
 
-#if defined(HAL_I2CEx_ConfigAnalogFilter)
     HAL_I2CEx_ConfigAnalogFilter(&g_i2c[index], I2C_ANALOGFILTER_ENABLE);
-#endif
 
-#if defined(HAL_I2CEx_ConfigDigitalFilter)
     HAL_I2CEx_ConfigDigitalFilter(&g_i2c[index], 0);
-#endif
 
     switch(index)
     {
-#if defined(I2C1_BASE)
         case hwI2C_Index_0:
             HAL_NVIC_SetPriority(I2C1_EV_IRQn, I2C_IRQ_NVIC_PRIORITY, I2C_IRQ_NVIC_SUB_PRIORITY);
             HAL_NVIC_EnableIRQ(I2C1_EV_IRQn);
             HAL_NVIC_SetPriority(I2C1_ER_IRQn, I2C_IRQ_NVIC_PRIORITY, I2C_IRQ_NVIC_SUB_PRIORITY);
             HAL_NVIC_EnableIRQ(I2C1_ER_IRQn);
             break;
-#endif
 
 #if defined(I2C2_BASE)
         case hwI2C_Index_1:
@@ -350,12 +330,10 @@ hwI2C_OpResult I2C_Master_DeInit(hwI2C_Index index)
 
     switch(index)
     {
-#if defined(I2C1_BASE)
         case hwI2C_Index_0:
             HAL_NVIC_DisableIRQ(I2C1_EV_IRQn);
             HAL_NVIC_DisableIRQ(I2C1_ER_IRQn);
             break;
-#endif
 
 #if defined(I2C2_BASE)
         case hwI2C_Index_1:
@@ -379,11 +357,9 @@ hwI2C_OpResult I2C_Master_DeInit(hwI2C_Index index)
 
     switch(index)
     {
-#if defined(I2C1_BASE)
         case hwI2C_Index_0:
             __HAL_RCC_I2C1_CLK_DISABLE();
             break;
-#endif
 #if defined(I2C2_BASE)
         case hwI2C_Index_1:
             __HAL_RCC_I2C2_CLK_DISABLE();

@@ -92,8 +92,8 @@ const I2C_AF_Map I2C_Pin_AF_Map[] =
 
 #if defined(I2C3_BASE)
     /* I2C3 */
-    { hwI2C_Index_2, hwGPIO_Pin_A8, GPIO_AF4_I2C3 },
-    { hwI2C_Index_2, hwGPIO_Pin_C9, GPIO_AF4_I2C3 },
+    { hwI2C_Index_2, hwGPIO_Pin_A8, GPIO_AF3_I2C3 },
+    { hwI2C_Index_2, hwGPIO_Pin_C9, GPIO_AF3_I2C3 },
 #endif
 };
 
