@@ -869,12 +869,12 @@ hwGPIO_OpStatus GPIO_Interrupt_DeInit(hwGPIO_Int_Pin irq_pin)
       bool irq_10_15_used = false;
       for(GPIO_EXTI_Line idx = GPIO_EXTI_Line_10; idx<=GPIO_EXTI_Line_15; idx++)
       {
-        if(gpio_exti_desc[exti_line_idx].irq_pin!=hwGPIO_Int_Pin_NC)
+        if(gpio_exti_desc[idx].irq_pin!=hwGPIO_Int_Pin_NC)
         {
           irq_10_15_used = true;
         }
       }
-      if(gpio_exti_enable_status[GPIO_EXTI_IRQn_10_15]==false && irq_10_15_used==false)
+      if(gpio_exti_enable_status[GPIO_EXTI_IRQn_10_15]==true && irq_10_15_used==false)
       {
         gpio_exti_enable_status[GPIO_EXTI_IRQn_10_15] = false;
         HAL_NVIC_DisableIRQ(EXTI15_10_IRQn);

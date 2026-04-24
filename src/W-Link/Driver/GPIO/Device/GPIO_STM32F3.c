@@ -10,7 +10,7 @@
 
 #include "GPIO/GPIO.h"
 
-#ifdef STM32F1
+#ifdef STM32F3
 
 #include "GPIO/Device/GPIO_STM32.h"
 
@@ -87,14 +87,18 @@ void GPIO_Enable_RCC_Clock(GPIO_TypeDef * base)
   {
     __HAL_RCC_GPIOC_CLK_ENABLE();
   }
+#if defined(GPIOD)
   else if(base==GPIOD)
   {
     __HAL_RCC_GPIOD_CLK_ENABLE();
   }
+#endif
+#if defined(GPIOE)
   else if(base==GPIOE)
   {
     __HAL_RCC_GPIOE_CLK_ENABLE();
   }
+#endif
 #if defined(GPIOF)
   else if(base==GPIOF)
   {
@@ -129,14 +133,18 @@ void GPIO_Disable_RCC_Clock(GPIO_TypeDef * base)
   {
     __HAL_RCC_GPIOC_CLK_DISABLE();
   }
+#if defined(GPIOD)
   else if(base==GPIOD)
   {
     __HAL_RCC_GPIOD_CLK_DISABLE();
   }
+#endif
+#if defined(GPIOE)
   else if(base==GPIOE)
   {
     __HAL_RCC_GPIOE_CLK_DISABLE();
   }
+#endif
 #if defined(GPIOF)
   else if(base==GPIOF)
   {
@@ -154,6 +162,19 @@ void GPIO_Disable_RCC_Clock(GPIO_TypeDef * base)
   {
     __HAL_RCC_GPIOH_CLK_DISABLE();
   }
+#endif
+}
+
+static void GPIO_Set_Speed(GPIO_InitTypeDef *gpio)
+{
+#if defined(GPIO_SPEED_FREQ_VERY_HIGH)
+    gpio->Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+#elif defined(GPIO_SPEED_FREQ_HIGH)
+    gpio->Speed = GPIO_SPEED_FREQ_HIGH;
+#elif defined(GPIO_SPEED_FREQ_MEDIUM)
+    gpio->Speed = GPIO_SPEED_FREQ_MEDIUM;
+#else
+    gpio->Speed = GPIO_SPEED_FREQ_LOW;
 #endif
 }
 
@@ -196,7 +217,16 @@ hwGPIO_OpStatus GPIO_Pin_Init(hwGPIO_Pin pin, hwGPIO_Direction dir, hwGPIO_Pull_
     {
         case hwGPIO_Direction_Input:
             gpio_pin_init.Mode = GPIO_MODE_INPUT;
+            switch(pull_mode)
+            {
+                case hwGPIO_Pull_Mode_None: gpio_pin_init.Pull = GPIO_NOPULL; break;
+                case hwGPIO_Pull_Mode_Up: gpio_pin_init.Pull = GPIO_PULLUP; break;
+                case hwGPIO_Pull_Mode_Down: gpio_pin_init.Pull = GPIO_PULLDOWN; break;
+                case hwGPIO_Pull_Mode_OpenDrain: gpio_pin_init.Pull = GPIO_NOPULL; break;
+                default: return hwGPIO_InvalidParameter;
+            }
             break;
+
         case hwGPIO_Direction_Output:
         case hwGPIO_Direction_Output_Only:
             switch(pull_mode)
@@ -215,22 +245,23 @@ hwGPIO_OpStatus GPIO_Pin_Init(hwGPIO_Pin pin, hwGPIO_Direction dir, hwGPIO_Pull_
                     break;
                 case hwGPIO_Pull_Mode_OpenDrain:
                     gpio_pin_init.Mode = GPIO_MODE_OUTPUT_OD;
+                    gpio_pin_init.Pull = GPIO_NOPULL;
                     break;
+                default:
+                    return hwGPIO_InvalidParameter;
             }
             break;
+
+        default:
+            return hwGPIO_InvalidParameter;
     }
     
-#ifdef GPIO_SPEED_FREQ_VERY_HIGH
-    gpio_pin_init.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-#else
-    gpio_pin_init.Speed = GPIO_SPEED_FREQ_HIGH;
-#endif
+    GPIO_Set_Speed(&gpio_pin_init);
 
     HAL_GPIO_Init(soc_base, &gpio_pin_init);
 
     gpio_current_dir[pin] = dir;
     gpio_current_mode[pin] = pull_mode;
-
     gpio_pin_init_status[pin] = true;
     
     return hwGPIO_OK;
@@ -238,6 +269,11 @@ hwGPIO_OpStatus GPIO_Pin_Init(hwGPIO_Pin pin, hwGPIO_Direction dir, hwGPIO_Pull_
 
 hwGPIO_OpStatus GPIO_Pin_DeInit(hwGPIO_Pin pin)
 {
+    if(pin>=hwGPIO_Pin_MAX)
+    {
+      return hwGPIO_InvalidParameter;
+    }
+
     if(gpio_pin_init_status[pin]==false)
     {
       return hwGPIO_OK;
@@ -255,7 +291,6 @@ hwGPIO_OpStatus GPIO_Pin_DeInit(hwGPIO_Pin pin)
     
     gpio_current_dir[pin] = hwGPIO_Direction_Input;
     gpio_current_mode[pin] = hwGPIO_Pull_Mode_None;
-    
     gpio_pin_init_status[pin] = false;
     
     return hwGPIO_OK;
@@ -293,7 +328,16 @@ hwGPIO_OpStatus GPIO_Pin_Set_Direction(hwGPIO_Pin pin, hwGPIO_Direction dir)
     {
         case hwGPIO_Direction_Input:
             gpio_pin_init.Mode = GPIO_MODE_INPUT;
+            switch(gpio_current_mode[pin])
+            {
+                case hwGPIO_Pull_Mode_None: gpio_pin_init.Pull = GPIO_NOPULL; break;
+                case hwGPIO_Pull_Mode_Up: gpio_pin_init.Pull = GPIO_PULLUP; break;
+                case hwGPIO_Pull_Mode_Down: gpio_pin_init.Pull = GPIO_PULLDOWN; break;
+                case hwGPIO_Pull_Mode_OpenDrain: gpio_pin_init.Pull = GPIO_NOPULL; break;
+                default: return hwGPIO_InvalidParameter;
+            }
             break;
+
         case hwGPIO_Direction_Output:
         case hwGPIO_Direction_Output_Only:
             switch(gpio_current_mode[pin])
@@ -312,16 +356,18 @@ hwGPIO_OpStatus GPIO_Pin_Set_Direction(hwGPIO_Pin pin, hwGPIO_Direction dir)
                     break;
                 case hwGPIO_Pull_Mode_OpenDrain:
                     gpio_pin_init.Mode = GPIO_MODE_OUTPUT_OD;
+                    gpio_pin_init.Pull = GPIO_NOPULL;
                     break;
+                default:
+                    return hwGPIO_InvalidParameter;
             }
             break;
+
+        default:
+            return hwGPIO_InvalidParameter;
     }
     
-#ifdef GPIO_SPEED_FREQ_VERY_HIGH
-    gpio_pin_init.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-#else
-    gpio_pin_init.Speed = GPIO_SPEED_FREQ_HIGH;
-#endif
+    GPIO_Set_Speed(&gpio_pin_init);
 
     HAL_GPIO_Init(soc_base, &gpio_pin_init);
 
@@ -332,12 +378,7 @@ hwGPIO_OpStatus GPIO_Pin_Set_Direction(hwGPIO_Pin pin, hwGPIO_Direction dir)
 
 hwGPIO_OpStatus GPIO_Pin_Get_Direction(hwGPIO_Pin pin, hwGPIO_Direction* dir)
 {
-    if(pin>=hwGPIO_Pin_MAX)
-    {
-      return hwGPIO_InvalidParameter;
-    }
-    
-    if(dir==NULL)
+    if(pin>=hwGPIO_Pin_MAX || dir==NULL)
     {
       return hwGPIO_InvalidParameter;
     }
@@ -374,7 +415,16 @@ hwGPIO_OpStatus GPIO_Pin_Set_PullMode(hwGPIO_Pin pin, hwGPIO_Pull_Mode pull_mode
     {
         case hwGPIO_Direction_Input:
             gpio_pin_init.Mode = GPIO_MODE_INPUT;
+            switch(pull_mode)
+            {
+                case hwGPIO_Pull_Mode_None: gpio_pin_init.Pull = GPIO_NOPULL; break;
+                case hwGPIO_Pull_Mode_Up: gpio_pin_init.Pull = GPIO_PULLUP; break;
+                case hwGPIO_Pull_Mode_Down: gpio_pin_init.Pull = GPIO_PULLDOWN; break;
+                case hwGPIO_Pull_Mode_OpenDrain: gpio_pin_init.Pull = GPIO_NOPULL; break;
+                default: return hwGPIO_InvalidParameter;
+            }
             break;
+
         case hwGPIO_Direction_Output:
         case hwGPIO_Direction_Output_Only:
             switch(pull_mode)
@@ -393,16 +443,18 @@ hwGPIO_OpStatus GPIO_Pin_Set_PullMode(hwGPIO_Pin pin, hwGPIO_Pull_Mode pull_mode
                     break;
                 case hwGPIO_Pull_Mode_OpenDrain:
                     gpio_pin_init.Mode = GPIO_MODE_OUTPUT_OD;
+                    gpio_pin_init.Pull = GPIO_NOPULL;
                     break;
+                default:
+                    return hwGPIO_InvalidParameter;
             }
             break;
+
+        default:
+            return hwGPIO_InvalidParameter;
     }
     
-#ifdef GPIO_SPEED_FREQ_VERY_HIGH
-    gpio_pin_init.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-#else
-    gpio_pin_init.Speed = GPIO_SPEED_FREQ_HIGH;
-#endif
+    GPIO_Set_Speed(&gpio_pin_init);
 
     HAL_GPIO_Init(soc_base, &gpio_pin_init);
 
@@ -413,12 +465,7 @@ hwGPIO_OpStatus GPIO_Pin_Set_PullMode(hwGPIO_Pin pin, hwGPIO_Pull_Mode pull_mode
 
 hwGPIO_OpStatus GPIO_Pin_Get_PullMode(hwGPIO_Pin pin, hwGPIO_Pull_Mode* pull_mode)
 {
-    if(pin>=hwGPIO_Pin_MAX)
-    {
-      return hwGPIO_InvalidParameter;
-    }
-    
-    if(pull_mode==NULL)
+    if(pin>=hwGPIO_Pin_MAX || pull_mode==NULL)
     {
       return hwGPIO_InvalidParameter;
     }
@@ -430,12 +477,7 @@ hwGPIO_OpStatus GPIO_Pin_Get_PullMode(hwGPIO_Pin pin, hwGPIO_Pull_Mode* pull_mod
 
 hwGPIO_OpStatus GPIO_Pin_Read(hwGPIO_Pin pin, bool* level)
 {
-    if(pin>=hwGPIO_Pin_MAX)
-    {
-      return hwGPIO_InvalidParameter;
-    }
-    
-    if(level==NULL)
+    if(pin>=hwGPIO_Pin_MAX || level==NULL)
     {
       return hwGPIO_InvalidParameter;
     }
@@ -453,7 +495,7 @@ hwGPIO_OpStatus GPIO_Pin_Read(hwGPIO_Pin pin, bool* level)
       return hwGPIO_InvalidParameter;
     }
     
-    *level = (HAL_GPIO_ReadPin(soc_base, soc_pin)==GPIO_PIN_SET) ? 1: 0;
+    *level = (HAL_GPIO_ReadPin(soc_base, soc_pin)==GPIO_PIN_SET) ? true : false;
     
     return hwGPIO_OK;
 }
@@ -478,14 +520,7 @@ hwGPIO_OpStatus GPIO_Pin_Write(hwGPIO_Pin pin, bool level)
       return hwGPIO_InvalidParameter;
     }
     
-    if(level)
-    {
-      HAL_GPIO_WritePin(soc_base, soc_pin, GPIO_PIN_SET);
-    }
-    else
-    {
-      HAL_GPIO_WritePin(soc_base, soc_pin, GPIO_PIN_RESET);
-    }
+    HAL_GPIO_WritePin(soc_base, soc_pin, level ? GPIO_PIN_SET : GPIO_PIN_RESET);
     
     return hwGPIO_OK;
 }
@@ -517,7 +552,17 @@ hwGPIO_OpStatus GPIO_Pin_Toggle(hwGPIO_Pin pin)
 
 static void GPIO_EXTI_Dispatch(GPIO_EXTI_Line line)
 {
+    if(line >= GPIO_EXTI_Line_MAX)
+    {
+        return;
+    }
+
     GPIO_EXTI_Desc *d = &gpio_exti_desc[line];
+
+    if(d->irq_pin >= hwGPIO_Int_Pin_MAX)
+    {
+        return;
+    }
 
     uint16_t soc_pin = GPIO_Int_Map_Soc_Pin(d->irq_pin);
     GPIO_TypeDef * soc_base = GPIO_Int_Map_Soc_Base(d->irq_pin);
@@ -545,6 +590,8 @@ static void GPIO_EXTI_Dispatch(GPIO_EXTI_Line line)
           case hwGPIO_Interrupt_Mode_Both_Edge:
             gpio_irq_handlers[d->irq_pin](d->irq_pin, hwGPIO_Interrupt_Action_Toggle);
             break;
+          default:
+            break;
         }
     }
 }
@@ -554,6 +601,7 @@ void EXTI1_IRQHandler(void) { GPIO_EXTI_Dispatch(GPIO_EXTI_Line_1); }
 void EXTI2_IRQHandler(void) { GPIO_EXTI_Dispatch(GPIO_EXTI_Line_2); }
 void EXTI3_IRQHandler(void) { GPIO_EXTI_Dispatch(GPIO_EXTI_Line_3); }
 void EXTI4_IRQHandler(void) { GPIO_EXTI_Dispatch(GPIO_EXTI_Line_4); }
+
 void EXTI9_5_IRQHandler(void)
 {
   GPIO_EXTI_Dispatch(GPIO_EXTI_Line_5);
@@ -562,6 +610,7 @@ void EXTI9_5_IRQHandler(void)
   GPIO_EXTI_Dispatch(GPIO_EXTI_Line_8);
   GPIO_EXTI_Dispatch(GPIO_EXTI_Line_9);
 }
+
 void EXTI15_10_IRQHandler(void)
 {
   GPIO_EXTI_Dispatch(GPIO_EXTI_Line_10);
@@ -576,40 +625,58 @@ static GPIO_EXTI_Line GPIO_Map_EXTI_Line_Index(uint32_t exti_line)
 {
     switch(exti_line)
     {
-        case EXTI_LINE_0:
-            return GPIO_EXTI_Line_0;
-        case EXTI_LINE_1:
-            return GPIO_EXTI_Line_1;
-        case EXTI_LINE_2:
-            return GPIO_EXTI_Line_2;
-        case EXTI_LINE_3:
-            return GPIO_EXTI_Line_3;
-        case EXTI_LINE_4:
-            return GPIO_EXTI_Line_4;
-        case EXTI_LINE_5:
-            return GPIO_EXTI_Line_5;
-        case EXTI_LINE_6:
-            return GPIO_EXTI_Line_6;
-        case EXTI_LINE_7:
-            return GPIO_EXTI_Line_7;
-        case EXTI_LINE_8:
-            return GPIO_EXTI_Line_8;
-        case EXTI_LINE_9:
-            return GPIO_EXTI_Line_9;
-        case EXTI_LINE_10:
-            return GPIO_EXTI_Line_10;
-        case EXTI_LINE_11:
-            return GPIO_EXTI_Line_11;
-        case EXTI_LINE_12:
-            return GPIO_EXTI_Line_12;
-        case EXTI_LINE_13:
-            return GPIO_EXTI_Line_13;
-        case EXTI_LINE_14:
-            return GPIO_EXTI_Line_14;
-        case EXTI_LINE_15:
-            return GPIO_EXTI_Line_15;
+        case EXTI_LINE_0:  return GPIO_EXTI_Line_0;
+        case EXTI_LINE_1:  return GPIO_EXTI_Line_1;
+        case EXTI_LINE_2:  return GPIO_EXTI_Line_2;
+        case EXTI_LINE_3:  return GPIO_EXTI_Line_3;
+        case EXTI_LINE_4:  return GPIO_EXTI_Line_4;
+        case EXTI_LINE_5:  return GPIO_EXTI_Line_5;
+        case EXTI_LINE_6:  return GPIO_EXTI_Line_6;
+        case EXTI_LINE_7:  return GPIO_EXTI_Line_7;
+        case EXTI_LINE_8:  return GPIO_EXTI_Line_8;
+        case EXTI_LINE_9:  return GPIO_EXTI_Line_9;
+        case EXTI_LINE_10: return GPIO_EXTI_Line_10;
+        case EXTI_LINE_11: return GPIO_EXTI_Line_11;
+        case EXTI_LINE_12: return GPIO_EXTI_Line_12;
+        case EXTI_LINE_13: return GPIO_EXTI_Line_13;
+        case EXTI_LINE_14: return GPIO_EXTI_Line_14;
+        case EXTI_LINE_15: return GPIO_EXTI_Line_15;
+        default:           return GPIO_EXTI_Line_MAX;
     }
-    return GPIO_EXTI_Line_MAX;
+}
+
+static void GPIO_EXTI_Fill_Config(EXTI_ConfigTypeDef *cfg,
+                                  uint32_t exti_line,
+                                  uint32_t exti_port,
+                                  hwGPIO_Interrupt_Mode mode)
+{
+    cfg->Line = exti_line;
+    cfg->Mode = EXTI_MODE_INTERRUPT;
+
+#if defined(EXTI_TRIGGER_NONE)
+    cfg->Trigger = EXTI_TRIGGER_NONE;
+#endif
+
+#if defined(EXTI_GPIO)
+    cfg->GPIOSel = exti_port;
+#else
+    cfg->GPIOSel = exti_port;
+#endif
+
+    switch(mode)
+    {
+        case hwGPIO_Interrupt_Mode_Falling_Edge:
+            cfg->Trigger = EXTI_TRIGGER_FALLING;
+            break;
+        case hwGPIO_Interrupt_Mode_Rising_Edge:
+            cfg->Trigger = EXTI_TRIGGER_RISING;
+            break;
+        case hwGPIO_Interrupt_Mode_Both_Edge:
+            cfg->Trigger = EXTI_TRIGGER_RISING_FALLING;
+            break;
+        default:
+            break;
+    }
 }
 
 hwGPIO_OpStatus GPIO_Interrupt_Init(hwGPIO_Int_Pin irq_pin, hwGPIO_Interrupt_Mode mode)
@@ -670,27 +737,8 @@ hwGPIO_OpStatus GPIO_Interrupt_Init(hwGPIO_Int_Pin irq_pin, hwGPIO_Interrupt_Mod
 
     HAL_GPIO_Init(soc_base, &gpio_irq_init);
     
-    EXTI_ConfigTypeDef cfg = {
-        .Line = exti_line,
-        .Mode = EXTI_MODE_INTERRUPT,
-        .Trigger = EXTI_TRIGGER_NONE,
-        .GPIOSel = exti_port,
-    };
-
-    switch(mode)
-    {
-        case hwGPIO_Interrupt_Mode_Falling_Edge:
-            cfg.Trigger = EXTI_TRIGGER_FALLING;
-            break;
-        case hwGPIO_Interrupt_Mode_Rising_Edge:
-            cfg.Trigger = EXTI_TRIGGER_RISING;
-            break;
-        case hwGPIO_Interrupt_Mode_Both_Edge:
-            cfg.Trigger = EXTI_TRIGGER_RISING_FALLING;
-            break;
-        default:
-            return hwGPIO_InvalidParameter;
-    }
+    EXTI_ConfigTypeDef cfg = {0};
+    GPIO_EXTI_Fill_Config(&cfg, exti_line, exti_port, mode);
     
     gpio_exti_desc[exti_line_idx].irq_pin = irq_pin;
     gpio_exti_desc[exti_line_idx].mode = mode;
@@ -722,8 +770,8 @@ hwGPIO_OpStatus GPIO_Interrupt_Init(hwGPIO_Int_Pin irq_pin, hwGPIO_Interrupt_Mod
       if(gpio_exti_enable_status[GPIO_EXTI_IRQn_2]==false)
       {
         gpio_exti_enable_status[GPIO_EXTI_IRQn_2] = true;
-        HAL_NVIC_SetPriority(EXTI2_IRQn, GPIO_EXTI_NVIC_PRIORITY, GPIO_EXTI_NVIC_SUB_PRIORITY);
-        HAL_NVIC_EnableIRQ(EXTI2_IRQn);
+        HAL_NVIC_SetPriority(EXTI2_TSC_IRQn, GPIO_EXTI_NVIC_PRIORITY, GPIO_EXTI_NVIC_SUB_PRIORITY);
+        HAL_NVIC_EnableIRQ(EXTI2_TSC_IRQn);
       }
     }
 
@@ -825,7 +873,7 @@ hwGPIO_OpStatus GPIO_Interrupt_DeInit(hwGPIO_Int_Pin irq_pin)
       if(gpio_exti_enable_status[GPIO_EXTI_IRQn_2]==true)
       {
         gpio_exti_enable_status[GPIO_EXTI_IRQn_2] = false;
-        HAL_NVIC_DisableIRQ(EXTI2_IRQn);
+        HAL_NVIC_DisableIRQ(EXTI2_TSC_IRQn);
       }
     }
 
@@ -850,13 +898,16 @@ hwGPIO_OpStatus GPIO_Interrupt_DeInit(hwGPIO_Int_Pin irq_pin)
     if(exti_line_idx>=GPIO_EXTI_Line_5 && exti_line_idx<=GPIO_EXTI_Line_9)
     {
       bool irq_5_9_used = false;
+
       for(GPIO_EXTI_Line idx = GPIO_EXTI_Line_5; idx<=GPIO_EXTI_Line_9; idx++)
       {
         if(gpio_exti_desc[idx].irq_pin!=hwGPIO_Int_Pin_NC)
         {
           irq_5_9_used = true;
+          break;
         }
       }
+
       if(gpio_exti_enable_status[GPIO_EXTI_IRQn_5_9]==true && irq_5_9_used==false)
       {
         gpio_exti_enable_status[GPIO_EXTI_IRQn_5_9] = false;
@@ -867,13 +918,16 @@ hwGPIO_OpStatus GPIO_Interrupt_DeInit(hwGPIO_Int_Pin irq_pin)
     if(exti_line_idx>=GPIO_EXTI_Line_10 && exti_line_idx<=GPIO_EXTI_Line_15)
     {
       bool irq_10_15_used = false;
+
       for(GPIO_EXTI_Line idx = GPIO_EXTI_Line_10; idx<=GPIO_EXTI_Line_15; idx++)
       {
         if(gpio_exti_desc[idx].irq_pin!=hwGPIO_Int_Pin_NC)
         {
           irq_10_15_used = true;
+          break;
         }
       }
+
       if(gpio_exti_enable_status[GPIO_EXTI_IRQn_10_15]==true && irq_10_15_used==false)
       {
         gpio_exti_enable_status[GPIO_EXTI_IRQn_10_15] = false;
@@ -892,12 +946,7 @@ hwGPIO_OpStatus GPIO_Interrupt_DeInit(hwGPIO_Int_Pin irq_pin)
 
 hwGPIO_OpStatus GPIO_Config_Interrupt_Mode(hwGPIO_Int_Pin irq_pin, hwGPIO_Interrupt_Mode mode)
 {
-    if(irq_pin>=hwGPIO_Int_Pin_MAX)
-    {
-        return hwGPIO_InvalidParameter;
-    }
-  
-    if(mode>=hwGPIO_Interrupt_Mode_MAX)
+    if(irq_pin>=hwGPIO_Int_Pin_MAX || mode>=hwGPIO_Interrupt_Mode_MAX)
     {
         return hwGPIO_InvalidParameter;
     }
@@ -911,27 +960,8 @@ hwGPIO_OpStatus GPIO_Config_Interrupt_Mode(hwGPIO_Int_Pin irq_pin, hwGPIO_Interr
         return hwGPIO_InvalidParameter;
     }
   
-    EXTI_ConfigTypeDef cfg = {
-        .Line = exti_line,
-        .Mode = EXTI_MODE_INTERRUPT,
-        .Trigger = EXTI_TRIGGER_NONE,
-        .GPIOSel = exti_port,
-    };
-
-    switch(mode)
-    {
-        case hwGPIO_Interrupt_Mode_Falling_Edge:
-            cfg.Trigger = EXTI_TRIGGER_FALLING;
-            break;
-        case hwGPIO_Interrupt_Mode_Rising_Edge:
-            cfg.Trigger = EXTI_TRIGGER_RISING;
-            break;
-        case hwGPIO_Interrupt_Mode_Both_Edge:
-            cfg.Trigger = EXTI_TRIGGER_RISING_FALLING;
-            break;
-        default:
-            return hwGPIO_InvalidParameter;
-    }
+    EXTI_ConfigTypeDef cfg = {0};
+    GPIO_EXTI_Fill_Config(&cfg, exti_line, exti_port, mode);
     
     gpio_exti_desc[exti_line_idx].mode = mode;
 
@@ -942,12 +972,7 @@ hwGPIO_OpStatus GPIO_Config_Interrupt_Mode(hwGPIO_Int_Pin irq_pin, hwGPIO_Interr
 
 hwGPIO_OpStatus GPIO_Register_Interrupt_Handler(hwGPIO_Int_Pin irq_pin, GPIO_Interrupt_Event_Handler handler)
 {
-    if(irq_pin>=hwGPIO_Int_Pin_MAX)
-    {
-        return hwGPIO_InvalidParameter;
-    }
-  
-    if(handler==NULL)
+    if(irq_pin>=hwGPIO_Int_Pin_MAX || handler==NULL)
     {
         return hwGPIO_InvalidParameter;
     }
@@ -985,27 +1010,8 @@ hwGPIO_OpStatus GPIO_Interrupt_Enable(hwGPIO_Int_Pin irq_pin)
         return hwGPIO_InvalidParameter;
     }
   
-    EXTI_ConfigTypeDef cfg = {
-        .Line = exti_line,
-        .Mode = EXTI_MODE_INTERRUPT,
-        .Trigger = EXTI_TRIGGER_NONE,
-        .GPIOSel = exti_port,
-    };
-
-    switch(gpio_exti_desc[exti_line_idx].mode)
-    {
-        case hwGPIO_Interrupt_Mode_Falling_Edge:
-            cfg.Trigger = EXTI_TRIGGER_FALLING;
-            break;
-        case hwGPIO_Interrupt_Mode_Rising_Edge:
-            cfg.Trigger = EXTI_TRIGGER_RISING;
-            break;
-        case hwGPIO_Interrupt_Mode_Both_Edge:
-            cfg.Trigger = EXTI_TRIGGER_RISING_FALLING;
-            break;
-        default:
-            return hwGPIO_InvalidParameter;
-    }
+    EXTI_ConfigTypeDef cfg = {0};
+    GPIO_EXTI_Fill_Config(&cfg, exti_line, exti_port, gpio_exti_desc[exti_line_idx].mode);
     
     HAL_EXTI_SetConfigLine(&gpio_exti_desc[exti_line_idx].hexti, &cfg);
     
@@ -1028,12 +1034,11 @@ hwGPIO_OpStatus GPIO_Interrupt_Disable(hwGPIO_Int_Pin irq_pin)
         return hwGPIO_InvalidParameter;
     }
   
-    EXTI_ConfigTypeDef cfg = {
-        .Line = exti_line,
-        .Mode = EXTI_MODE_INTERRUPT,
-        .Trigger = EXTI_TRIGGER_NONE,
-        .GPIOSel = exti_port,
-    };
+    EXTI_ConfigTypeDef cfg = {0};
+    cfg.Line = exti_line;
+    cfg.Mode = EXTI_MODE_INTERRUPT;
+    cfg.Trigger = EXTI_TRIGGER_NONE;
+    cfg.GPIOSel = exti_port;
 
     HAL_EXTI_SetConfigLine(&gpio_exti_desc[exti_line_idx].hexti, &cfg);
     
@@ -1042,27 +1047,22 @@ hwGPIO_OpStatus GPIO_Interrupt_Disable(hwGPIO_Int_Pin irq_pin)
 
 hwGPIO_OpStatus GPIO_Interrupt_Pin_Read(hwGPIO_Int_Pin pin, bool* level)
 {
-    if(pin>=hwGPIO_Int_Pin_MAX)
-    {
-      return hwGPIO_InvalidParameter;
-    }
-    
-    if(level==NULL)
+    if(pin>=hwGPIO_Int_Pin_MAX || level==NULL)
     {
       return hwGPIO_InvalidParameter;
     }
   
-    uint16_t soc_pin = GPIO_Map_Soc_Pin(pin);
-    GPIO_TypeDef * soc_base = GPIO_Map_Soc_Base(pin);
+    uint16_t soc_pin = GPIO_Int_Map_Soc_Pin(pin);
+    GPIO_TypeDef * soc_base = GPIO_Int_Map_Soc_Base(pin);
 
     if(soc_pin==0 || soc_base==NULL)
     {
       return hwGPIO_InvalidParameter;
     }
     
-    *level = (HAL_GPIO_ReadPin(soc_base, soc_pin)==GPIO_PIN_SET) ? 1: 0;
+    *level = (HAL_GPIO_ReadPin(soc_base, soc_pin)==GPIO_PIN_SET) ? true : false;
     
     return hwGPIO_OK;
 }
 
-#endif //STM32F1
+#endif // STM32F3
