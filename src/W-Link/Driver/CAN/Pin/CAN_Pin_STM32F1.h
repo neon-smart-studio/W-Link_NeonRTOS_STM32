@@ -23,7 +23,7 @@ const CAN_Pinset_t CAN_Index_Map_Alt[hwCAN_Index_MAX] = {
 #if defined (CAN1_BASE)
     CONFIG_CAN0_PINSET,
 #endif
-#if defined (CAN1_BASE)
+#if defined (CAN2_BASE)
     CONFIG_CAN1_PINSET
 #endif
 };
@@ -43,7 +43,7 @@ const CAN_Pin_Def CAN_Pin_Def_Table[hwCAN_Index_MAX][CAN_Pinset_MAX] =
         { hwGPIO_Pin_D1, hwGPIO_Pin_D0 },
     },
 #endif
-#if defined (CAN1_BASE)
+#if defined (CAN2_BASE)
     /* ================= CAN2 (CAN1) ================= */
     {
         /* DEFAULT */

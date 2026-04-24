@@ -49,40 +49,40 @@ USART_TypeDef * UART_Map_Soc_Base(hwUART_Index index)
 {
     switch(index)
     {
-#if defined(UART1)
+#if defined(UART1_BASE)
         case hwUART_Index_0: return UART1;
 #endif
-#if defined(USART1)
+#if defined(USART1_BASE)
         case hwUART_Index_0: return USART1;
 #endif
-#if defined(UART2)
+#if defined(UART2_BASE)
         case hwUART_Index_1: return UART2;
 #endif
-#if defined(USART2)
+#if defined(USART2_BASE)
         case hwUART_Index_1: return USART2;
 #endif
-#if defined(UART3)
+#if defined(UART3_BASE)
         case hwUART_Index_2: return UART3;
 #endif
-#if defined(USART3)
+#if defined(USART3_BASE)
         case hwUART_Index_2: return USART3;
 #endif
-#if defined(UART4)
+#if defined(UART4_BASE)
         case hwUART_Index_3: return UART4;
 #endif
-#if defined(USART4)
+#if defined(USART4_BASE)
         case hwUART_Index_3: return USART4;
 #endif
-#if defined(UART5)
+#if defined(UART5_BASE)
         case hwUART_Index_4: return UART5;
 #endif
-#if defined(USART5)
+#if defined(USART5_BASE)
         case hwUART_Index_4: return USART5;
 #endif
-#if defined(UART6)
+#if defined(UART6_BASE)
         case hwUART_Index_5: return UART6;
 #endif
-#if defined(USART6)
+#if defined(USART6_BASE)
         case hwUART_Index_5: return USART6;
 #endif
         default: break;
@@ -121,45 +121,45 @@ static void UART_HAL_IRQHandler(hwUART_Index index)
 }
 
 // ====== 你的 IRQ handler（請確保對應的向量真的存在）======
-#if defined(UART1)
+#if defined(UART1_BASE)
 void UART1_IRQHandler(void){ UART_HAL_IRQHandler(hwUART_Index_0); }
 #endif
-#if defined(USART1)
+#if defined(USART1_BASE)
 void USART1_IRQHandler(void){ UART_HAL_IRQHandler(hwUART_Index_0); }
 #endif
 
-#if defined(UART2)
+#if defined(UART2_BASE)
 void UART2_IRQHandler(void){ UART_HAL_IRQHandler(hwUART_Index_1); }
 #endif
-#if defined(USART2)
+#if defined(USART2_BASE)
 void USART2_IRQHandler(void){ UART_HAL_IRQHandler(hwUART_Index_1); }
 #endif
 
-#if defined(UART3)
+#if defined(UART3_BASE)
 void UART3_IRQHandler(void){ UART_HAL_IRQHandler(hwUART_Index_2); }
 #endif
-#if defined(USART3)
+#if defined(USART3_BASE)
 void USART3_IRQHandler(void){ UART_HAL_IRQHandler(hwUART_Index_2); }
 #endif
 
-#if defined(UART4)
+#if defined(UART4_BASE)
 void UART4_IRQHandler(void){ UART_HAL_IRQHandler(hwUART_Index_3); }
 #endif
-#if defined(USART4)
+#if defined(USART4_BASE)
 void USART4_IRQHandler(void){ UART_HAL_IRQHandler(hwUART_Index_3); }
 #endif
 
-#if defined(UART5)
+#if defined(UART5_BASE)
 void UART5_IRQHandler(void){ UART_HAL_IRQHandler(hwUART_Index_4); }
 #endif
-#if defined(USART5)
+#if defined(USART5_BASE)
 void USART5_IRQHandler(void){ UART_HAL_IRQHandler(hwUART_Index_4); }
 #endif
 
-#if defined(UART6)
+#if defined(UART6_BASE)
 void UART6_IRQHandler(void){ UART_HAL_IRQHandler(hwUART_Index_5); }
 #endif
-#if defined(USART6)
+#if defined(USART6_BASE)
 void USART6_IRQHandler(void){ UART_HAL_IRQHandler(hwUART_Index_5); }
 #endif
 
@@ -303,40 +303,40 @@ hwUART_OpResult UART_Open_Specific_Format(hwUART_Index index, uint32_t baudrate,
     // UART peripheral clock
     switch(index)
     {
-#if defined(UART1)
+#if defined(UART1_BASE)
         case hwUART_Index_0: __HAL_RCC_UART1_CLK_ENABLE(); break;
 #endif
-#if defined(USART1)
+#if defined(USART1_BASE)
         case hwUART_Index_0: __HAL_RCC_USART1_CLK_ENABLE(); break;
 #endif
-#if defined(UART2)
+#if defined(UART2_BASE)
         case hwUART_Index_1: __HAL_RCC_UART2_CLK_ENABLE(); break;
 #endif
-#if defined(USART2)
+#if defined(USART2_BASE)
         case hwUART_Index_1: __HAL_RCC_USART2_CLK_ENABLE(); break;
 #endif
-#if defined(UART3)
+#if defined(UART3_BASE)
         case hwUART_Index_2: __HAL_RCC_UART3_CLK_ENABLE(); break;
 #endif
-#if defined(USART3)
+#if defined(USART3_BASE)
         case hwUART_Index_2: __HAL_RCC_USART3_CLK_ENABLE(); break;
 #endif
-#if defined(UART4)
+#if defined(UART4_BASE)
         case hwUART_Index_3: __HAL_RCC_UART4_CLK_ENABLE(); break;
 #endif
-#if defined(USART4)
+#if defined(USART4_BASE)
         case hwUART_Index_3: __HAL_RCC_USART4_CLK_ENABLE(); break;
 #endif
-#if defined(UART5)
+#if defined(UART5_BASE)
         case hwUART_Index_4: __HAL_RCC_UART5_CLK_ENABLE(); break;
 #endif
-#if defined(USART5)
+#if defined(USART5_BASE)
         case hwUART_Index_4: __HAL_RCC_USART5_CLK_ENABLE(); break;
 #endif
-#if defined(UART6)
+#if defined(UART6_BASE)
         case hwUART_Index_5: __HAL_RCC_UART6_CLK_ENABLE(); break;
 #endif
-#if defined(USART6)
+#if defined(USART6_BASE)
         case hwUART_Index_5: __HAL_RCC_USART6_CLK_ENABLE(); break;
 #endif
     }
@@ -415,74 +415,74 @@ hwUART_OpResult UART_Open_Specific_Format(hwUART_Index index, uint32_t baudrate,
 
     switch(index)
     {
-#if defined(UART1)
+#if defined(UART1_BASE)
         case hwUART_Index_0:
             HAL_NVIC_SetPriority(UART1_IRQn, UART_IRQ_NVIC_PRIORITY, UART_IRQ_NVIC_SUB_PRIORITY);
             HAL_NVIC_EnableIRQ(UART1_IRQn);
             break;
 #endif
-#if defined(USART1)
+#if defined(USART1_BASE)
         case hwUART_Index_0:
             HAL_NVIC_SetPriority(USART1_IRQn, UART_IRQ_NVIC_PRIORITY, UART_IRQ_NVIC_SUB_PRIORITY);
             HAL_NVIC_EnableIRQ(USART1_IRQn);
             break;
 #endif
-#if defined(UART2)
+#if defined(UART2_BASE)
         case hwUART_Index_1:
             HAL_NVIC_SetPriority(UART2_IRQn, UART_IRQ_NVIC_PRIORITY, UART_IRQ_NVIC_SUB_PRIORITY);
             HAL_NVIC_EnableIRQ(UART2_IRQn);
             break;
 #endif
-#if defined(USART2)
+#if defined(USART2_BASE)
         case hwUART_Index_1:
             HAL_NVIC_SetPriority(USART2_IRQn, UART_IRQ_NVIC_PRIORITY, UART_IRQ_NVIC_SUB_PRIORITY);
             HAL_NVIC_EnableIRQ(USART2_IRQn);
             break;
 
 #endif
-#if defined(UART3)
+#if defined(UART3_BASE)
         case hwUART_Index_2:
             HAL_NVIC_SetPriority(UART3_IRQn, UART_IRQ_NVIC_PRIORITY, UART_IRQ_NVIC_SUB_PRIORITY);
             HAL_NVIC_EnableIRQ(UART3_IRQn);
             break;
 #endif
-#if defined(USART3)
+#if defined(USART3_BASE)
         case hwUART_Index_2:
             HAL_NVIC_SetPriority(USART3_IRQn, UART_IRQ_NVIC_PRIORITY, UART_IRQ_NVIC_SUB_PRIORITY);
             HAL_NVIC_EnableIRQ(USART3_IRQn);
             break;
 #endif
-#if defined(UART4)
+#if defined(UART4_BASE)
         case hwUART_Index_3:
             HAL_NVIC_SetPriority(UART4_IRQn, UART_IRQ_NVIC_PRIORITY, UART_IRQ_NVIC_SUB_PRIORITY);
             HAL_NVIC_EnableIRQ(UART4_IRQn);
             break;
 #endif
-#if defined(USART4)
+#if defined(USART4_BASE)
         case hwUART_Index_3:
             HAL_NVIC_SetPriority(USART4_IRQn, UART_IRQ_NVIC_PRIORITY, UART_IRQ_NVIC_SUB_PRIORITY);
             HAL_NVIC_EnableIRQ(USART4_IRQn);
             break;
 #endif
-#if defined(UART5)
+#if defined(UART5_BASE)
         case hwUART_Index_4:
             HAL_NVIC_SetPriority(UART5_IRQn, UART_IRQ_NVIC_PRIORITY, UART_IRQ_NVIC_SUB_PRIORITY);
             HAL_NVIC_EnableIRQ(UART5_IRQn);
             break;
 #endif
-#if defined(USART5)
+#if defined(USART5_BASE)
         case hwUART_Index_4:
             HAL_NVIC_SetPriority(USART5_IRQn, UART_IRQ_NVIC_PRIORITY, UART_IRQ_NVIC_SUB_PRIORITY);
             HAL_NVIC_EnableIRQ(USART5_IRQn);
             break;
 #endif
-#if defined(UART6)
+#if defined(UART6_BASE)
         case hwUART_Index_5:
             HAL_NVIC_SetPriority(UART6_IRQn, UART_IRQ_NVIC_PRIORITY, UART_IRQ_NVIC_SUB_PRIORITY);
             HAL_NVIC_EnableIRQ(UART6_IRQn);
             break;
 #endif
-#if defined(USART6)
+#if defined(USART6_BASE)
         case hwUART_Index_5:
             HAL_NVIC_SetPriority(USART6_IRQn, UART_IRQ_NVIC_PRIORITY, UART_IRQ_NVIC_SUB_PRIORITY);
             HAL_NVIC_EnableIRQ(USART6_IRQn);
@@ -544,63 +544,63 @@ hwUART_OpResult UART_Close(hwUART_Index index)
 
     switch(index)
     {
-#if defined(UART1)
+#if defined(UART1_BASE)
         case hwUART_Index_0:
             HAL_NVIC_DisableIRQ(UART1_IRQn);
             break;
 #endif
-#if defined(USART1)
+#if defined(USART1_BASE)
         case hwUART_Index_0:
             HAL_NVIC_DisableIRQ(USART1_IRQn);
             break;
 #endif
-#if defined(UART2)
+#if defined(UART2_BASE)
         case hwUART_Index_1:
             HAL_NVIC_DisableIRQ(UART2_IRQn);
             break;
 #endif
-#if defined(USART2)
+#if defined(USART2_BASE)
         case hwUART_Index_1:
             HAL_NVIC_DisableIRQ(USART2_IRQn);
             break;
 
 #endif
-#if defined(UART3)
+#if defined(UART3_BASE)
         case hwUART_Index_2:
             HAL_NVIC_DisableIRQ(UART3_IRQn);
             break;
 #endif
-#if defined(USART3)
+#if defined(USART3_BASE)
         case hwUART_Index_2:
             HAL_NVIC_DisableIRQ(USART3_IRQn);
             break;
 #endif
-#if defined(UART4)
+#if defined(UART4_BASE)
         case hwUART_Index_3:
             HAL_NVIC_DisableIRQ(UART4_IRQn);
             break;
 #endif
-#if defined(USART4)
+#if defined(USART4_BASE)
         case hwUART_Index_3:
             HAL_NVIC_DisableIRQ(USART4_IRQn);
             break;
 #endif
-#if defined(UART5)
+#if defined(UART5_BASE)
         case hwUART_Index_4:
             HAL_NVIC_DisableIRQ(UART5_IRQn);
             break;
 #endif
-#if defined(USART5)
+#if defined(USART5_BASE)
         case hwUART_Index_4:
             HAL_NVIC_DisableIRQ(USART5_IRQn);
             break;
 #endif
-#if defined(UART6)
+#if defined(UART6_BASE)
         case hwUART_Index_5:
             HAL_NVIC_DisableIRQ(UART6_IRQn);
             break;
 #endif
-#if defined(USART6)
+#if defined(USART6_BASE)
         case hwUART_Index_5:
             HAL_NVIC_DisableIRQ(USART6_IRQn);
             break;
@@ -615,40 +615,40 @@ hwUART_OpResult UART_Close(hwUART_Index index)
     // disable peripheral clock
     switch(index)
     {
-#if defined(UART1)
+#if defined(UART1_BASE)
         case hwUART_Index_0: __HAL_RCC_UART1_CLK_DISABLE(); break;
 #endif
-#if defined(USART1)
+#if defined(USART1_BASE)
         case hwUART_Index_0: __HAL_RCC_USART1_CLK_DISABLE(); break;
 #endif
-#if defined(UART2)
+#if defined(UART2_BASE)
         case hwUART_Index_1: __HAL_RCC_UART2_CLK_DISABLE(); break;
 #endif
-#if defined(USART2)
+#if defined(USART2_BASE)
         case hwUART_Index_1: __HAL_RCC_USART2_CLK_DISABLE(); break;
 #endif
-#if defined(UART3)
+#if defined(UART3_BASE)
         case hwUART_Index_2: __HAL_RCC_UART3_CLK_DISABLE(); break;
 #endif
-#if defined(USART3)
+#if defined(USART3_BASE)
         case hwUART_Index_2: __HAL_RCC_USART3_CLK_DISABLE(); break;
 #endif
-#if defined(UART4)
+#if defined(UART4_BASE)
         case hwUART_Index_3: __HAL_RCC_UART4_CLK_DISABLE(); break;
 #endif
-#if defined(USART4)
+#if defined(USART4_BASE)
         case hwUART_Index_3: __HAL_RCC_USART4_CLK_DISABLE(); break;
 #endif
-#if defined(UART5)
+#if defined(UART5_BASE)
         case hwUART_Index_4: __HAL_RCC_UART5_CLK_DISABLE(); break;
 #endif
-#if defined(USART5)
+#if defined(USART5_BASE)
         case hwUART_Index_4: __HAL_RCC_USART5_CLK_DISABLE(); break;
 #endif
-#if defined(UART6)
+#if defined(UART6_BASE)
         case hwUART_Index_5: __HAL_RCC_UART6_CLK_DISABLE(); break;
 #endif
-#if defined(USART6)
+#if defined(USART6_BASE)
         case hwUART_Index_5: __HAL_RCC_USART6_CLK_DISABLE(); break;
 #endif
     }

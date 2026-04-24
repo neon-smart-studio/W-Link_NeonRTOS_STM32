@@ -169,16 +169,16 @@ hwI2C_OpResult I2C_Master_Init(hwI2C_Index index, hwI2C_Speed_Mode speed_mode)
 
     GPIO_InitTypeDef g_i2c_sda = {0};
     g_i2c_sda.Pin       = sda_soc_pin;
-    g_i2c_sda.Mode      = GPIO_MODE_AF_PP;
-    g_i2c_sda.Pull      = GPIO_NOPULL;
+    g_i2c_sda.Mode      = GPIO_MODE_AF_OD;
+    g_i2c_sda.Pull      = GPIO_PULLUP;
     g_i2c_sda.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
     g_i2c_sda.Alternate = sda_af;
     HAL_GPIO_Init(sda_soc_base, &g_i2c_sda);
 
     GPIO_InitTypeDef g_i2c_scl = {0};
     g_i2c_scl.Pin       = scl_soc_pin;
-    g_i2c_scl.Mode      = GPIO_MODE_AF_PP;
-    g_i2c_scl.Pull      = GPIO_NOPULL;
+    g_i2c_scl.Mode      = GPIO_MODE_AF_OD;
+    g_i2c_scl.Pull      = GPIO_PULLUP;
     g_i2c_scl.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
     g_i2c_scl.Alternate = scl_af;
     HAL_GPIO_Init(scl_soc_base, &g_i2c_scl);

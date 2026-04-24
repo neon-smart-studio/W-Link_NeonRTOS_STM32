@@ -10,7 +10,7 @@
 
 #include "I2C/I2C_Master.h"
 
-#ifdef STM32F1
+#ifdef STM32F4
 
 #include "I2C/I2C_Pin.h"
 
@@ -28,6 +28,16 @@ static NeonRTOS_SyncObj_t I2C_Master_Done_SyncHandle[hwI2C_Index_MAX];
 
 static I2C_HandleTypeDef g_i2c[hwI2C_Index_MAX];
 
+uint32_t STM32_I2C_GetAF(hwI2C_Index I2C, hwGPIO_Pin pin)
+{
+    for (size_t i = 0; i < sizeof(I2C_Pin_AF_Map)/sizeof(I2C_Pin_AF_Map[0]); i++) {
+        if (I2C_Pin_AF_Map[i].i2c == I2C &&
+            I2C_Pin_AF_Map[i].pin  == pin)
+            return I2C_Pin_AF_Map[i].af;
+    }
+    return 0;
+}
+
 static hwI2C_Index I2C_IndexFromHandle(I2C_HandleTypeDef *hI2C)
 {
     for(int i=0;i<hwI2C_Index_MAX;i++){
@@ -42,6 +52,7 @@ I2C_TypeDef * I2C_Map_Soc_Base(hwI2C_Index index)
     {
         case hwI2C_Index_0: return I2C1;
         case hwI2C_Index_1: return I2C2;
+        case hwI2C_Index_2: return I2C3;
         default: break;
     }
     return NULL;
@@ -99,6 +110,8 @@ void I2C1_EV_IRQHandler(void){ I2C_HAL_EV_IRQHandler(hwI2C_Index_0); }
 void I2C1_ER_IRQHandler(void){ I2C_HAL_ER_IRQHandler(hwI2C_Index_0); }
 void I2C2_EV_IRQHandler(void){ I2C_HAL_EV_IRQHandler(hwI2C_Index_1); }
 void I2C2_ER_IRQHandler(void){ I2C_HAL_ER_IRQHandler(hwI2C_Index_1); }
+void I2C3_EV_IRQHandler(void){ I2C_HAL_EV_IRQHandler(hwI2C_Index_2); }
+void I2C3_ER_IRQHandler(void){ I2C_HAL_ER_IRQHandler(hwI2C_Index_2); }
 
 hwI2C_OpResult I2C_Master_Init(hwI2C_Index index, hwI2C_Speed_Mode speed_mode)
 {
@@ -158,14 +171,16 @@ hwI2C_OpResult I2C_Master_Init(hwI2C_Index index, hwI2C_Speed_Mode speed_mode)
     g_i2c_sda.Pin       = sda_soc_pin;
     g_i2c_sda.Mode      = GPIO_MODE_AF_OD;
     g_i2c_sda.Pull      = GPIO_PULLUP;
-    g_i2c_sda.Speed     = GPIO_SPEED_FREQ_HIGH;
+    g_i2c_sda.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
+    g_i2c_sda.Alternate = sda_af;
     HAL_GPIO_Init(sda_soc_base, &g_i2c_sda);
 
     GPIO_InitTypeDef g_i2c_scl = {0};
     g_i2c_scl.Pin       = scl_soc_pin;
     g_i2c_scl.Mode      = GPIO_MODE_AF_OD;
     g_i2c_scl.Pull      = GPIO_PULLUP;
-    g_i2c_scl.Speed     = GPIO_SPEED_FREQ_HIGH;
+    g_i2c_scl.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
+    g_i2c_scl.Alternate = scl_af;
     HAL_GPIO_Init(scl_soc_base, &g_i2c_scl);
 
     switch(index)
@@ -175,6 +190,9 @@ hwI2C_OpResult I2C_Master_Init(hwI2C_Index index, hwI2C_Speed_Mode speed_mode)
             break;
         case hwI2C_Index_1:
             __HAL_RCC_I2C2_CLK_ENABLE();
+            break;
+        case hwI2C_Index_2:
+            __HAL_RCC_I2C3_CLK_ENABLE();
             break;
     }
 
@@ -214,6 +232,12 @@ hwI2C_OpResult I2C_Master_Init(hwI2C_Index index, hwI2C_Speed_Mode speed_mode)
             HAL_NVIC_EnableIRQ(I2C2_EV_IRQn);
             HAL_NVIC_SetPriority(I2C2_ER_IRQn, I2C_IRQ_NVIC_PRIORITY, I2C_IRQ_NVIC_SUB_PRIORITY);
             HAL_NVIC_EnableIRQ(I2C2_ER_IRQn);
+            break;
+        case hwI2C_Index_2:
+            HAL_NVIC_SetPriority(I2C3_EV_IRQn, I2C_IRQ_NVIC_PRIORITY, I2C_IRQ_NVIC_SUB_PRIORITY);
+            HAL_NVIC_EnableIRQ(I2C3_EV_IRQn);
+            HAL_NVIC_SetPriority(I2C3_ER_IRQn, I2C_IRQ_NVIC_PRIORITY, I2C_IRQ_NVIC_SUB_PRIORITY);
+            HAL_NVIC_EnableIRQ(I2C3_ER_IRQn);
             break;
     }
 
@@ -258,6 +282,10 @@ hwI2C_OpResult I2C_Master_DeInit(hwI2C_Index index)
             HAL_NVIC_DisableIRQ(I2C2_EV_IRQn);
             HAL_NVIC_DisableIRQ(I2C2_ER_IRQn);
             break;
+        case hwI2C_Index_2:
+            HAL_NVIC_DisableIRQ(I2C3_EV_IRQn);
+            HAL_NVIC_DisableIRQ(I2C3_ER_IRQn);
+            break;
     }
 
     HAL_I2C_DeInit(&g_i2c[index]);
@@ -269,6 +297,9 @@ hwI2C_OpResult I2C_Master_DeInit(hwI2C_Index index)
             break;
         case hwI2C_Index_1:
             __HAL_RCC_I2C2_CLK_DISABLE();
+            break;
+        case hwI2C_Index_2:
+            __HAL_RCC_I2C3_CLK_DISABLE();
             break;
     }
 
@@ -383,4 +414,4 @@ bool I2C_Master_isInit(hwI2C_Index index)
     return I2C_Master_Init_Status[index];
 }
 
-#endif //STM32F1
+#endif //STM32F4

@@ -18,6 +18,10 @@
 #include "Pin/SPI_Pin_STM32F3.h"
 #endif //STM32F3
 
+#ifdef STM32F4
+#include "Pin/SPI_Pin_STM32F4.h"
+#endif //STM32F4
+
 #ifdef STM32F7
 #include "Pin/SPI_Pin_STM32F7.h"
 #endif //STM32F7
