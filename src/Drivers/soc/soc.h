@@ -70,6 +70,24 @@
 #include "stm32f2xx_hal_dac.h"
 #endif //STM32F2
 
+#if defined (STM32F301x8) || defined (STM32F302x8) || defined (STM32F318xx) || \
+    defined (STM32F302xC) || defined (STM32F303xC) || defined (STM32F358xx) || \
+    defined (STM32F303x8) || defined (STM32F334x8) || defined (STM32F328xx) || \
+    defined (STM32F302xE) || defined (STM32F303xE) || defined (STM32F398xx) || \
+    defined (STM32F373xC) || defined (STM32F378xx)
+#include "stm32f3xx.h"
+#include "stm32f3xx_hal_gpio.h"
+#include "stm32f3xx_hal_exti.h"
+#include "stm32f3xx_hal_uart.h"
+#include "stm32f3xx_hal_spi.h"
+#include "stm32f3xx_hal_i2c.h"
+#include "stm32f3xx_hal_dma.h"
+#include "stm32f3xx_hal_rtc.h"
+#include "stm32f3xx_hal_adc.h"
+#include "stm32f3xx_hal_can.h"
+#include "stm32f3xx_hal_dac.h"
+#endif //STM32F3
+
 #if defined (STM32F756xx) || defined (STM32F746xx) || defined (STM32F745xx) || defined (STM32F765xx) || \
     defined (STM32F767xx) || defined (STM32F769xx) || defined (STM32F777xx) || defined (STM32F779xx) || \
     defined (STM32F722xx) || defined (STM32F723xx) || defined (STM32F732xx) || defined (STM32F733xx) || \
