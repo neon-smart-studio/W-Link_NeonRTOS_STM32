@@ -21,6 +21,20 @@
 #include "driverlib/flash.h"
 #endif //DEVICE_TM4C1294
 
+#if !defined (STM32C011xx) && !defined (STM32C031xx)
+#include "stm32c0xx.h"
+#include "stm32c0xx_hal_gpio.h"
+#include "stm32c0xx_hal_exti.h"
+#include "stm32c0xx_hal_uart.h"
+#include "stm32c0xx_hal_spi.h"
+#include "stm32c0xx_hal_i2c.h"
+#include "stm32c0xx_hal_dma.h"
+#include "stm32c0xx_hal_rtc.h"
+#include "stm32c0xx_hal_adc.h"
+#include "stm32c0xx_hal_can.h"
+#include "stm32c0xx_hal_dac.h"
+#endif //STM32C0
+
 #if defined (STM32F030x6) || defined (STM32F030x8) ||                           \
     defined (STM32F031x6) || defined (STM32F038xx) ||                           \
     defined (STM32F042x6) || defined (STM32F048xx) || defined (STM32F070x6) || \
