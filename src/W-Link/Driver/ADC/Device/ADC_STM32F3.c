@@ -93,71 +93,6 @@ void ADC3_IRQHandler(void)
 }
 #endif
 
-static hwADC_OpStatus ADC_Instance_Enable(hwADC_Instance inst)
-{
-    switch (inst)
-    {
-#if defined(ADC1_BASE)
-        case hwADC_Instance_1:
-            __HAL_RCC_ADC12_CLK_ENABLE();
-            g_adc[inst].Instance = ADC1;
-            break;
-#endif
-
-#if defined(ADC2_BASE)
-        case hwADC_Instance_2:
-            __HAL_RCC_ADC12_CLK_ENABLE();
-            g_adc[inst].Instance = ADC2;
-            break;
-#endif
-
-#if defined(ADC3_BASE)
-        case hwADC_Instance_3:
-            __HAL_RCC_ADC34_CLK_ENABLE();
-            g_adc[inst].Instance = ADC3;
-            break;
-#endif
-
-        default:
-            return hwADC_InvalidParameter;
-    }
-
-    return hwADC_OK;
-}
-
-static void ADC_Instance_Disable(hwADC_Instance inst)
-{
-    switch (inst)
-    {
-#if defined(ADC1_BASE)
-        case hwADC_Instance_1:
-            if (!ADC_Instance_Init_Status[hwADC_Instance_1])
-            {
-                __HAL_RCC_ADC12_CLK_DISABLE();
-            }
-            break;
-#endif
-
-#if defined(ADC2_BASE)
-        case hwADC_Instance_2:
-            if (!ADC_Instance_Init_Status[hwADC_Instance_2])
-            {
-                __HAL_RCC_ADC12_CLK_DISABLE();
-            }
-            break;
-#endif
-
-#if defined(ADC3_BASE)
-        case hwADC_Instance_3:
-            __HAL_RCC_ADC34_CLK_DISABLE();
-            break;
-#endif
-
-        default:
-            break;
-    }
-}
-
 static void ADC_NVIC_Enable_All(void)
 {
 #if defined(ADC1_BASE) || defined(ADC2_BASE)
@@ -227,10 +162,31 @@ hwADC_OpStatus hwADC_Channel_Init(hwADC_Channel_Index ch)
 
     if (!ADC_Instance_Init_Status[inst])
     {
-        if (ADC_Instance_Enable(inst) != hwADC_OK)
+        switch (inst)
         {
-            NeonRTOS_MsgQDelete(&ADC_Channel_SyncQueue[inst]);
-            return hwADC_InvalidParameter;
+#if defined(ADC1_BASE)
+            case hwADC_Instance_1:
+                __HAL_RCC_ADC12_CLK_ENABLE();
+                g_adc[inst].Instance = ADC1;
+                break;
+#endif
+
+#if defined(ADC2_BASE)
+            case hwADC_Instance_2:
+                __HAL_RCC_ADC12_CLK_ENABLE();
+                g_adc[inst].Instance = ADC2;
+                break;
+#endif
+
+#if defined(ADC3_BASE)
+            case hwADC_Instance_3:
+                __HAL_RCC_ADC34_CLK_ENABLE();
+                g_adc[inst].Instance = ADC3;
+                break;
+#endif
+
+            default:
+                return hwADC_InvalidParameter;
         }
 
         g_adc[inst].Init.ClockPrescaler        = ADC_CLOCK_SYNC_PCLK_DIV4;
@@ -330,7 +286,36 @@ hwADC_OpStatus hwADC_Channel_DeInit(hwADC_Channel_Index ch)
             HAL_ADC_DeInit(&g_adc[i_inst]);
 
             ADC_Instance_Init_Status[i_inst] = false;
-            ADC_Instance_Disable(i_inst);
+            
+            switch (inst)
+            {
+#if defined(ADC1_BASE)
+                case hwADC_Instance_1:
+                    if (!ADC_Instance_Init_Status[hwADC_Instance_1])
+                    {
+                        __HAL_RCC_ADC12_CLK_DISABLE();
+                    }
+                    break;
+#endif
+
+#if defined(ADC2_BASE)
+                case hwADC_Instance_2:
+                    if (!ADC_Instance_Init_Status[hwADC_Instance_2])
+                    {
+                        __HAL_RCC_ADC12_CLK_DISABLE();
+                    }
+                    break;
+#endif
+
+#if defined(ADC3_BASE)
+                case hwADC_Instance_3:
+                    __HAL_RCC_ADC34_CLK_DISABLE();
+                    break;
+#endif
+
+                default:
+                    break;
+            }
 
             NeonRTOS_MsgQDelete(&ADC_Channel_SyncQueue[i_inst]);
             ADC_Channel_SyncQueue[i_inst] = NULL;
