@@ -44,6 +44,7 @@ static hwUART_Index UART_IndexFromHandle(UART_HandleTypeDef *huart)
     }
     return hwUART_Index_MAX;
 }
+
 USART_TypeDef * UART_Map_Soc_Base(hwUART_Index index)
 {
     switch(index)
@@ -100,11 +101,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     hwUART_Index idx = UART_IndexFromHandle(huart);
     if(idx >= hwUART_Index_MAX) return;
 
-#if defined(STM32H7)
-    __HAL_UART_CLEAR_FLAG(huart, UART_FLAG_RXFNE);
-#else
     __HAL_UART_CLEAR_FLAG(huart, UART_FLAG_RXNE);
-#endif
+    
     huart->RxState = HAL_UART_STATE_READY;
 
     NeonRTOS_SyncObjSignalFromISR(&UART_Recv_SyncHandle[idx]);
@@ -425,7 +423,7 @@ hwUART_OpResult UART_Open_Specific_Format(hwUART_Index index, uint32_t baudrate,
             HAL_NVIC_EnableIRQ(UART1_IRQn);
             break;
 #endif
-#if defined(USART1)
+#if defined(USART1_BASE)
         case hwUART_Index_0:
             HAL_NVIC_SetPriority(USART1_IRQn, UART_IRQ_NVIC_PRIORITY, UART_IRQ_NVIC_SUB_PRIORITY);
             HAL_NVIC_EnableIRQ(USART1_IRQn);

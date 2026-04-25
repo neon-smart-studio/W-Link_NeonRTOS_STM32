@@ -96,11 +96,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     hwUART_Index idx = UART_IndexFromHandle(huart);
     if(idx >= hwUART_Index_MAX) return;
 
-#if defined(STM32H7)
-    __HAL_UART_CLEAR_FLAG(huart, UART_FLAG_RXFNE);
-#else
     __HAL_UART_CLEAR_FLAG(huart, UART_FLAG_RXNE);
-#endif
+    
     huart->RxState = HAL_UART_STATE_READY;
 
     NeonRTOS_SyncObjSignalFromISR(&UART_Recv_SyncHandle[idx]);

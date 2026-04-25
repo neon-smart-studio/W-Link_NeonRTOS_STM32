@@ -2,6 +2,11 @@
 #ifndef UART_PIN_H
 #define UART_PIN_H
 
+#ifdef STM32C0
+#include "Pin/UART_Pin_STM32C0.h"
+#endif //STM32C0
+
+
 #ifdef STM32F0
 #include "Pin/UART_Pin_STM32F0.h"
 #endif //STM32F0

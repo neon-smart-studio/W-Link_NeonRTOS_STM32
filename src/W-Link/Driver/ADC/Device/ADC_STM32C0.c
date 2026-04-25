@@ -151,8 +151,8 @@ hwADC_OpStatus hwADC_Channel_Init(hwADC_Channel_Index ch)
 
         if (!ADC_NVIC_Init_Status)
         {
-            HAL_NVIC_SetPriority(ADC1_COMP_IRQn, ADC_IRQ_NVIC_PRIORITY, ADC_IRQ_NVIC_SUB_PRIORITY);
-            HAL_NVIC_EnableIRQ(ADC1_COMP_IRQn);
+            HAL_NVIC_SetPriority(ADC1_IRQn, ADC_IRQ_NVIC_PRIORITY, ADC_IRQ_NVIC_SUB_PRIORITY);
+            HAL_NVIC_EnableIRQ(ADC1_IRQn);
             ADC_NVIC_Init_Status = true;
         }
 
@@ -223,7 +223,7 @@ hwADC_OpStatus hwADC_Channel_DeInit(hwADC_Channel_Index ch)
 
     if (!inst_used && ADC_NVIC_Init_Status)
     {
-        HAL_NVIC_DisableIRQ(ADC1_COMP_IRQn);
+        HAL_NVIC_DisableIRQ(ADC1_IRQn);
         ADC_NVIC_Init_Status = false;
     }
 
