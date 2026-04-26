@@ -6,7 +6,6 @@
 #include "Pin/UART_Pin_STM32C0.h"
 #endif //STM32C0
 
-
 #ifdef STM32F0
 #include "Pin/UART_Pin_STM32F0.h"
 #endif //STM32F0
@@ -30,6 +29,10 @@
 #ifdef STM32F7
 #include "Pin/UART_Pin_STM32F7.h"
 #endif //STM32F7
+
+#ifdef STM32G0
+#include "Pin/UART_Pin_STM32G0.h"
+#endif //STM32G0
 
 #ifdef STM32H7
 #include "Pin/UART_Pin_STM32H7.h"

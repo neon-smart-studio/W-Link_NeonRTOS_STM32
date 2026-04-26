@@ -33,7 +33,7 @@ int main(void) {
     HAL_Init();
     SystemClock_Config();
 
-    __HAL_RCC_WWDG_CLK_DISABLE();  // 禁用窗口看門狗
+    //__HAL_RCC_WWDG_CLK_DISABLE();  // 禁用窗口看門狗
     //__HAL_RCC_IWDG_CLK_DISABLE();  // 禁用獨立看門狗
 
     // 啟動 NeonRTOS 調度器

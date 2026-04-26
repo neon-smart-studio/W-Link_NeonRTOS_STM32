@@ -38,6 +38,9 @@ typedef enum hwUART_Index_t
 #if defined(LPUART1_BASE) || defined(LPUSART1_BASE)
   hwUART_Index_L1,
 #endif
+#if defined(LPUART2_BASE) || defined(LPUSART2_BASE)
+  hwUART_Index_L2,
+#endif
   hwUART_Index_MAX,
 }hwUART_Index;
 // 定義標準輸出的 UART 索引
