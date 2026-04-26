@@ -16,6 +16,12 @@ typedef enum {
 #if defined (ADC3_BASE)
     hwADC_Instance_3,
 #endif
+#if defined (ADC4_BASE)
+    hwADC_Instance_4,
+#endif
+#if defined (ADC5_BASE)
+    hwADC_Instance_5,
+#endif
     hwADC_Instance_MAX,
 } hwADC_Instance;
 

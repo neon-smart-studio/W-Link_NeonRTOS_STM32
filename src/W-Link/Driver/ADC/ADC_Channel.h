@@ -20,6 +20,9 @@ typedef enum hwADC_Channel_Index_t
   hwADC_Channel_Index_13,
   hwADC_Channel_Index_14,
   hwADC_Channel_Index_15,
+  hwADC_Channel_Index_16,
+  hwADC_Channel_Index_17,
+  hwADC_Channel_Index_18,
   hwADC_Channel_Index_MAX,
 }hwADC_Channel_Index;
 

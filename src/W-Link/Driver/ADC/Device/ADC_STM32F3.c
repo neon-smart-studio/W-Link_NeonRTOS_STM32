@@ -54,6 +54,8 @@ static uint32_t ADC_Channel_To_HAL(hwADC_Channel_Index ch)
         case hwADC_Channel_Index_13: return ADC_CHANNEL_14;
         case hwADC_Channel_Index_14: return ADC_CHANNEL_15;
         case hwADC_Channel_Index_15: return ADC_CHANNEL_16;
+        case hwADC_Channel_Index_16: return ADC_CHANNEL_17;
+        case hwADC_Channel_Index_17: return ADC_CHANNEL_18;
         default: return 0;
     }
 }
@@ -92,34 +94,6 @@ void ADC3_IRQHandler(void)
     HAL_ADC_IRQHandler(&g_adc[hwADC_Instance_3]);
 }
 #endif
-
-static void ADC_NVIC_Enable_All(void)
-{
-#if defined(ADC1_BASE) || defined(ADC2_BASE)
-    HAL_NVIC_SetPriority(ADC1_2_IRQn, ADC_IRQ_NVIC_PRIORITY, ADC_IRQ_NVIC_SUB_PRIORITY);
-    HAL_NVIC_EnableIRQ(ADC1_2_IRQn);
-#endif
-
-#if defined(ADC3_BASE)
-    HAL_NVIC_SetPriority(ADC3_IRQn, ADC_IRQ_NVIC_PRIORITY, ADC_IRQ_NVIC_SUB_PRIORITY);
-    HAL_NVIC_EnableIRQ(ADC3_IRQn);
-#endif
-
-    ADC_NVIC_Init_Status = true;
-}
-
-static void ADC_NVIC_Disable_All(void)
-{
-#if defined(ADC1_BASE) || defined(ADC2_BASE)
-    HAL_NVIC_DisableIRQ(ADC1_2_IRQn);
-#endif
-
-#if defined(ADC3_BASE)
-    HAL_NVIC_DisableIRQ(ADC3_IRQn);
-#endif
-
-    ADC_NVIC_Init_Status = false;
-}
 
 hwADC_OpStatus hwADC_Channel_Init(hwADC_Channel_Index ch)
 {
@@ -224,7 +198,17 @@ hwADC_OpStatus hwADC_Channel_Init(hwADC_Channel_Index ch)
 
         if (!ADC_NVIC_Init_Status)
         {
-            ADC_NVIC_Enable_All();
+#if defined(ADC1_BASE) || defined(ADC2_BASE)
+                HAL_NVIC_SetPriority(ADC1_2_IRQn, ADC_IRQ_NVIC_PRIORITY, ADC_IRQ_NVIC_SUB_PRIORITY);
+                HAL_NVIC_EnableIRQ(ADC1_2_IRQn);
+#endif
+
+#if defined(ADC3_BASE)
+                HAL_NVIC_SetPriority(ADC3_IRQn, ADC_IRQ_NVIC_PRIORITY, ADC_IRQ_NVIC_SUB_PRIORITY);
+                HAL_NVIC_EnableIRQ(ADC3_IRQn);
+#endif
+
+                ADC_NVIC_Init_Status = true;
         }
 
         ADC_Instance_Init_Status[inst] = true;
@@ -329,7 +313,15 @@ hwADC_OpStatus hwADC_Channel_DeInit(hwADC_Channel_Index ch)
 
     if (!inst_used && ADC_NVIC_Init_Status)
     {
-        ADC_NVIC_Disable_All();
+#if defined(ADC1_BASE) || defined(ADC2_BASE)
+        HAL_NVIC_DisableIRQ(ADC1_2_IRQn);
+ #endif
+
+#if defined(ADC3_BASE)
+        HAL_NVIC_DisableIRQ(ADC3_IRQn);
+#endif
+
+        ADC_NVIC_Init_Status = false;
     }
 
     HAL_GPIO_DeInit(adc_pin_soc_base, adc_soc_pin);
