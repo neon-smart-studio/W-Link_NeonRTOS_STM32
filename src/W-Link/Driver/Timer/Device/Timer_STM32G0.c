@@ -608,4 +608,4 @@ bool Timer_is_Init(hwTimer_Index hw_index)
     return Timer_Init_Status[hw_index];
 }
 
-#endif // STM32F0
+#endif // STM32G0

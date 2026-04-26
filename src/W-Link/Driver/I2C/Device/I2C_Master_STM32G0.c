@@ -17,10 +17,10 @@
 #define I2C_IRQ_NVIC_PRIORITY      5
 #define I2C_IRQ_NVIC_SUB_PRIORITY  0
 
-#define TIMING_VAL_48M_CLK_100KHZ  0x10805E89  // Standard mode with Rise Time = 400ns and Fall Time = 100ns
-#define TIMING_VAL_48M_CLK_400KHZ  0x00901850  // Fast mode with Rise Time = 250ns and Fall Time = 100ns
-#define TIMING_VAL_48M_CLK_1MHZ    0x00700818  // Fast mode Plus with Rise Time = 60ns and Fall Time = 100ns
-#define I2C_PCLK_48M               48000000    // 48 MHz    
+#define TIMING_VAL_64M_CLK_100KHZ  0xC0311319  // Standard mode with Rise Time = 400ns and Fall Time = 100ns
+#define TIMING_VAL_64M_CLK_400KHZ  0x10B1102E  // Fast mode with Rise Time = 250ns and Fall Time = 100ns
+#define TIMING_VAL_64M_CLK_1MHZ    0x00710B1E  // Fast mode Plus with Rise Time = 60ns and Fall Time = 100ns
+#define I2C_PCLK_64M               64000000    // 64 MHz
 
 static bool I2C_Master_Init_Status[hwI2C_Index_MAX] = {false};
 static hwI2C_Speed_Mode I2C_Clock_Speed_Mode[hwI2C_Index_MAX] = {hwI2C_Standard_Mode};

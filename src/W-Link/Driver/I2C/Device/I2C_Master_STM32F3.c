@@ -7,7 +7,9 @@
 #include "soc.h"
 
 #include "NeonRTOS.h"
+
 #include "I2C/I2C_Master.h"
+#include "I2C_Master_STM32.h"
 
 #ifdef STM32F3
 
@@ -17,48 +19,11 @@
 #define I2C_IRQ_NVIC_PRIORITY 5
 #define I2C_IRQ_NVIC_SUB_PRIORITY 0
 
-#define TIMING_VAL_64M_CLK_100KHZ  0x10B17DB4  // Standard mode with Rise time = 120ns, Fall time = 120ns
-#define TIMING_VAL_64M_CLK_400KHZ  0x00E22163  // Fast Mode with Rise time = 120ns, Fall time = 120ns
-#define TIMING_VAL_64M_CLK_1MHZ    0x00A00D1E  // Fast Mode Plus with Rise time = 120ns, Fall time = 10ns
-#define I2C_PCLK_64M               64000000    // 64 MHz
-
-#define TIMING_VAL_72M_CLK_100KHZ  0x10D28DCB  // Standard mode with Rise time = 120ns, Fall time = 120ns
-#define TIMING_VAL_72M_CLK_400KHZ  0x00F32571  // Fast Mode with Rise time = 120ns, Fall time = 120ns
-#define TIMING_VAL_72M_CLK_1MHZ    0x00C00D24  // Fast Mode Plus with Rise time = 120ns, Fall time = 10ns
-#define I2C_PCLK_72M               72000000    // 72 MHz
-
 static bool I2C_Master_Init_Status[hwI2C_Index_MAX] = {false};
 static hwI2C_Speed_Mode I2C_Clock_Speed_Mode[hwI2C_Index_MAX] = {hwI2C_Standard_Mode};
 static NeonRTOS_SyncObj_t I2C_Master_Done_SyncHandle[hwI2C_Index_MAX];
 
 static I2C_HandleTypeDef g_i2c[hwI2C_Index_MAX];
-
-static uint32_t I2C_Get_Timing_By_Clock(hwI2C_Speed_Mode speed_mode)
-{
-    uint32_t pclk = HAL_RCC_GetPCLK1Freq();
-
-    if (pclk >= 70000000 && pclk <= 74000000)
-    {
-        switch(speed_mode)
-        {
-            case hwI2C_Standard_Mode: return TIMING_VAL_72M_CLK_100KHZ;
-            case hwI2C_Fast_Mode:     return TIMING_VAL_72M_CLK_400KHZ;
-            default:                  return 0;
-        }
-    }
-
-    if (pclk >= 62000000 && pclk <= 66000000)
-    {
-        switch(speed_mode)
-        {
-            case hwI2C_Standard_Mode: return TIMING_VAL_64M_CLK_100KHZ;
-            case hwI2C_Fast_Mode:     return TIMING_VAL_64M_CLK_400KHZ;
-            default:                  return 0;
-        }
-    }
-
-    return 0;
-}
 
 uint32_t STM32_I2C_GetAF(hwI2C_Index I2C, hwGPIO_Pin pin)
 {
@@ -240,7 +205,7 @@ hwI2C_OpResult I2C_Master_Init(hwI2C_Index index, hwI2C_Speed_Mode speed_mode)
 
     g_i2c[index].Instance = i2c_soc_base;
 
-    g_i2c[index].Init.Timing = I2C_Get_Timing_By_Clock(speed_mode);
+    g_i2c[index].Init.Timing = I2C_Master_Get_Timing(index, speed_mode);
 
     if (g_i2c[index].Init.Timing == 0)
     {

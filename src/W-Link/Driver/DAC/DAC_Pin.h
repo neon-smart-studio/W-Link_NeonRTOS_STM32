@@ -30,6 +30,10 @@
 #include "Pin/DAC_Pin_STM32G0.h"
 #endif //STM32G0
 
+#ifdef STM32G4
+#include "Pin/DAC_Pin_STM32G4.h"
+#endif //STM32G4
+
 #ifdef STM32H7
 #include "Pin/DAC_Pin_STM32H7.h"
 #endif //STM32H7
