@@ -5,7 +5,7 @@
 #ifdef DEVICE_STM32
 typedef enum hwDAC_Channel_Index_t
 {
-#if defined(DAC1_BASE)
+#if defined(DAC1_BASE) || defined(DAC_BASE)
   hwDAC_Channel_Index_0 = 0,
   hwDAC_Channel_Index_1,
 #endif

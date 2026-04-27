@@ -1,219 +1,140 @@
-
-#include <stdlib.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <math.h>
 
 #include "soc.h"
 
-#include "NeonRTOS.h"
-
-#include "RTC/RTC.h"
-
 #ifdef STM32G4
 
-#define RTC_MUTEX_ACCESS_TIMEOUT     500
+#include "RTC/RTC.h"
+#include "RTC_STM32.h"
 
-#define RTC_IRQ_NVIC_PRIORITY       5
-#define RTC_IRQ_NVIC_SUB_PRIORITY   0
+RTC_HandleTypeDef g_rtc[hwRTC_Index_MAX];
 
-static RTC_HandleTypeDef g_rtc[hwRTC_Index_MAX];
-
-static bool RTC_HW_Init_Status[hwRTC_Index_MAX] = {false};
-static NeonRTOS_LockObj_t rtc_access_mutex[hwRTC_Index_MAX];
-
-onAlarmEventCallback Alarm_Event_Callback[hwRTC_Alarm_Channel_Index_MAX] = {NULL};
-
-#define RTC_MUTEX_LOCK(a, b)  if (NeonRTOS_LockObjLock(&rtc_access_mutex[a], b)!=NeonRTOS_OK) {return hwRTC_MutexTimeout;}
-#define RTC_MUTEX_UNLOCK(a)   NeonRTOS_LockObjUnlock(&rtc_access_mutex[a]);
-
-/* ===================== 時間轉換 ===================== */
-
-static void UnixToRTC(time_t t, RTC_TimeTypeDef *time, RTC_DateTypeDef *date)
+hwRTC_Index RTC_IndexFromHandle(RTC_HandleTypeDef *hrtc)
 {
-    struct tm tm_time;
-    gmtime_r(&t, &tm_time);
-
-    time->Hours   = tm_time.tm_hour;
-    time->Minutes = tm_time.tm_min;
-    time->Seconds = tm_time.tm_sec;
-    time->DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
-    time->StoreOperation = RTC_STOREOPERATION_RESET;
-
-    date->Year  = tm_time.tm_year - 100;
-    date->Month = tm_time.tm_mon + 1;
-    date->Date  = tm_time.tm_mday;
-    date->WeekDay = tm_time.tm_wday + 1;
-}
-
-static time_t RTCToUnix(RTC_TimeTypeDef *time, RTC_DateTypeDef *date)
-{
-    struct tm tm_time = {0};
-
-    tm_time.tm_year = date->Year + 100;
-    tm_time.tm_mon  = date->Month - 1;
-    tm_time.tm_mday = date->Date;
-    tm_time.tm_hour = time->Hours;
-    tm_time.tm_min  = time->Minutes;
-    tm_time.tm_sec  = time->Seconds;
-
-    return mktime(&tm_time);
-}
-
-/* ===================== IRQ ===================== */
-
-static hwRTC_Index RTC_IndexFromHandle(RTC_HandleTypeDef *hrtc)
-{
-    for(int i=0;i<hwRTC_Index_MAX;i++){
-        if(&g_rtc[i] == hrtc) return (hwRTC_Index)i;
+    for (hwRTC_Index i = 0; i < hwRTC_Index_MAX; i++)
+    {
+        if (&g_rtc[i] == hrtc)
+            return i;
     }
     return hwRTC_Index_MAX;
 }
 
 void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 {
-    hwRTC_Index index = RTC_IndexFromHandle(hrtc);
+	hwRTC_Index index = RTC_IndexFromHandle(hrtc);
 
     if (Alarm_Event_Callback[hwRTC_Alarm_Channel_Index_0])
-    {
+	{
         Alarm_Event_Callback[hwRTC_Alarm_Channel_Index_0](index, hwRTC_Alarm_Channel_Index_0);
-    }
+	}
 }
 
-/* ⚠️ G4 IRQ 名稱有差異 */
+void HAL_RTC_AlarmBEventCallback(RTC_HandleTypeDef *hrtc)
+{
+	hwRTC_Index index = RTC_IndexFromHandle(hrtc);
+
+    if (Alarm_Event_Callback[hwRTC_Alarm_Channel_Index_1])
+	{
+        Alarm_Event_Callback[hwRTC_Alarm_Channel_Index_1](index, hwRTC_Alarm_Channel_Index_1);
+	}
+}
+
 void RTC_Alarm_IRQHandler(void)
 {
     HAL_RTC_AlarmIRQHandler(&g_rtc[hwRTC_Index_0]);
 }
 
-/* ===================== Init ===================== */
-
-hwRTC_OpResult RTC_Timer_Init(hwRTC_Index index)
+hwRTC_OpResult RTC_Instance_Init(hwRTC_Index index)
 {
     if (index >= hwRTC_Index_MAX)
         return hwRTC_InvalidParameter;
 
-    if (RTC_HW_Init_Status[index])
-        return hwRTC_OK;
-
-    if(NeonRTOS_LockObjCreate(&rtc_access_mutex[index])!=NeonRTOS_OK)
-        return hwRTC_MemoryError;
-
-    NeonRTOS_LockObjUnlock(&rtc_access_mutex[index]);
-
     __HAL_RCC_PWR_CLK_ENABLE();
     HAL_PWR_EnableBkUpAccess();
 
-    /* ⚠️ G0 必須選 RTC clock source */
+    /* G4 建議明確指定 */
     __HAL_RCC_RTC_CONFIG(RCC_RTCCLKSOURCE_LSI);
 
     __HAL_RCC_RTC_ENABLE();
 
     g_rtc[index].Instance = RTC;
+
     g_rtc[index].Init.HourFormat = RTC_HOURFORMAT_24;
     g_rtc[index].Init.AsynchPrediv = 127;
     g_rtc[index].Init.SynchPrediv  = 255;
+
     g_rtc[index].Init.OutPut = RTC_OUTPUT_DISABLE;
 
     if (HAL_RTC_Init(&g_rtc[index]) != HAL_OK)
         return hwRTC_HwError;
 
-    /* NVIC */
-    HAL_NVIC_SetPriority(RTC_Alarm_IRQn, RTC_IRQ_NVIC_PRIORITY, RTC_IRQ_NVIC_SUB_PRIORITY);
-    HAL_NVIC_EnableIRQ(RTC_Alarm_IRQn);
-
-    RTC_HW_Init_Status[index] = true;
-
     return hwRTC_OK;
 }
 
-/* ===================== DeInit ===================== */
-
-hwRTC_OpResult RTC_Timer_DeInit(hwRTC_Index index)
+hwRTC_OpResult RTC_Instance_DeInit(hwRTC_Index index)
 {
     if (index >= hwRTC_Index_MAX)
         return hwRTC_InvalidParameter;
-
-    if (!RTC_HW_Init_Status[index])
-        return hwRTC_OK;
-
-    HAL_NVIC_DisableIRQ(RTC_Alarm_IRQn);
 
     HAL_RTC_DeactivateAlarm(&g_rtc[index], RTC_ALARM_A);
-    HAL_RTC_DeInit(&g_rtc[index]);
+    HAL_RTC_DeactivateAlarm(&g_rtc[index], RTC_ALARM_B);
 
-    NeonRTOS_LockObjDelete(&rtc_access_mutex[index]);
+    if (HAL_RTC_DeInit(&g_rtc[index]) != HAL_OK)
+        return hwRTC_HwError;
 
-    RTC_HW_Init_Status[index] = false;
     return hwRTC_OK;
 }
 
-/* ===================== Read / Write ===================== */
-
-hwRTC_OpResult RTC_Timer_Read(hwRTC_Index index, time_t *unix_time)
+void RTC_NVIC_Init(void)
 {
-    if (index >= hwRTC_Index_MAX || unix_time == NULL)
+    HAL_NVIC_SetPriority(
+        RTC_Alarm_IRQn,
+        RTC_IRQ_NVIC_PRIORITY,
+        RTC_IRQ_NVIC_SUB_PRIORITY
+    );
+
+    HAL_NVIC_EnableIRQ(RTC_Alarm_IRQn);
+}
+
+void RTC_NVIC_DeInit(void)
+{
+    HAL_NVIC_DisableIRQ(RTC_Alarm_IRQn);
+}
+
+hwRTC_OpResult RTC_Device_SetAlarm(
+    hwRTC_Index index,
+    hwRTC_Alarm_Channel_Index alarm_ch,
+    RTC_TimeTypeDef *time
+)
+{
+    if (index >= hwRTC_Index_MAX || time == NULL)
         return hwRTC_InvalidParameter;
 
-    if (!RTC_HW_Init_Status[index])
-        return hwRTC_NotInit;
+    RTC_AlarmTypeDef alarm = {0};
 
-    RTC_TimeTypeDef time;
-    RTC_DateTypeDef date;
-
-    RTC_MUTEX_LOCK(index, RTC_MUTEX_ACCESS_TIMEOUT);
-
-    HAL_RTC_GetTime(&g_rtc[index], &time, RTC_FORMAT_BIN);
-    HAL_RTC_GetDate(&g_rtc[index], &date, RTC_FORMAT_BIN);
-
-    *unix_time = RTCToUnix(&time, &date);
-
-    RTC_MUTEX_UNLOCK(index);
-
-    return hwRTC_OK;
-}
-
-hwRTC_OpResult RTC_Timer_Write(hwRTC_Index index, time_t unix_time)
-{
-    if (index >= hwRTC_Index_MAX)
-        return hwRTC_InvalidParameter;
-
-    if (!RTC_HW_Init_Status[index])
-        return hwRTC_NotInit;
-
-    RTC_TimeTypeDef time;
-    RTC_DateTypeDef date;
-
-    UnixToRTC(unix_time, &time, &date);
-
-    RTC_MUTEX_LOCK(index, RTC_MUTEX_ACCESS_TIMEOUT);
-
-    HAL_RTC_SetTime(&g_rtc[index], &time, RTC_FORMAT_BIN);
-    HAL_RTC_SetDate(&g_rtc[index], &date, RTC_FORMAT_BIN);
-
-    RTC_MUTEX_UNLOCK(index);
-
-    return hwRTC_OK;
-}
-
-/* ===================== Alarm ===================== */
-
-hwRTC_OpResult RTC_Timer_Set_Alarm(hwRTC_Index index,
-                                   hwRTC_Alarm_Channel_Index alarm_ch,
-                                   time_t alarm_unix_time,
-                                   onAlarmEventCallback cb)
-{
-    RTC_AlarmTypeDef alarm;
-    RTC_TimeTypeDef time;
-    RTC_DateTypeDef date;
-
-    UnixToRTC(alarm_unix_time, &time, &date);
-
-    alarm.AlarmTime = time;
+    alarm.AlarmTime = *time;
     alarm.AlarmMask = RTC_ALARMMASK_DATEWEEKDAY;
-    alarm.Alarm = RTC_ALARM_A;
 
-    Alarm_Event_Callback[alarm_ch] = cb;
+#if defined(RTC_ALARMSUBSECONDMASK_ALL)
+    alarm.AlarmSubSecondMask = RTC_ALARMSUBSECONDMASK_ALL;
+#endif
+
+    switch (alarm_ch)
+    {
+        case hwRTC_Alarm_Channel_Index_0:
+            alarm.Alarm = RTC_ALARM_A;
+            break;
+
+#if defined(RTC_ALARM_B)
+        case hwRTC_Alarm_Channel_Index_1:
+            alarm.Alarm = RTC_ALARM_B;
+            break;
+#endif
+
+        default:
+            return hwRTC_InvalidParameter;
+    }
 
     if (HAL_RTC_SetAlarm_IT(&g_rtc[index], &alarm, RTC_FORMAT_BIN) != HAL_OK)
         return hwRTC_HwError;
@@ -221,24 +142,33 @@ hwRTC_OpResult RTC_Timer_Set_Alarm(hwRTC_Index index,
     return hwRTC_OK;
 }
 
-hwRTC_OpResult RTC_Timer_Clear_Alarm(hwRTC_Index index,
-                                     hwRTC_Alarm_Channel_Index alarm_ch_index)
+hwRTC_OpResult RTC_Device_ClearAlarm(
+    hwRTC_Index index,
+    hwRTC_Alarm_Channel_Index alarm_ch
+)
 {
     if (index >= hwRTC_Index_MAX)
         return hwRTC_InvalidParameter;
 
-    if (!RTC_HW_Init_Status[index])
-        return hwRTC_NotInit;
+    switch (alarm_ch)
+    {
+        case hwRTC_Alarm_Channel_Index_0:
+            if (HAL_RTC_DeactivateAlarm(&g_rtc[index], RTC_ALARM_A) != HAL_OK)
+                return hwRTC_HwError;
+            break;
 
-    RTC_MUTEX_LOCK(index, RTC_MUTEX_ACCESS_TIMEOUT);
+#if defined(RTC_ALARM_B)
+        case hwRTC_Alarm_Channel_Index_1:
+            if (HAL_RTC_DeactivateAlarm(&g_rtc[index], RTC_ALARM_B) != HAL_OK)
+                return hwRTC_HwError;
+            break;
+#endif
 
-    Alarm_Event_Callback[alarm_ch_index] = NULL;
-
-    HAL_RTC_DeactivateAlarm(&g_rtc[index], RTC_ALARM_A);
-
-    RTC_MUTEX_UNLOCK(index);
+        default:
+            return hwRTC_InvalidParameter;
+    }
 
     return hwRTC_OK;
 }
 
-#endif // STM32G4
+#endif //STM32G4

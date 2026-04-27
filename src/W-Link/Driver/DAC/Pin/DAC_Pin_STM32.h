@@ -7,7 +7,7 @@
 #include "DAC/DAC.h"
 
 typedef enum {
-#if defined(DAC1_BASE)
+#if defined(DAC1_BASE) || defined(DAC_BASE)
     hwDAC_Instance_1 = 0,
 #endif
 #if defined(DAC2_BASE)
