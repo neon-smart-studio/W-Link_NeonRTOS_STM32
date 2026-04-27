@@ -152,7 +152,7 @@ static void I2C_EnableClock(hwI2C_Index index)
             break;
 #endif
         default:
-            return hwI2C_InvalidParameter;
+            break;
     }
 }
 
@@ -287,38 +287,6 @@ hwI2C_OpResult I2C_Instance_DeInit(hwI2C_Index index)
     I2C_DisableClock(index);
 
     return hwI2C_OK;
-}
-
-hwI2C_OpResult I2C_Instance_Read(hwI2C_Index index, uint8_t address, uint8_t *read_dat, uint8_t read_len, bool stop)
-{
-    if (HAL_I2C_Master_Receive_IT(&g_i2c[index], address << 1, read_dat, read_len) != HAL_OK) {
-        return hwI2C_HwError;
-    }
-
-    return hwI2C_OK;
-}
-
-hwI2C_OpResult I2C_Instance_Write(hwI2C_Index index, uint8_t address, uint8_t *write_dat, uint8_t write_len, bool stop)
-{
-    if (HAL_I2C_Master_Transmit_IT(&g_i2c[index], address << 1, write_dat, write_len) != HAL_OK) {
-        return hwI2C_HwError;
-    }
-    
-    return hwI2C_OK;
-}
-
-hwI2C_OpResult I2C_Instance_Abort(hwI2C_Index index, uint8_t address)
-{
-    if (HAL_I2C_Master_Abort_IT(&g_i2c[index], address << 1) != HAL_OK) {
-        return hwI2C_HwError;
-    }
-
-    return hwI2C_OK;
-}
-
-hwI2C_OpResult I2C_Instance_CheckError(hwI2C_Index index)
-{
-    return (g_i2c[index].ErrorCode == HAL_I2C_ERROR_NONE) ? hwI2C_OK : hwI2C_BusError;
 }
 
 void I2C_NVIC_Init(hwI2C_Index index)

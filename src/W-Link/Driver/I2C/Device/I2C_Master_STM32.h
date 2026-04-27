@@ -11,6 +11,9 @@
 #define I2C_IRQ_NVIC_PRIORITY      5
 #define I2C_IRQ_NVIC_SUB_PRIORITY  0
 
+#define I2C_MASTER_STANDARD_MODE_CLK_FREQUENCY 100000
+#define I2C_MASTER_FAST_MODE_CLK_FREQUENCY     400000
+
 extern I2C_HandleTypeDef g_i2c[hwI2C_Index_MAX];
 extern bool I2C_Master_Init_Status[];
 
@@ -23,9 +26,6 @@ hwI2C_OpResult I2C_Instance_Init(
 );
 
 hwI2C_OpResult I2C_Instance_DeInit(hwI2C_Index index);
-
-hwI2C_OpResult I2C_Instance_Read(hwI2C_Index index, uint8_t address, uint8_t *read_dat, uint8_t read_len, bool stop);
-hwI2C_OpResult I2C_Instance_Write(hwI2C_Index index, uint8_t address, uint8_t *write_dat, uint8_t write_len, bool stop);
 
 void I2C_NVIC_Init(hwI2C_Index index);
 void I2C_NVIC_DeInit(hwI2C_Index index);

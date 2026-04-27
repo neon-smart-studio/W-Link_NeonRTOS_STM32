@@ -352,6 +352,7 @@ uint32_t I2C_Master_Get_Timing(hwI2C_Index index, hwI2C_Speed_Mode speed_mode)
     return tim;
 }
 
+#ifndef STM32F1
 uint32_t STM32_I2C_GetAF(hwI2C_Index i2c, hwGPIO_Pin pin)
 {
     for (size_t i = 0; i < sizeof(I2C_Pin_AF_Map) / sizeof(I2C_Pin_AF_Map[0]); i++) {
@@ -362,6 +363,7 @@ uint32_t STM32_I2C_GetAF(hwI2C_Index i2c, hwGPIO_Pin pin)
     }
     return 0;
 }
+#endif
 
 void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c_cb)
 {
@@ -411,12 +413,14 @@ hwI2C_OpResult I2C_Master_Init(hwI2C_Index index, hwI2C_Speed_Mode speed_mode)
         return hwI2C_InvalidParameter;
     }
 
+#ifndef STM32F1
     uint32_t sda_af = STM32_I2C_GetAF(index, I2C_Pin_Def_Table[index][I2C_Index_Map_Alt[index]].sda_pin);
     uint32_t scl_af = STM32_I2C_GetAF(index, I2C_Pin_Def_Table[index][I2C_Index_Map_Alt[index]].scl_pin);
 
     if (sda_af == 0 || scl_af == 0) {
         return hwI2C_InvalidParameter;
     }
+#endif
 
     if (NeonRTOS_SyncObjCreate(&I2C_Master_Done_SyncHandle[index]) != NeonRTOS_OK) {
         return hwI2C_MemoryError;
@@ -429,16 +433,28 @@ hwI2C_OpResult I2C_Master_Init(hwI2C_Index index, hwI2C_Speed_Mode speed_mode)
     g_i2c_sda.Pin       = sda_soc_pin;
     g_i2c_sda.Mode      = GPIO_MODE_AF_OD;
     g_i2c_sda.Pull      = GPIO_PULLUP;
+#ifdef GPIO_SPEED_FREQ_VERY_HIGH
     g_i2c_sda.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
+#else
+    g_i2c_sda.Speed     = GPIO_SPEED_HIGH;
+#endif
+#ifndef STM32F1
     g_i2c_sda.Alternate = sda_af;
+#endif
     HAL_GPIO_Init(sda_soc_base, &g_i2c_sda);
 
     GPIO_InitTypeDef g_i2c_scl = {0};
     g_i2c_scl.Pin       = scl_soc_pin;
     g_i2c_scl.Mode      = GPIO_MODE_AF_OD;
     g_i2c_scl.Pull      = GPIO_PULLUP;
+#ifdef GPIO_SPEED_FREQ_VERY_HIGH
     g_i2c_scl.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
+#else
+    g_i2c_scl.Speed     = GPIO_SPEED_HIGH;
+#endif
+#ifndef STM32F1
     g_i2c_scl.Alternate = scl_af;
+#endif
     HAL_GPIO_Init(scl_soc_base, &g_i2c_scl);
 
     hwI2C_OpResult result = I2C_Instance_Init(index, speed_mode);
