@@ -11,7 +11,7 @@
 
 #include "GPIO/GPIO.h"
 
-#ifdef STM32F0
+#ifdef STM32C0
 
 #include "GPIO/Device/GPIO_STM32.h"
 
