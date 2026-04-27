@@ -38,6 +38,10 @@
 #include "Pin/ADC_Pin_STM32G4.h"
 #endif //STM32G4
 
+#if defined(STM32L0) || defined(STM32L1) || defined(STM32L4) || defined(STM32L5)
+#include "Pin/ADC_Pin_STM32Lx.h"
+#endif //STM32L0 || STM32L1 || STM32L4 || STM32L5
+
 #ifdef STM32H7
 #include "Pin/ADC_Pin_STM32H7.h"
 #endif //STM32H7
