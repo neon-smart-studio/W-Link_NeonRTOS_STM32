@@ -52,7 +52,7 @@
 #define configUSE_TICK_HOOK               1
 #define configMAX_PRIORITIES              (7)
 #define configSUPPORT_STATIC_ALLOCATION   0
-#define configCPU_CLOCK_HZ                (120000000L)
+#define configCPU_CLOCK_HZ                F_CPU
 #define configTICK_RATE_HZ                ((TickType_t)1000)
 #define configMINIMAL_STACK_SIZE          ((uint16_t)128)
 #define configTOTAL_HEAP_SIZE             ((size_t)CONFIG_RTOS_HEAP_SIZE)
