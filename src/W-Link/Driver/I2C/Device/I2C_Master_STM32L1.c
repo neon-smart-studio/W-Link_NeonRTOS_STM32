@@ -134,7 +134,15 @@ hwI2C_OpResult I2C_Instance_Init(hwI2C_Index index, hwI2C_Speed_Mode speed_mode)
     memset(&g_i2c[index], 0, sizeof(I2C_HandleTypeDef));
 
     g_i2c[index].Instance             = i2c_soc_base;
-    g_i2c[index].Init.Timing          = I2C_Master_Get_Timing(index, speed_mode);
+    switch(speed_mode)
+    {
+        case hwI2C_Standard_Mode:
+            g_i2c[index].Init.ClockSpeed = I2C_MASTER_STANDARD_MODE_CLK_FREQUENCY;
+            break;
+        case hwI2C_Fast_Mode:
+            g_i2c[index].Init.ClockSpeed = I2C_MASTER_FAST_MODE_CLK_FREQUENCY;
+            break;
+    }
     g_i2c[index].Init.OwnAddress1     = 0;
     g_i2c[index].Init.AddressingMode  = I2C_ADDRESSINGMODE_7BIT;
     g_i2c[index].Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;

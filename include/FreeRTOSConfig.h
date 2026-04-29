@@ -55,6 +55,7 @@
 #define configCPU_CLOCK_HZ                F_CPU
 #define configTICK_RATE_HZ                ((TickType_t)1000)
 #define configMINIMAL_STACK_SIZE          ((uint16_t)128)
+#define configMINIMAL_SECURE_STACK_SIZE   configMINIMAL_STACK_SIZE
 #define configTOTAL_HEAP_SIZE             ((size_t)CONFIG_RTOS_HEAP_SIZE)
 #define configMAX_TASK_NAME_LEN           (16)
 #define configUSE_TRACE_FACILITY          1

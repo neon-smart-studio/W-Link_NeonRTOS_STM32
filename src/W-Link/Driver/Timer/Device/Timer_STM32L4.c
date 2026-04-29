@@ -400,7 +400,7 @@ void Timer_NVIC_Disable(hwTimer_Index index)
         case hwTimer_Index_15:
 #endif
 #if defined(TIM1_BASE) && defined(TIM16_BASE)
-                if (!Timer_Init_Status[hwTimer_Index_0] && !Timer_Init_Status[hwTimer_Index_9])
+                if (!Timer_Init_Status[hwTimer_Index_0] && !Timer_Init_Status[hwTimer_Index_15])
 #endif
                 {
                         HAL_NVIC_DisableIRQ(TIM1_UP_TIM16_IRQn);

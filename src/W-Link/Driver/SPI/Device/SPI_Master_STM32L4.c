@@ -4,7 +4,7 @@
 
 #include "soc.h"
 
-#if defined(STM32L0) || defined(STM32L1) || defined(STM32L4) || defined(STM32L5)
+#if STM32L4
 
 #include "SPI/SPI_Master.h"
 #include "SPI_Master_STM32.h"
@@ -217,21 +217,21 @@ static void SPI_HAL_IRQHandler(hwSPI_Index index)
         HAL_SPI_IRQHandler(&g_spi[index]);
 }
 
-#if defined(SPI1_IRQn)
+#if defined(SPI1_BASE)
 void SPI1_IRQHandler(void)
 {
     SPI_HAL_IRQHandler(hwSPI_Index_0);
 }
 #endif
 
-#if defined(SPI2_IRQn)
+#if defined(SPI2_BASE)
 void SPI2_IRQHandler(void)
 {
     SPI_HAL_IRQHandler(hwSPI_Index_1);
 }
 #endif
 
-#if defined(SPI3_IRQn)
+#if defined(SPI3_BASE)
 void SPI3_IRQHandler(void)
 {
     SPI_HAL_IRQHandler(hwSPI_Index_2);
@@ -242,21 +242,21 @@ void SPI_NVIC_Init(hwSPI_Index index)
 {
     switch (index)
     {
-#if defined(SPI1_BASE) && defined(SPI1_IRQn)
+#if defined(SPI1_BASE)
         case hwSPI_Index_0:
             HAL_NVIC_SetPriority(SPI1_IRQn, SPI_IRQ_NVIC_PRIORITY, SPI_IRQ_NVIC_SUB_PRIORITY);
             HAL_NVIC_EnableIRQ(SPI1_IRQn);
             break;
 #endif
 
-#if defined(SPI2_BASE) && defined(SPI2_IRQn)
+#if defined(SPI2_BASE)
         case hwSPI_Index_1:
             HAL_NVIC_SetPriority(SPI2_IRQn, SPI_IRQ_NVIC_PRIORITY, SPI_IRQ_NVIC_SUB_PRIORITY);
             HAL_NVIC_EnableIRQ(SPI2_IRQn);
             break;
 #endif
 
-#if defined(SPI3_BASE) && defined(SPI3_IRQn)
+#if defined(SPI3_BASE)
         case hwSPI_Index_2:
             HAL_NVIC_SetPriority(SPI3_IRQn, SPI_IRQ_NVIC_PRIORITY, SPI_IRQ_NVIC_SUB_PRIORITY);
             HAL_NVIC_EnableIRQ(SPI3_IRQn);
@@ -272,19 +272,19 @@ void SPI_NVIC_DeInit(hwSPI_Index index)
 {
     switch (index)
     {
-#if defined(SPI1_BASE) && defined(SPI1_IRQn)
+#if defined(SPI1_BASE)
         case hwSPI_Index_0:
             HAL_NVIC_DisableIRQ(SPI1_IRQn);
             break;
 #endif
 
-#if defined(SPI2_BASE) && defined(SPI2_IRQn)
+#if defined(SPI2_BASE)
         case hwSPI_Index_1:
             HAL_NVIC_DisableIRQ(SPI2_IRQn);
             break;
 #endif
 
-#if defined(SPI3_BASE) && defined(SPI3_IRQn)
+#if defined(SPI3_BASE)
         case hwSPI_Index_2:
             HAL_NVIC_DisableIRQ(SPI3_IRQn);
             break;
@@ -295,4 +295,4 @@ void SPI_NVIC_DeInit(hwSPI_Index index)
     }
 }
 
-#endif
+#endif // STM32L4

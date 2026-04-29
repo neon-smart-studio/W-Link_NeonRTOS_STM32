@@ -8,7 +8,7 @@
 #include "NeonRTOS.h"
 #include "GPIO/GPIO.h"
 
-#if defined(STM32L0) || defined(STM32L1) || defined(STM32L4) || defined(STM32L5)
+#ifdef STM32_L1
 
 #include "GPIO/Device/GPIO_STM32.h"
 
@@ -87,27 +87,16 @@ void GPIO_Disable_RCC_Clock(GPIO_TypeDef *base)
 #endif
 }
 
-#if defined(EXTI0_IRQn)
 void EXTI0_IRQHandler(void) { GPIO_EXTI_Dispatch(GPIO_EXTI_Line_0); }
-#endif
 
-#if defined(EXTI1_IRQn)
 void EXTI1_IRQHandler(void) { GPIO_EXTI_Dispatch(GPIO_EXTI_Line_1); }
-#endif
 
-#if defined(EXTI2_IRQn)
 void EXTI2_IRQHandler(void) { GPIO_EXTI_Dispatch(GPIO_EXTI_Line_2); }
-#endif
 
-#if defined(EXTI3_IRQn)
 void EXTI3_IRQHandler(void) { GPIO_EXTI_Dispatch(GPIO_EXTI_Line_3); }
-#endif
 
-#if defined(EXTI4_IRQn)
 void EXTI4_IRQHandler(void) { GPIO_EXTI_Dispatch(GPIO_EXTI_Line_4); }
-#endif
 
-#if defined(EXTI9_5_IRQn)
 void EXTI9_5_IRQHandler(void)
 {
   GPIO_EXTI_Dispatch(GPIO_EXTI_Line_5);
@@ -116,9 +105,7 @@ void EXTI9_5_IRQHandler(void)
   GPIO_EXTI_Dispatch(GPIO_EXTI_Line_8);
   GPIO_EXTI_Dispatch(GPIO_EXTI_Line_9);
 }
-#endif
 
-#if defined(EXTI15_10_IRQn)
 void EXTI15_10_IRQHandler(void)
 {
   GPIO_EXTI_Dispatch(GPIO_EXTI_Line_10);
@@ -128,130 +115,104 @@ void EXTI15_10_IRQHandler(void)
   GPIO_EXTI_Dispatch(GPIO_EXTI_Line_14);
   GPIO_EXTI_Dispatch(GPIO_EXTI_Line_15);
 }
-#endif
 
 void GPIO_EXTI_NVIC_Init(GPIO_EXTI_Line exti_line_idx)
 {
   if (exti_line_idx == GPIO_EXTI_Line_0) {
-#if defined(EXTI0_IRQn)
     if (!gpio_exti_enable_status[GPIO_EXTI_IRQn_0]) {
       gpio_exti_enable_status[GPIO_EXTI_IRQn_0] = true;
       HAL_NVIC_SetPriority(EXTI0_IRQn, GPIO_EXTI_NVIC_PRIORITY, GPIO_EXTI_NVIC_SUB_PRIORITY);
       HAL_NVIC_EnableIRQ(EXTI0_IRQn);
     }
-#endif
   }
 
   if (exti_line_idx == GPIO_EXTI_Line_1) {
-#if defined(EXTI1_IRQn)
     if (!gpio_exti_enable_status[GPIO_EXTI_IRQn_1]) {
       gpio_exti_enable_status[GPIO_EXTI_IRQn_1] = true;
       HAL_NVIC_SetPriority(EXTI1_IRQn, GPIO_EXTI_NVIC_PRIORITY, GPIO_EXTI_NVIC_SUB_PRIORITY);
       HAL_NVIC_EnableIRQ(EXTI1_IRQn);
     }
-#endif
   }
 
   if (exti_line_idx == GPIO_EXTI_Line_2) {
-#if defined(EXTI2_IRQn)
     if (!gpio_exti_enable_status[GPIO_EXTI_IRQn_2]) {
       gpio_exti_enable_status[GPIO_EXTI_IRQn_2] = true;
       HAL_NVIC_SetPriority(EXTI2_IRQn, GPIO_EXTI_NVIC_PRIORITY, GPIO_EXTI_NVIC_SUB_PRIORITY);
       HAL_NVIC_EnableIRQ(EXTI2_IRQn);
     }
-#endif
   }
 
   if (exti_line_idx == GPIO_EXTI_Line_3) {
-#if defined(EXTI3_IRQn)
     if (!gpio_exti_enable_status[GPIO_EXTI_IRQn_3]) {
       gpio_exti_enable_status[GPIO_EXTI_IRQn_3] = true;
       HAL_NVIC_SetPriority(EXTI3_IRQn, GPIO_EXTI_NVIC_PRIORITY, GPIO_EXTI_NVIC_SUB_PRIORITY);
       HAL_NVIC_EnableIRQ(EXTI3_IRQn);
     }
-#endif
   }
 
   if (exti_line_idx == GPIO_EXTI_Line_4) {
-#if defined(EXTI4_IRQn)
     if (!gpio_exti_enable_status[GPIO_EXTI_IRQn_4]) {
       gpio_exti_enable_status[GPIO_EXTI_IRQn_4] = true;
       HAL_NVIC_SetPriority(EXTI4_IRQn, GPIO_EXTI_NVIC_PRIORITY, GPIO_EXTI_NVIC_SUB_PRIORITY);
       HAL_NVIC_EnableIRQ(EXTI4_IRQn);
     }
-#endif
   }
 
   if (exti_line_idx >= GPIO_EXTI_Line_5 && exti_line_idx <= GPIO_EXTI_Line_9) {
-#if defined(EXTI9_5_IRQn)
     if (!gpio_exti_enable_status[GPIO_EXTI_IRQn_5_9]) {
       gpio_exti_enable_status[GPIO_EXTI_IRQn_5_9] = true;
       HAL_NVIC_SetPriority(EXTI9_5_IRQn, GPIO_EXTI_NVIC_PRIORITY, GPIO_EXTI_NVIC_SUB_PRIORITY);
       HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
     }
-#endif
   }
 
   if (exti_line_idx >= GPIO_EXTI_Line_10 && exti_line_idx <= GPIO_EXTI_Line_15) {
-#if defined(EXTI15_10_IRQn)
     if (!gpio_exti_enable_status[GPIO_EXTI_IRQn_10_15]) {
       gpio_exti_enable_status[GPIO_EXTI_IRQn_10_15] = true;
       HAL_NVIC_SetPriority(EXTI15_10_IRQn, GPIO_EXTI_NVIC_PRIORITY, GPIO_EXTI_NVIC_SUB_PRIORITY);
       HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
     }
-#endif
   }
 }
 
 void GPIO_EXTI_NVIC_DeInit(GPIO_EXTI_Line exti_line_idx, GPIO_EXTI_Desc *gpio_exti_desc)
 {
   if (exti_line_idx == GPIO_EXTI_Line_0) {
-#if defined(EXTI0_IRQn)
     if (gpio_exti_enable_status[GPIO_EXTI_IRQn_0]) {
       gpio_exti_enable_status[GPIO_EXTI_IRQn_0] = false;
       HAL_NVIC_DisableIRQ(EXTI0_IRQn);
     }
-#endif
   }
 
   if (exti_line_idx == GPIO_EXTI_Line_1) {
-#if defined(EXTI1_IRQn)
     if (gpio_exti_enable_status[GPIO_EXTI_IRQn_1]) {
       gpio_exti_enable_status[GPIO_EXTI_IRQn_1] = false;
       HAL_NVIC_DisableIRQ(EXTI1_IRQn);
     }
-#endif
   }
 
   if (exti_line_idx == GPIO_EXTI_Line_2) {
-#if defined(EXTI2_IRQn)
     if (gpio_exti_enable_status[GPIO_EXTI_IRQn_2]) {
       gpio_exti_enable_status[GPIO_EXTI_IRQn_2] = false;
       HAL_NVIC_DisableIRQ(EXTI2_IRQn);
     }
-#endif
   }
 
   if (exti_line_idx == GPIO_EXTI_Line_3) {
-#if defined(EXTI3_IRQn)
     if (gpio_exti_enable_status[GPIO_EXTI_IRQn_3]) {
       gpio_exti_enable_status[GPIO_EXTI_IRQn_3] = false;
       HAL_NVIC_DisableIRQ(EXTI3_IRQn);
     }
-#endif
   }
 
   if (exti_line_idx == GPIO_EXTI_Line_4) {
-#if defined(EXTI4_IRQn)
     if (gpio_exti_enable_status[GPIO_EXTI_IRQn_4]) {
       gpio_exti_enable_status[GPIO_EXTI_IRQn_4] = false;
       HAL_NVIC_DisableIRQ(EXTI4_IRQn);
     }
-#endif
   }
 
   if (exti_line_idx >= GPIO_EXTI_Line_5 && exti_line_idx <= GPIO_EXTI_Line_9) {
-#if defined(EXTI9_5_IRQn)
     bool irq_5_9_used = false;
 
     for (GPIO_EXTI_Line idx = GPIO_EXTI_Line_5; idx <= GPIO_EXTI_Line_9; idx++) {
@@ -264,11 +225,9 @@ void GPIO_EXTI_NVIC_DeInit(GPIO_EXTI_Line exti_line_idx, GPIO_EXTI_Desc *gpio_ex
       gpio_exti_enable_status[GPIO_EXTI_IRQn_5_9] = false;
       HAL_NVIC_DisableIRQ(EXTI9_5_IRQn);
     }
-#endif
   }
 
   if (exti_line_idx >= GPIO_EXTI_Line_10 && exti_line_idx <= GPIO_EXTI_Line_15) {
-#if defined(EXTI15_10_IRQn)
     bool irq_10_15_used = false;
 
     for (GPIO_EXTI_Line idx = GPIO_EXTI_Line_10; idx <= GPIO_EXTI_Line_15; idx++) {
@@ -281,8 +240,7 @@ void GPIO_EXTI_NVIC_DeInit(GPIO_EXTI_Line exti_line_idx, GPIO_EXTI_Desc *gpio_ex
       gpio_exti_enable_status[GPIO_EXTI_IRQn_10_15] = false;
       HAL_NVIC_DisableIRQ(EXTI15_10_IRQn);
     }
-#endif
   }
 }
 
-#endif
+#endif //STM32_L1

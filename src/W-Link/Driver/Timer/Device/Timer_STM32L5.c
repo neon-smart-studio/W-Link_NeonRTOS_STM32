@@ -318,7 +318,7 @@ void Timer_NVIC_Enable(hwTimer_Index index)
 #endif
 
 #if defined(TIM5_BASE)
-        case hwTimer_Index_5:
+        case hwTimer_Index_4:
             HAL_NVIC_SetPriority(TIM5_IRQn, TIMER_IRQ_NVIC_PRIORITY, TIMER_IRQ_NVIC_SUB_PRIORITY);
             HAL_NVIC_EnableIRQ(TIM5_IRQn);
             break;
@@ -400,7 +400,7 @@ void Timer_NVIC_Disable(hwTimer_Index index)
 #endif
 
 #if defined(TIM5_BASE)
-        case hwTimer_Index_5:
+        case hwTimer_Index_4:
             HAL_NVIC_DisableIRQ(TIM5_IRQn);
             break;
 #endif

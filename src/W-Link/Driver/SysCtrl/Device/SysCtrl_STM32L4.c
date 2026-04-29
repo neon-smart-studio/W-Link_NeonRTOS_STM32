@@ -17,16 +17,15 @@ void SysCtrl_Init(void)
      *
      * 4MHz / 1 * 40 / 2 = 80MHz
      */
-    RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_MSI;
-    RCC_OscInitStruct.MSIState       = RCC_MSI_ON;
-    RCC_OscInitStruct.MSIClockRange  = RCC_MSIRANGE_6;
+    RCC_OscInitStruct.OscillatorType      = RCC_OSCILLATORTYPE_MSI;
+    RCC_OscInitStruct.MSIState            = RCC_MSI_ON;
+    RCC_OscInitStruct.MSIClockRange       = RCC_MSIRANGE_6;
     RCC_OscInitStruct.MSICalibrationValue = RCC_MSICALIBRATION_DEFAULT;
 
     RCC_OscInitStruct.PLL.PLLState  = RCC_PLL_ON;
     RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_MSI;
     RCC_OscInitStruct.PLL.PLLM      = 1;
     RCC_OscInitStruct.PLL.PLLN      = 40;
-    RCC_OscInitStruct.PLL.PLLP      = RCC_PLLP_DIV7;
     RCC_OscInitStruct.PLL.PLLQ      = RCC_PLLQ_DIV2;
     RCC_OscInitStruct.PLL.PLLR      = RCC_PLLR_DIV2;
 

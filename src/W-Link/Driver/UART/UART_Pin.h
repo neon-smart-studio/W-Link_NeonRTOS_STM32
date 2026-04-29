@@ -39,7 +39,7 @@
 #endif //STM32G4
 
 #ifdef STM32L0
-#include "Pin/UART_Pin_STM32G0.h"
+#include "Pin/UART_Pin_STM32L0.h"
 #endif //STM32L0
 
 #ifdef STM32L1
