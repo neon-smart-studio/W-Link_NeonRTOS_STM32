@@ -3,7 +3,7 @@
 
 #include "soc.h"
 
-#if defined(STM32L0) || defined(STM32L1) || defined(STM32L4) || defined(STM32L5)
+#ifdef STM32L1
 
 #include "RTC/RTC.h"
 #include "RTC_STM32.h"
@@ -12,17 +12,10 @@ RTC_HandleTypeDef g_rtc[hwRTC_Index_MAX];
 
 /* ================= IRQ Handler ================= */
 
-#if defined(RTC_TAMP_IRQn)
-void RTC_TAMP_IRQHandler(void)
-{
-    HAL_RTC_AlarmIRQHandler(&g_rtc[hwRTC_Index_0]);
-}
-#elif defined(RTC_Alarm_IRQn)
 void RTC_Alarm_IRQHandler(void)
 {
     HAL_RTC_AlarmIRQHandler(&g_rtc[hwRTC_Index_0]);
 }
-#endif
 
 /* ================= Init / DeInit ================= */
 
@@ -77,13 +70,9 @@ hwRTC_OpResult RTC_Instance_DeInit(hwRTC_Index index)
     if (index >= hwRTC_Index_MAX)
         return hwRTC_InvalidParameter;
 
-#if defined(RTC_ALARM_A)
     HAL_RTC_DeactivateAlarm(&g_rtc[index], RTC_ALARM_A);
-#endif
 
-#if defined(RTC_ALARM_B)
     HAL_RTC_DeactivateAlarm(&g_rtc[index], RTC_ALARM_B);
-#endif
 
     if (HAL_RTC_DeInit(&g_rtc[index]) != HAL_OK)
         return hwRTC_HwError;
@@ -97,31 +86,17 @@ hwRTC_OpResult RTC_Instance_DeInit(hwRTC_Index index)
 
 void RTC_NVIC_Init(void)
 {
-#if defined(RTC_TAMP_IRQn)
-    HAL_NVIC_SetPriority(
-        RTC_TAMP_IRQn,
-        RTC_IRQ_NVIC_PRIORITY,
-        RTC_IRQ_NVIC_SUB_PRIORITY
-    );
-    HAL_NVIC_EnableIRQ(RTC_TAMP_IRQn);
-
-#elif defined(RTC_Alarm_IRQn)
     HAL_NVIC_SetPriority(
         RTC_Alarm_IRQn,
         RTC_IRQ_NVIC_PRIORITY,
         RTC_IRQ_NVIC_SUB_PRIORITY
     );
     HAL_NVIC_EnableIRQ(RTC_Alarm_IRQn);
-#endif
 }
 
 void RTC_NVIC_DeInit(void)
 {
-#if defined(RTC_TAMP_IRQn)
-    HAL_NVIC_DisableIRQ(RTC_TAMP_IRQn);
-#elif defined(RTC_Alarm_IRQn)
     HAL_NVIC_DisableIRQ(RTC_Alarm_IRQn);
-#endif
 }
 
 /* ================= Alarm ================= */
@@ -146,17 +121,13 @@ hwRTC_OpResult RTC_Device_SetAlarm(
 
     switch (alarm_ch)
     {
-#if defined(RTC_ALARM_A)
         case hwRTC_Alarm_Channel_Index_0:
             alarm.Alarm = RTC_ALARM_A;
             break;
-#endif
 
-#if defined(RTC_ALARM_B)
         case hwRTC_Alarm_Channel_Index_1:
             alarm.Alarm = RTC_ALARM_B;
             break;
-#endif
 
         default:
             return hwRTC_InvalidParameter;
@@ -180,17 +151,13 @@ hwRTC_OpResult RTC_Device_ClearAlarm(
 
     switch (alarm_ch)
     {
-#if defined(RTC_ALARM_A)
         case hwRTC_Alarm_Channel_Index_0:
             alarm = RTC_ALARM_A;
             break;
-#endif
 
-#if defined(RTC_ALARM_B)
         case hwRTC_Alarm_Channel_Index_1:
             alarm = RTC_ALARM_B;
             break;
-#endif
 
         default:
             return hwRTC_InvalidParameter;
@@ -202,4 +169,4 @@ hwRTC_OpResult RTC_Device_ClearAlarm(
     return hwRTC_OK;
 }
 
-#endif /* STM32L0 || STM32L1 || STM32L4 || STM32L5 */
+#endif // STM32L1

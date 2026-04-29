@@ -18,8 +18,17 @@ typedef enum GPIO_EXTI_IRQn {
   GPIO_EXTI_IRQn_2,
   GPIO_EXTI_IRQn_3,
   GPIO_EXTI_IRQn_4,
-  GPIO_EXTI_IRQn_5_9,
-  GPIO_EXTI_IRQn_10_15,
+  GPIO_EXTI_IRQn_5,
+  GPIO_EXTI_IRQn_6,
+  GPIO_EXTI_IRQn_7,
+  GPIO_EXTI_IRQn_8,
+  GPIO_EXTI_IRQn_9,
+  GPIO_EXTI_IRQn_10,
+  GPIO_EXTI_IRQn_11,
+  GPIO_EXTI_IRQn_12,
+  GPIO_EXTI_IRQn_13,
+  GPIO_EXTI_IRQn_14,
+  GPIO_EXTI_IRQn_15,
   GPIO_EXTI_IRQn_MAX,
 } GPIO_EXTI_IRQn;
 
@@ -97,24 +106,27 @@ void EXTI3_IRQHandler(void) { GPIO_EXTI_Dispatch(GPIO_EXTI_Line_3); }
 
 void EXTI4_IRQHandler(void) { GPIO_EXTI_Dispatch(GPIO_EXTI_Line_4); }
 
-void EXTI9_5_IRQHandler(void)
-{
-  GPIO_EXTI_Dispatch(GPIO_EXTI_Line_5);
-  GPIO_EXTI_Dispatch(GPIO_EXTI_Line_6);
-  GPIO_EXTI_Dispatch(GPIO_EXTI_Line_7);
-  GPIO_EXTI_Dispatch(GPIO_EXTI_Line_8);
-  GPIO_EXTI_Dispatch(GPIO_EXTI_Line_9);
-}
+void EXTI5_IRQHandler(void) { GPIO_EXTI_Dispatch(GPIO_EXTI_Line_5); }
 
-void EXTI15_10_IRQHandler(void)
-{
-  GPIO_EXTI_Dispatch(GPIO_EXTI_Line_10);
-  GPIO_EXTI_Dispatch(GPIO_EXTI_Line_11);
-  GPIO_EXTI_Dispatch(GPIO_EXTI_Line_12);
-  GPIO_EXTI_Dispatch(GPIO_EXTI_Line_13);
-  GPIO_EXTI_Dispatch(GPIO_EXTI_Line_14);
-  GPIO_EXTI_Dispatch(GPIO_EXTI_Line_15);
-}
+void EXTI6_IRQHandler(void) { GPIO_EXTI_Dispatch(GPIO_EXTI_Line_6); }
+
+void EXTI7_IRQHandler(void) { GPIO_EXTI_Dispatch(GPIO_EXTI_Line_7); }
+
+void EXTI8_IRQHandler(void) { GPIO_EXTI_Dispatch(GPIO_EXTI_Line_8); }
+
+void EXTI9_IRQHandler(void) { GPIO_EXTI_Dispatch(GPIO_EXTI_Line_9); }
+
+void EXTI10_IRQHandler(void) { GPIO_EXTI_Dispatch(GPIO_EXTI_Line_10); }
+
+void EXTI11_IRQHandler(void) { GPIO_EXTI_Dispatch(GPIO_EXTI_Line_11); }
+
+void EXTI12_IRQHandler(void) { GPIO_EXTI_Dispatch(GPIO_EXTI_Line_12); }
+
+void EXTI13_IRQHandler(void) { GPIO_EXTI_Dispatch(GPIO_EXTI_Line_13); }
+
+void EXTI14_IRQHandler(void) { GPIO_EXTI_Dispatch(GPIO_EXTI_Line_14); }
+
+void EXTI15_IRQHandler(void) { GPIO_EXTI_Dispatch(GPIO_EXTI_Line_15); }
 
 void GPIO_EXTI_NVIC_Init(GPIO_EXTI_Line exti_line_idx)
 {
@@ -158,19 +170,91 @@ void GPIO_EXTI_NVIC_Init(GPIO_EXTI_Line exti_line_idx)
     }
   }
 
-  if (exti_line_idx >= GPIO_EXTI_Line_5 && exti_line_idx <= GPIO_EXTI_Line_9) {
-    if (!gpio_exti_enable_status[GPIO_EXTI_IRQn_5_9]) {
-      gpio_exti_enable_status[GPIO_EXTI_IRQn_5_9] = true;
-      HAL_NVIC_SetPriority(EXTI9_5_IRQn, GPIO_EXTI_NVIC_PRIORITY, GPIO_EXTI_NVIC_SUB_PRIORITY);
-      HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
+  if (exti_line_idx == GPIO_EXTI_Line_5) {
+    if (!gpio_exti_enable_status[GPIO_EXTI_IRQn_5]) {
+      gpio_exti_enable_status[GPIO_EXTI_IRQn_5] = true;
+      HAL_NVIC_SetPriority(EXTI5_IRQn, GPIO_EXTI_NVIC_PRIORITY, GPIO_EXTI_NVIC_SUB_PRIORITY);
+      HAL_NVIC_EnableIRQ(EXTI5_IRQn);
     }
   }
 
-  if (exti_line_idx >= GPIO_EXTI_Line_10 && exti_line_idx <= GPIO_EXTI_Line_15) {
-    if (!gpio_exti_enable_status[GPIO_EXTI_IRQn_10_15]) {
-      gpio_exti_enable_status[GPIO_EXTI_IRQn_10_15] = true;
-      HAL_NVIC_SetPriority(EXTI15_10_IRQn, GPIO_EXTI_NVIC_PRIORITY, GPIO_EXTI_NVIC_SUB_PRIORITY);
-      HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
+  if (exti_line_idx == GPIO_EXTI_Line_6) {
+    if (!gpio_exti_enable_status[GPIO_EXTI_IRQn_6]) {
+      gpio_exti_enable_status[GPIO_EXTI_IRQn_6] = true;
+      HAL_NVIC_SetPriority(EXTI6_IRQn, GPIO_EXTI_NVIC_PRIORITY, GPIO_EXTI_NVIC_SUB_PRIORITY);
+      HAL_NVIC_EnableIRQ(EXTI6_IRQn);
+    }
+  }
+
+  if (exti_line_idx == GPIO_EXTI_Line_7) {
+    if (!gpio_exti_enable_status[GPIO_EXTI_IRQn_7]) {
+      gpio_exti_enable_status[GPIO_EXTI_IRQn_7] = true;
+      HAL_NVIC_SetPriority(EXTI7_IRQn, GPIO_EXTI_NVIC_PRIORITY, GPIO_EXTI_NVIC_SUB_PRIORITY);
+      HAL_NVIC_EnableIRQ(EXTI7_IRQn);
+    }
+  }
+
+  if (exti_line_idx == GPIO_EXTI_Line_8) {
+    if (!gpio_exti_enable_status[GPIO_EXTI_IRQn_8]) {
+      gpio_exti_enable_status[GPIO_EXTI_IRQn_8] = true;
+      HAL_NVIC_SetPriority(EXTI8_IRQn, GPIO_EXTI_NVIC_PRIORITY, GPIO_EXTI_NVIC_SUB_PRIORITY);
+      HAL_NVIC_EnableIRQ(EXTI8_IRQn);
+    }
+  }
+
+  if (exti_line_idx == GPIO_EXTI_Line_9) {
+    if (!gpio_exti_enable_status[GPIO_EXTI_IRQn_9]) {
+      gpio_exti_enable_status[GPIO_EXTI_IRQn_9] = true;
+      HAL_NVIC_SetPriority(EXTI9_IRQn, GPIO_EXTI_NVIC_PRIORITY, GPIO_EXTI_NVIC_SUB_PRIORITY);
+      HAL_NVIC_EnableIRQ(EXTI9_IRQn);
+    }
+  }
+
+  if (exti_line_idx == GPIO_EXTI_Line_10) {
+    if (!gpio_exti_enable_status[GPIO_EXTI_IRQn_10]) {
+      gpio_exti_enable_status[GPIO_EXTI_IRQn_10] = true;
+      HAL_NVIC_SetPriority(EXTI10_IRQn, GPIO_EXTI_NVIC_PRIORITY, GPIO_EXTI_NVIC_SUB_PRIORITY);
+      HAL_NVIC_EnableIRQ(EXTI10_IRQn);
+    }
+  }
+  
+  if (exti_line_idx == GPIO_EXTI_Line_11) {
+    if (!gpio_exti_enable_status[GPIO_EXTI_IRQn_11]) {
+      gpio_exti_enable_status[GPIO_EXTI_IRQn_11] = true;
+      HAL_NVIC_SetPriority(EXTI11_IRQn, GPIO_EXTI_NVIC_PRIORITY, GPIO_EXTI_NVIC_SUB_PRIORITY);
+      HAL_NVIC_EnableIRQ(EXTI11_IRQn);
+    }
+  }
+  
+  if (exti_line_idx == GPIO_EXTI_Line_12) {
+    if (!gpio_exti_enable_status[GPIO_EXTI_IRQn_12]) {
+      gpio_exti_enable_status[GPIO_EXTI_IRQn_12] = true;
+      HAL_NVIC_SetPriority(EXTI12_IRQn, GPIO_EXTI_NVIC_PRIORITY, GPIO_EXTI_NVIC_SUB_PRIORITY);
+      HAL_NVIC_EnableIRQ(EXTI12_IRQn);
+    }
+  }
+  
+  if (exti_line_idx == GPIO_EXTI_Line_13) {
+    if (!gpio_exti_enable_status[GPIO_EXTI_IRQn_13]) {
+      gpio_exti_enable_status[GPIO_EXTI_IRQn_13] = true;
+      HAL_NVIC_SetPriority(EXTI13_IRQn, GPIO_EXTI_NVIC_PRIORITY, GPIO_EXTI_NVIC_SUB_PRIORITY);
+      HAL_NVIC_EnableIRQ(EXTI13_IRQn);
+    }
+  }
+  
+  if (exti_line_idx == GPIO_EXTI_Line_14) {
+    if (!gpio_exti_enable_status[GPIO_EXTI_IRQn_14]) {
+      gpio_exti_enable_status[GPIO_EXTI_IRQn_14] = true;
+      HAL_NVIC_SetPriority(EXTI14_IRQn, GPIO_EXTI_NVIC_PRIORITY, GPIO_EXTI_NVIC_SUB_PRIORITY);
+      HAL_NVIC_EnableIRQ(EXTI14_IRQn);
+    }
+  }
+  
+  if (exti_line_idx == GPIO_EXTI_Line_15) {
+    if (!gpio_exti_enable_status[GPIO_EXTI_IRQn_15]) {
+      gpio_exti_enable_status[GPIO_EXTI_IRQn_15] = true;
+      HAL_NVIC_SetPriority(EXTI15_IRQn, GPIO_EXTI_NVIC_PRIORITY, GPIO_EXTI_NVIC_SUB_PRIORITY);
+      HAL_NVIC_EnableIRQ(EXTI15_IRQn);
     }
   }
 }
@@ -212,33 +296,80 @@ void GPIO_EXTI_NVIC_DeInit(GPIO_EXTI_Line exti_line_idx, GPIO_EXTI_Desc *gpio_ex
     }
   }
 
-  if (exti_line_idx >= GPIO_EXTI_Line_5 && exti_line_idx <= GPIO_EXTI_Line_9) {
-    bool irq_5_9_used = false;
-
-    for (GPIO_EXTI_Line idx = GPIO_EXTI_Line_5; idx <= GPIO_EXTI_Line_9; idx++) {
-      if (gpio_exti_desc[idx].irq_pin != hwGPIO_Int_Pin_NC) {
-        irq_5_9_used = true;
-      }
-    }
-
-    if (gpio_exti_enable_status[GPIO_EXTI_IRQn_5_9] && !irq_5_9_used) {
-      gpio_exti_enable_status[GPIO_EXTI_IRQn_5_9] = false;
-      HAL_NVIC_DisableIRQ(EXTI9_5_IRQn);
+  if (exti_line_idx == GPIO_EXTI_Line_5) {
+    if (gpio_exti_enable_status[GPIO_EXTI_IRQn_5]) {
+      gpio_exti_enable_status[GPIO_EXTI_IRQn_5] = false;
+      HAL_NVIC_DisableIRQ(EXTI5_IRQn);
     }
   }
 
-  if (exti_line_idx >= GPIO_EXTI_Line_10 && exti_line_idx <= GPIO_EXTI_Line_15) {
-    bool irq_10_15_used = false;
-
-    for (GPIO_EXTI_Line idx = GPIO_EXTI_Line_10; idx <= GPIO_EXTI_Line_15; idx++) {
-      if (gpio_exti_desc[idx].irq_pin != hwGPIO_Int_Pin_NC) {
-        irq_10_15_used = true;
-      }
+  if (exti_line_idx == GPIO_EXTI_Line_6) {
+    if (gpio_exti_enable_status[GPIO_EXTI_IRQn_6]) {
+      gpio_exti_enable_status[GPIO_EXTI_IRQn_6] = false;
+      HAL_NVIC_DisableIRQ(EXTI6_IRQn);
     }
+  }
 
-    if (gpio_exti_enable_status[GPIO_EXTI_IRQn_10_15] && !irq_10_15_used) {
-      gpio_exti_enable_status[GPIO_EXTI_IRQn_10_15] = false;
-      HAL_NVIC_DisableIRQ(EXTI15_10_IRQn);
+  if (exti_line_idx == GPIO_EXTI_Line_7) {
+    if (gpio_exti_enable_status[GPIO_EXTI_IRQn_7]) {
+      gpio_exti_enable_status[GPIO_EXTI_IRQn_7] = false;
+      HAL_NVIC_DisableIRQ(EXTI7_IRQn);
+    }
+  }
+
+  if (exti_line_idx == GPIO_EXTI_Line_8) {
+    if (gpio_exti_enable_status[GPIO_EXTI_IRQn_8]) {
+      gpio_exti_enable_status[GPIO_EXTI_IRQn_8] = false;
+      HAL_NVIC_DisableIRQ(EXTI8_IRQn);
+    }
+  }
+
+  if (exti_line_idx == GPIO_EXTI_Line_9) {
+    if (gpio_exti_enable_status[GPIO_EXTI_IRQn_9]) {
+      gpio_exti_enable_status[GPIO_EXTI_IRQn_9] = false;
+      HAL_NVIC_DisableIRQ(EXTI9_IRQn);
+    }
+  }
+
+  if (exti_line_idx == GPIO_EXTI_Line_10) {
+    if (gpio_exti_enable_status[GPIO_EXTI_IRQn_10]) {
+      gpio_exti_enable_status[GPIO_EXTI_IRQn_10] = false;
+      HAL_NVIC_DisableIRQ(EXTI10_IRQn);
+    }
+  }
+
+  if (exti_line_idx == GPIO_EXTI_Line_11) {
+    if (gpio_exti_enable_status[GPIO_EXTI_IRQn_11]) {
+      gpio_exti_enable_status[GPIO_EXTI_IRQn_11] = false;
+      HAL_NVIC_DisableIRQ(EXTI11_IRQn);
+    }
+  }
+
+  if (exti_line_idx == GPIO_EXTI_Line_12) {
+    if (gpio_exti_enable_status[GPIO_EXTI_IRQn_12]) {
+      gpio_exti_enable_status[GPIO_EXTI_IRQn_12] = false;
+      HAL_NVIC_DisableIRQ(EXTI12_IRQn);
+    }
+  }
+
+  if (exti_line_idx == GPIO_EXTI_Line_13) {
+    if (gpio_exti_enable_status[GPIO_EXTI_IRQn_13]) {
+      gpio_exti_enable_status[GPIO_EXTI_IRQn_13] = false;
+      HAL_NVIC_DisableIRQ(EXTI13_IRQn);
+    }
+  }
+
+  if (exti_line_idx == GPIO_EXTI_Line_14) {
+    if (gpio_exti_enable_status[GPIO_EXTI_IRQn_14]) {
+      gpio_exti_enable_status[GPIO_EXTI_IRQn_14] = false;
+      HAL_NVIC_DisableIRQ(EXTI14_IRQn);
+    }
+  }
+
+  if (exti_line_idx == GPIO_EXTI_Line_15) {
+    if (gpio_exti_enable_status[GPIO_EXTI_IRQn_15]) {
+      gpio_exti_enable_status[GPIO_EXTI_IRQn_15] = false;
+      HAL_NVIC_DisableIRQ(EXTI15_IRQn);
     }
   }
 }

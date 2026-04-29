@@ -8,7 +8,7 @@
 #include "Timer/Timer.h"
 #include "PWM/PWM.h"
 
-#if defined(STM32L0) || defined(STM32L1) || defined(STM32L4) || defined(STM32L5)
+#ifdef STM32L5
 
 #include "PWM/Pin/PWM_Pin_STM32.h"
 #include "PWM_STM32.h"
@@ -59,6 +59,12 @@ void PWM_Clock_Enable(hwPWM_Channel ch)
             break;
 #endif
 
+#if defined(TIM8_BASE)
+        case hwTimer_Index_7:
+            __HAL_RCC_TIM8_CLK_ENABLE();
+            break;
+#endif
+
 #if defined(TIM15_BASE)
         case hwTimer_Index_14:
             __HAL_RCC_TIM15_CLK_ENABLE();
@@ -74,18 +80,6 @@ void PWM_Clock_Enable(hwPWM_Channel ch)
 #if defined(TIM17_BASE)
         case hwTimer_Index_16:
             __HAL_RCC_TIM17_CLK_ENABLE();
-            break;
-#endif
-
-#if defined(TIM21_BASE)
-        case hwTimer_Index_20:
-            __HAL_RCC_TIM21_CLK_ENABLE();
-            break;
-#endif
-
-#if defined(TIM22_BASE)
-        case hwTimer_Index_21:
-            __HAL_RCC_TIM22_CLK_ENABLE();
             break;
 #endif
 
@@ -202,6 +196,24 @@ void PWM_Clock_Disable(hwPWM_Channel ch)
                 }
                 break;
 #endif
+#if defined(TIM8_BASE)
+        case hwTimer_Index_7:
+                all_off = true;
+                for(hwPWM_Channel i = hwPWM_Channel_21; i <= hwPWM_Channel_24; i++)
+                {
+                        {
+                                if(PWM_Channel_Init_Status[i])
+                                {
+                                    all_off = false;    
+                                }
+                        }
+                }
+                if(all_off)
+                {
+                        __HAL_RCC_TIM8_CLK_DISABLE();
+                }
+                break;
+#endif
 #if defined(TIM15_BASE)
         case hwTimer_Index_14:
                 all_off = true;
@@ -243,36 +255,10 @@ void PWM_Clock_Disable(hwPWM_Channel ch)
                 }
                 break;
 #endif
-#if defined(TIM21_BASE)
-        case hwTimer_Index_20:
-                all_off = true;
-                if(PWM_Channel_Init_Status[hwPWM_Channel_41] || PWM_Channel_Init_Status[hwPWM_Channel_42])
-                {
-                        all_off = false;  
-                }
-                if(all_off)
-                {
-                        __HAL_RCC_TIM21_CLK_DISABLE();
-                }
-                break;
-#endif
-#if defined(TIM22_BASE)
-        case hwTimer_Index_21:
-                all_off = true;
-                if(PWM_Channel_Init_Status[hwPWM_Channel_43] || PWM_Channel_Init_Status[hwPWM_Channel_44])
-                {
-                        all_off = false;  
-                }
-                if(all_off)
-                {
-                        __HAL_RCC_TIM22_CLK_DISABLE();
-                }
-                break;
-#endif
 
         default:
                 break;
     }
 }
 
-#endif
+#endif // STM32L5
