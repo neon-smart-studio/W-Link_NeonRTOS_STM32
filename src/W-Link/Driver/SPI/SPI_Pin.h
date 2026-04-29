@@ -54,6 +54,10 @@
 #include "Pin/SPI_Pin_STM32L5.h"
 #endif // STM32L5
 
+#ifdef STM32U0
+#include "Pin/SPI_Pin_STM32U0.h"
+#endif //STM32U0
+
 #ifdef STM32H7
 #include "Pin/SPI_Pin_STM32H7.h"
 #endif //STM32H7

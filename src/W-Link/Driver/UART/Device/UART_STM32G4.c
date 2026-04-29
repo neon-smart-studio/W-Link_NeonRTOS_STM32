@@ -74,19 +74,6 @@ USART_TypeDef *UART_Map_Soc_Base(hwUART_Index index)
         case hwUART_Index_L1:
             return LPUART1;
 #endif
-#if defined(LPUSART1_BASE)
-        case hwUART_Index_L1:
-            return LPUSART1;
-#endif
-
-#if defined(LPUART2_BASE)
-        case hwUART_Index_L2:
-            return LPUART2;
-#endif
-#if defined(LPUSART2_BASE)
-        case hwUART_Index_L2:
-            return LPUSART2;
-#endif
 
         default:
             break;
@@ -159,11 +146,6 @@ static void UART_EnableClock(hwUART_Index index)
             __HAL_RCC_LPUART1_CLK_ENABLE();
             break;
 #endif
-#if defined(LPUSART1_BASE)
-        case hwUART_Index_L1:
-            __HAL_RCC_LPUSART1_CLK_ENABLE();
-            break;
-#endif
 
         default:
             break;
@@ -232,11 +214,6 @@ static void UART_DisableClock(hwUART_Index index)
 #if defined(LPUART1_BASE)
         case hwUART_Index_L1:
             __HAL_RCC_LPUART1_CLK_DISABLE();
-            break;
-#endif
-#if defined(LPUSART1_BASE)
-        case hwUART_Index_L1:
-            __HAL_RCC_LPUSART1_CLK_DISABLE();
             break;
 #endif
     }
@@ -356,7 +333,7 @@ void UART5_IRQHandler(void)
 }
 #endif
 
-#if defined(LPUART1_BASE) || defined(LPUSART1_BASE)
+#if defined(LPUART1_BASE)
 void LPUART1_IRQHandler(void)
 {
     UART_HAL_IRQHandler(hwUART_Index_L1);
@@ -438,12 +415,6 @@ void UART_NVIC_Init(hwUART_Index index)
             HAL_NVIC_EnableIRQ(LPUART1_IRQn);
             break;
 #endif
-#if defined(LPUSART1_BASE)
-        case hwUART_Index_L1:
-            HAL_NVIC_SetPriority(LPUSART1_IRQn, UART_IRQ_NVIC_PRIORITY, UART_IRQ_NVIC_SUB_PRIORITY);
-            HAL_NVIC_EnableIRQ(LPUSART1_IRQn);
-            break;
-#endif
 
         default:
             break;
@@ -512,11 +483,6 @@ void UART_NVIC_DeInit(hwUART_Index index)
 #if defined(LPUART1_BASE)
         case hwUART_Index_L1:
             HAL_NVIC_DisableIRQ(LPUART1_IRQn);
-            break;
-#endif
-#if defined(LPUSART1_BASE)
-        case hwUART_Index_L1:
-            HAL_NVIC_DisableIRQ(LPUSART1_IRQn);
             break;
 #endif
 

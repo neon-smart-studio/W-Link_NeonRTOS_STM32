@@ -6,8 +6,12 @@
 typedef enum hwDAC_Channel_Index_t
 {
 #if defined(DAC1_BASE) || defined(DAC_BASE)
+#if defined(DAC_CHANNEL_1)
   hwDAC_Channel_Index_0 = 0,
+#endif
+#if defined(DAC_CHANNEL_2)
   hwDAC_Channel_Index_1,
+#endif
 #endif
 #if defined(DAC2_BASE)
   hwDAC_Channel_Index_2,

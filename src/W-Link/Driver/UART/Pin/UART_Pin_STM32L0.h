@@ -23,10 +23,10 @@ const UART_Pinset_t UART_Index_Map_Alt[hwUART_Index_MAX] = {
 #if defined(UART1_BASE) || defined(USART1_BASE)
     CONFIG_UART0_PINSET,
 #endif
-#if defined(USART2_BASE) || defined(USART2_BASE)
+#if defined(UART2_BASE) || defined(USART2_BASE)
     CONFIG_UART1_PINSET,
 #endif
-#if defined(LPUART1_BASE) || defined(LPUSART1_BASE)
+#if defined(LPUART1_BASE)
     CONFIG_UART_L1_PINSET,
 #endif
 };
@@ -40,14 +40,14 @@ const UART_Pin_Def UART_Pin_Def_Table[hwUART_Index_MAX][UART_Pinset_MAX] =
     },
 #endif
 
-#if defined(USART2_BASE) || defined(USART2_BASE)
+#if defined(UART2_BASE) || defined(USART2_BASE)
     {
         { hwGPIO_Pin_A2,  hwGPIO_Pin_A3,  hwGPIO_Pin_NC, hwGPIO_Pin_NC },
         { hwGPIO_Pin_A14, hwGPIO_Pin_A15, hwGPIO_Pin_NC, hwGPIO_Pin_NC },
     },
 #endif
 
-#if defined(LPUART1_BASE) || defined(LPUSART1_BASE)
+#if defined(LPUART1_BASE)
     {
         { hwGPIO_Pin_A2, hwGPIO_Pin_A3, hwGPIO_Pin_NC, hwGPIO_Pin_NC },
         { hwGPIO_Pin_B10, hwGPIO_Pin_B11, hwGPIO_Pin_NC, hwGPIO_Pin_NC },
@@ -63,14 +63,14 @@ const UART_AF_Map UART_Pin_AF_Map[] = {
     { hwUART_Index_0, hwGPIO_Pin_B7,  GPIO_AF4_USART1 },
 #endif
 
-#if defined(USART2_BASE) || defined(USART2_BASE)
+#if defined(UART2_BASE) || defined(USART2_BASE)
     { hwUART_Index_1, hwGPIO_Pin_A2,  GPIO_AF4_USART2 },
     { hwUART_Index_1, hwGPIO_Pin_A3,  GPIO_AF4_USART2 },
     { hwUART_Index_1, hwGPIO_Pin_A14, GPIO_AF4_USART2 },
     { hwUART_Index_1, hwGPIO_Pin_A15, GPIO_AF4_USART2 },
 #endif
 
-#if defined(LPUART1_BASE) || defined(LPUSART1_BASE)
+#if defined(LPUART1_BASE)
     { hwUART_Index_L1, hwGPIO_Pin_A2,  GPIO_AF6_LPUART1 },
     { hwUART_Index_L1, hwGPIO_Pin_A3,  GPIO_AF6_LPUART1 },
     { hwUART_Index_L1, hwGPIO_Pin_B10, GPIO_AF6_LPUART1 },
@@ -78,4 +78,4 @@ const UART_AF_Map UART_Pin_AF_Map[] = {
 #endif
 };
 
-#endif
+#endif // UART_PIN_STM32L0_H

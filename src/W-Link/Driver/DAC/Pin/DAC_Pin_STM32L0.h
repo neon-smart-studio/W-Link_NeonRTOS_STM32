@@ -1,5 +1,5 @@
-#ifndef DAC_PIN_STM32F3_H
-#define DAC_PIN_STM32F3_H
+#ifndef DAC_PIN_STM32L0_H
+#define DAC_PIN_STM32L0_H
 
 #include "DAC_Pin_STM32.h"
 
@@ -15,4 +15,4 @@ const DAC_Channel_Def DAC_Channel_Def_Table[hwDAC_Channel_Index_MAX] = {
 #endif
 };
 
-#endif // DAC_PIN_STM32F3_H
+#endif // DAC_PIN_STM32L0_H

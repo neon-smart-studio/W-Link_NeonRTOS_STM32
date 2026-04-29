@@ -158,9 +158,9 @@ void TIM1_BRK_TIM15_IRQHandler(void) { Timer_HAL_IRQHandler(hwTimer_Index_14); }
 #if defined(TIM17_BASE)
 #if defined (STM32L471xx) || defined (STM32L475xx) || defined (STM32L476xx) || defined (STM32L485xx) || defined (STM32L486xx) || \
     defined (STM32L496xx)
-void TIM1_TRG_COM_IRQHandler(void) { Timer_HAL_IRQHandler(hwTimer_Index_17); }
+void TIM1_TRG_COM_IRQHandler(void) { Timer_HAL_IRQHandler(hwTimer_Index_16); }
 #else
-void TIM1_TRG_COM_TIM17_IRQHandler(void) { Timer_HAL_IRQHandler(hwTimer_Index_17); }
+void TIM1_TRG_COM_TIM17_IRQHandler(void) { Timer_HAL_IRQHandler(hwTimer_Index_16); }
 #endif
 #endif
 
