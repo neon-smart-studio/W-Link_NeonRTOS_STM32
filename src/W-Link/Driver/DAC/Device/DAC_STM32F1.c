@@ -16,8 +16,12 @@ static uint32_t DAC_Channel_To_HAL(hwDAC_Channel_Index ch)
 {
     switch (ch)
     {
+#if defined(DAC_CHANNEL_1)
         case hwDAC_Channel_Index_0: return DAC_CHANNEL_1;
+#endif
+#if defined(DAC_CHANNEL_2)
         case hwDAC_Channel_Index_1: return DAC_CHANNEL_2;
+#endif
         default: return 0;
     }
 }

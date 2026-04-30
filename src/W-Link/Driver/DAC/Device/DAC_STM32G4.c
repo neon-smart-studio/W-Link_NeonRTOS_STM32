@@ -18,8 +18,12 @@ static uint32_t DAC_Channel_To_HAL(hwDAC_Instance inst, hwDAC_Channel_Index ch)
     {
 #if defined(DAC1_BASE)
         case hwDAC_Instance_1:
+#if defined(DAC_CHANNEL_1)
             if (ch == hwDAC_Channel_Index_0) return DAC_CHANNEL_1;
+#endif
+#if defined(DAC_CHANNEL_2)
             if (ch == hwDAC_Channel_Index_1) return DAC_CHANNEL_2;
+#endif
             break;
 #endif
 
@@ -143,14 +147,7 @@ hwDAC_OpStatus DAC_ConfigChannel(hwDAC_Instance inst, hwDAC_Channel_Index ch)
 
     cfg.DAC_Trigger      = DAC_TRIGGER_NONE;
     cfg.DAC_OutputBuffer = DAC_OUTPUTBUFFER_ENABLE;
-
-#if defined(DAC_CHIPCONNECT_DISABLE)
-    cfg.DAC_ConnectOnChipPeripheral = DAC_CHIPCONNECT_DISABLE;
-#endif
-
-#if defined(DAC_SAMPLEANDHOLD_DISABLE)
     cfg.DAC_SampleAndHold = DAC_SAMPLEANDHOLD_DISABLE;
-#endif
 
     if (HAL_DAC_ConfigChannel(&g_dac[inst], &cfg, hal_ch) != HAL_OK)
         return hwDAC_HwError;

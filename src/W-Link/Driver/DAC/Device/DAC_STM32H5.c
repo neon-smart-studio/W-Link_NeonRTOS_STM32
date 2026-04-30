@@ -3,7 +3,7 @@
 
 #include "soc.h"
 
-#ifdef STM32U5
+#ifdef STM32H5
 
 #if defined(DAC1_BASE) || defined(DAC_BASE)
 
@@ -86,8 +86,10 @@ hwDAC_OpStatus DAC_ConfigChannel(hwDAC_Instance inst, hwDAC_Channel_Index ch)
 
     cfg.DAC_Trigger = DAC_TRIGGER_NONE;
     cfg.DAC_OutputBuffer = DAC_OUTPUTBUFFER_ENABLE;
-    cfg.DAC_ConnectOnChipPeripheral = DAC_CHIPCONNECT_DISABLE;
     cfg.DAC_SampleAndHold = DAC_SAMPLEANDHOLD_DISABLE;
+    cfg.DAC_HighFrequency = DAC_HIGH_FREQUENCY_INTERFACE_MODE_DISABLE;
+    cfg.DAC_DMADoubleDataMode = DISABLE;
+    cfg.DAC_SignedFormat = DISABLE;
 
     return (HAL_DAC_ConfigChannel(&g_dac[inst], &cfg, hal_ch) == HAL_OK)
         ? hwDAC_OK : hwDAC_HwError;
@@ -128,4 +130,4 @@ hwDAC_OpStatus DAC_WriteRaw(hwDAC_Instance inst, hwDAC_Channel_Index ch, uint32_
 
 #endif // DAC1_BASE || DAC_BASE
 
-#endif // STM32U5
+#endif // STM32H5

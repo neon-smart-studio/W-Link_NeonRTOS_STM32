@@ -89,14 +89,7 @@ hwDAC_OpStatus DAC_ConfigChannel(hwDAC_Instance inst, hwDAC_Channel_Index ch)
     DAC_ChannelConfTypeDef cfg = {0};
     cfg.DAC_Trigger      = DAC_TRIGGER_NONE;
     cfg.DAC_OutputBuffer = DAC_OUTPUTBUFFER_ENABLE;
-
-#if defined(DAC_CHIPCONNECT_DISABLE)
-    cfg.DAC_ConnectOnChipPeripheral = DAC_CHIPCONNECT_DISABLE;
-#endif
-
-#if defined(DAC_SAMPLEANDHOLD_DISABLE)
     cfg.DAC_SampleAndHold = DAC_SAMPLEANDHOLD_DISABLE;
-#endif
 
     return (HAL_DAC_ConfigChannel(&g_dac[inst], &cfg, hal_ch) == HAL_OK)
         ? hwDAC_OK : hwDAC_HwError;

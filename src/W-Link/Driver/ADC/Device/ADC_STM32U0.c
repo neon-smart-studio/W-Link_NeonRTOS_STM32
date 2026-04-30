@@ -89,15 +89,9 @@ hwADC_OpStatus ADC_Instance_Init(hwADC_Instance inst)
     g_adc[inst].Init.DiscontinuousConvMode = DISABLE;
     g_adc[inst].Init.ExternalTrigConv      = ADC_SOFTWARE_START;
     g_adc[inst].Init.ExternalTrigConvEdge  = ADC_EXTERNALTRIGCONVEDGE_NONE;
-
-#if defined(ADC_CFGR1_DMAEN) || defined(ADC_CFGR_DMAEN)
     g_adc[inst].Init.DMAContinuousRequests = DISABLE;
-#endif
-
     g_adc[inst].Init.Overrun = ADC_OVR_DATA_OVERWRITTEN;
-
     g_adc[inst].Init.TriggerFrequencyMode = ADC_TRIGGER_FREQ_HIGH;
-
     g_adc[inst].Init.SamplingTimeCommon1 = ADC_SAMPLETIME_160CYCLES_5;
     g_adc[inst].Init.SamplingTimeCommon2 = ADC_SAMPLETIME_160CYCLES_5;
 

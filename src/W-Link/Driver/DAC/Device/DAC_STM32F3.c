@@ -16,16 +16,18 @@ static uint32_t DAC_Channel_To_HAL(hwDAC_Channel_Index ch)
 {
     switch (ch)
     {
-        case hwDAC_Channel_Index_0:
-            return DAC_CHANNEL_1;
+#if defined(DAC_CHANNEL_1)
+        case hwDAC_Channel_Index_0: return DAC_CHANNEL_1;
+#endif
 
 #if defined(STM32F303xE) || defined(STM32F398xx) || \
     defined(STM32F303xC) || defined(STM32F358xx) || \
     defined(STM32F303x8) || defined(STM32F334x8) || \
     defined(STM32F328xx) || defined(STM32F373xC) || \
     defined(STM32F378xx)
-        case hwDAC_Channel_Index_1:
-            return DAC_CHANNEL_2;
+#if defined(DAC_CHANNEL_2)
+        case hwDAC_Channel_Index_1: return DAC_CHANNEL_2;
+#endif
 #endif
 
         default:
