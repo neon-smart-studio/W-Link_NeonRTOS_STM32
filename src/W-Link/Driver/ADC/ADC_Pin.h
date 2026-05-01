@@ -43,7 +43,7 @@
 #endif //STM32H5
 
 #ifdef STM32H7
-#include "Pin/ADC_Pin_STM32H5.h"
+#include "Pin/ADC_Pin_STM32H7.h"
 #endif //STM32H7
 
 #ifdef STM32H7RS
@@ -73,9 +73,5 @@
 #ifdef STM32U5
 #include "Pin/ADC_Pin_STM32U5.h"
 #endif //STM32U5
-
-#ifdef STM32H7
-#include "Pin/ADC_Pin_STM32H7.h"
-#endif //STM32H7
 
 #endif //ADC_PIN_H

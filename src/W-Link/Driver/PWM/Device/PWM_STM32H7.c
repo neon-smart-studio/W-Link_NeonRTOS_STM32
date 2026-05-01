@@ -8,7 +8,7 @@
 #include "Timer/Timer.h"
 #include "PWM/PWM.h"
 
-#ifdef STM32U5
+#ifdef STM32H7
 
 #include "PWM/Pin/PWM_Pin_STM32.h"
 #include "PWM_STM32.h"
@@ -65,6 +65,24 @@ void PWM_Clock_Enable(hwPWM_Channel ch)
             break;
 #endif
 
+#if defined(TIM12_BASE)
+        case hwTimer_Index_11:
+            __HAL_RCC_TIM12_CLK_ENABLE();
+            break;
+#endif
+
+#if defined(TIM13_BASE)
+        case hwTimer_Index_12:
+            __HAL_RCC_TIM13_CLK_ENABLE();
+            break;
+#endif
+
+#if defined(TIM14_BASE)
+        case hwTimer_Index_13:
+            __HAL_RCC_TIM14_CLK_ENABLE();
+            break;
+#endif
+
 #if defined(TIM15_BASE)
         case hwTimer_Index_14:
             __HAL_RCC_TIM15_CLK_ENABLE();
@@ -80,6 +98,18 @@ void PWM_Clock_Enable(hwPWM_Channel ch)
 #if defined(TIM17_BASE)
         case hwTimer_Index_16:
             __HAL_RCC_TIM17_CLK_ENABLE();
+            break;
+#endif
+
+#if defined(TIM23_BASE)
+        case hwTimer_Index_22:
+            __HAL_RCC_TIM23_CLK_ENABLE();
+            break;
+#endif
+
+#if defined(TIM24_BASE)
+        case hwTimer_Index_23:
+            __HAL_RCC_TIM24_CLK_ENABLE();
             break;
 #endif
 
@@ -210,7 +240,51 @@ void PWM_Clock_Disable(hwPWM_Channel ch)
                 }
                 if(all_off)
                 {
-                        __HAL_RCC_TIM3_CLK_DISABLE();
+                        __HAL_RCC_TIM8_CLK_DISABLE();
+                }
+                break;
+#endif
+#if defined(TIM12_BASE)
+        case hwTimer_Index_11:
+                all_off = true;
+                for(hwPWM_Channel i = hwPWM_Channel_29; i <= hwPWM_Channel_30; i++)
+                {
+                        {
+                                if(PWM_Channel_Init_Status[i])
+                                {
+                                        all_off = false;    
+                                }
+                        }
+                }
+                if(all_off)
+                {
+                        __HAL_RCC_TIM12_CLK_DISABLE();
+                }
+                break;
+#endif
+#if defined(TIM13_BASE)
+        case hwTimer_Index_12:
+                all_off = true;
+                if(PWM_Channel_Init_Status[hwPWM_Channel_31])
+                {
+                        all_off = false;  
+                }
+                if(all_off)
+                {
+                        __HAL_RCC_TIM13_CLK_DISABLE();
+                }
+                break;
+#endif
+#if defined(TIM14_BASE)
+        case hwTimer_Index_13:
+                all_off = true;
+                if(PWM_Channel_Init_Status[hwPWM_Channel_32])
+                {
+                        all_off = false;  
+                }
+                if(all_off)
+                {
+                        __HAL_RCC_TIM14_CLK_DISABLE();
                 }
                 break;
 #endif
@@ -256,10 +330,44 @@ void PWM_Clock_Disable(hwPWM_Channel ch)
                 }
                 break;
 #endif
+#if defined(TIM23_BASE)
+        case hwTimer_Index_22:
+                all_off = true;
+                for(hwPWM_Channel i = hwPWM_Channel_45; i <= hwPWM_Channel_48; i++)
+                {
+                        if(PWM_Channel_Init_Status[i])
+                        {
+                                all_off = false;
+                        }
+                }
+
+                if(all_off)
+                {
+                        __HAL_RCC_TIM23_CLK_DISABLE();
+                }
+                break;
+#endif
+#if defined(TIM24_BASE)
+        case hwTimer_Index_23:
+                all_off = true;
+                for(hwPWM_Channel i = hwPWM_Channel_49; i <= hwPWM_Channel_52; i++)
+                {
+                        if(PWM_Channel_Init_Status[i])
+                        {
+                                all_off = false;
+                        }
+                }
+
+                if(all_off)
+                {
+                        __HAL_RCC_TIM24_CLK_DISABLE();
+                }
+                break;
+#endif
 
         default:
                 break;
     }
 }
 
-#endif // STM32U5
+#endif // STM32H7

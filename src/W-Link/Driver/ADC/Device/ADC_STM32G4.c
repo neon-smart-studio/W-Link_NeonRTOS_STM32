@@ -170,7 +170,24 @@ hwADC_OpStatus ADC_Instance_DeInit(hwADC_Instance inst)
 #if defined(ADC5_BASE)
         case hwADC_Instance_5:
 #endif
-            __HAL_RCC_ADC345_CLK_DISABLE();
+            bool all_unused = true;
+
+#if defined(ADC3_BASE)
+            all_unused &= !ADC_Instance_Init_Status[hwADC_Instance_3];
+#endif
+
+#if defined(ADC4_BASE)
+            all_unused &= !ADC_Instance_Init_Status[hwADC_Instance_4];
+#endif
+
+#if defined(ADC5_BASE)
+            all_unused &= !ADC_Instance_Init_Status[hwADC_Instance_5];
+#endif
+
+            if (all_unused)
+            {
+                __HAL_RCC_ADC345_CLK_DISABLE();
+            }
             break;
 #endif
 

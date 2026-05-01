@@ -5,7 +5,7 @@
 typedef enum hwTimer_Index_t
 {
 #if defined (TIM1_BASE)
-  hwTimer_Index_0,
+  hwTimer_Index_0 = 0,
 #endif
 #if defined (TIM2_BASE)
   hwTimer_Index_1,
@@ -69,6 +69,12 @@ typedef enum hwTimer_Index_t
 #endif
 #if defined(TIM22_BASE)
   hwTimer_Index_21,
+#endif
+#if defined(TIM23_BASE)
+  hwTimer_Index_22,
+#endif
+#if defined(TIM24_BASE)
+  hwTimer_Index_23,
 #endif
   hwTimer_Index_MAX,
 }hwTimer_Index;

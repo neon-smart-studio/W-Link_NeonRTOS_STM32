@@ -315,7 +315,6 @@
 #include "stm32h7xx_hal_dma.h"
 #include "stm32h7xx_hal_rtc.h"
 #include "stm32h7xx_hal_adc.h"
-#include "stm32h7xx_hal_can.h"
 #include "stm32h7xx_hal_dac.h"
 #endif //STM32H7
 

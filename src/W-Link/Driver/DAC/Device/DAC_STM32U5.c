@@ -31,34 +31,25 @@ static uint32_t DAC_Channel_To_HAL(hwDAC_Instance inst, hwDAC_Channel_Index ch)
     return 0;
 }
 
-static void DAC_EnableClock(void)
-{
-    __HAL_RCC_DAC1_CLK_ENABLE();
-}
-
-static void DAC_DisableClock(void)
-{
-    __HAL_RCC_DAC1_CLK_DISABLE();
-}
-
-static DAC_TypeDef * DAC_GetInstance(void)
-{
-    return DAC1;
-}
-
 hwDAC_OpStatus DAC_Instance_Init(hwDAC_Instance inst)
 {
     if (inst != hwDAC_Instance_1)
         return hwDAC_InvalidParameter;
 
-    DAC_TypeDef *instance = DAC_GetInstance();
-    if (instance == NULL)
+    switch (inst)
+    {
+#if defined(DAC1_BASE)
+        case hwDAC_Instance_1:
+            __HAL_RCC_DAC1_CLK_ENABLE();
+            g_dac[inst].Instance = DAC1;
+            break;
+#endif
+    }
+    
+    if (HAL_DAC_Init(&g_dac[inst]) != HAL_OK)
         return hwDAC_HwError;
 
-    DAC_EnableClock();
-    g_dac[inst].Instance = instance;
-
-    return (HAL_DAC_Init(&g_dac[inst]) == HAL_OK) ? hwDAC_OK : hwDAC_HwError;
+    return hwDAC_OK;
 }
 
 hwDAC_OpStatus DAC_Instance_DeInit(hwDAC_Instance inst)
@@ -69,7 +60,15 @@ hwDAC_OpStatus DAC_Instance_DeInit(hwDAC_Instance inst)
     if (HAL_DAC_DeInit(&g_dac[inst]) != HAL_OK)
         return hwDAC_HwError;
 
-    DAC_DisableClock();
+    switch (inst)
+    {
+#if defined(DAC1_BASE)
+        case hwDAC_Instance_1:
+            __HAL_RCC_DAC1_CLK_DISABLE();
+            break;
+#endif
+    }
+
     return hwDAC_OK;
 }
 

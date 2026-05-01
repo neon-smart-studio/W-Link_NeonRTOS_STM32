@@ -22,8 +22,8 @@
 #include "Pin/CAN_Pin_STM32F7.h"
 #endif //STM32F7
 
-#ifdef STM32H7
-#include "Pin/CAN_Pin_STM32H7.h"
-#endif //STM32H7
+#ifdef STM32L4
+#include "Pin/CAN_Pin_STM32L4.h"
+#endif //STM32L4
 
 #endif //CAN_PIN_H

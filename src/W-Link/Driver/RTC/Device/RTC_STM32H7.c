@@ -3,7 +3,7 @@
 
 #include "soc.h"
 
-#ifdef STM32H5
+#ifdef STM32H7
 
 #include "RTC/RTC.h"
 #include "RTC_STM32.h"
@@ -12,7 +12,7 @@ RTC_HandleTypeDef g_rtc[hwRTC_Index_MAX];
 
 /* ================= IRQ Handler ================= */
 
-void RTC_IRQHandler(void)
+void RTC_Alarm_IRQHandler(void)
 {
     HAL_RTC_AlarmIRQHandler(&g_rtc[hwRTC_Index_0]);
 }
@@ -26,11 +26,10 @@ hwRTC_OpResult RTC_Instance_Init(hwRTC_Index index)
 
     HAL_PWR_EnableBkUpAccess();
 
-    __HAL_RCC_LSE_CONFIG(RCC_LSEDRIVE_LOW);
-
     __HAL_RCC_LSI_ENABLE();
 
     __HAL_RCC_RTC_CONFIG(RCC_RTCCLKSOURCE_LSI);
+
     __HAL_RCC_RTC_ENABLE();
 
     g_rtc[index].Instance = RTC;
@@ -43,8 +42,6 @@ hwRTC_OpResult RTC_Instance_Init(hwRTC_Index index)
     g_rtc[index].Init.OutPutPolarity = RTC_OUTPUT_POLARITY_HIGH;
     g_rtc[index].Init.OutPutType = RTC_OUTPUT_TYPE_OPENDRAIN;
     g_rtc[index].Init.OutPutRemap = RTC_OUTPUT_REMAP_NONE;
-    g_rtc[index].Init.BinMode = RTC_BINARY_NONE;
-    g_rtc[index].Init.OutPutPullUp = RTC_OUTPUT_PULLUP_NONE;
 
     if (HAL_RTC_Init(&g_rtc[index]) != HAL_OK)
         return hwRTC_HwError;
@@ -74,16 +71,16 @@ hwRTC_OpResult RTC_Instance_DeInit(hwRTC_Index index)
 void RTC_NVIC_Init(void)
 {
     HAL_NVIC_SetPriority(
-        RTC_IRQn,
+        RTC_Alarm_IRQn,
         RTC_IRQ_NVIC_PRIORITY,
         RTC_IRQ_NVIC_SUB_PRIORITY
     );
-    HAL_NVIC_EnableIRQ(RTC_IRQn);
+    HAL_NVIC_EnableIRQ(RTC_Alarm_IRQn);
 }
 
 void RTC_NVIC_DeInit(void)
 {
-    HAL_NVIC_DisableIRQ(RTC_IRQn);
+    HAL_NVIC_DisableIRQ(RTC_Alarm_IRQn);
 }
 
 /* ================= Alarm ================= */
@@ -154,4 +151,4 @@ hwRTC_OpResult RTC_Device_ClearAlarm(
     return hwRTC_OK;
 }
 
-#endif // STM32H5
+#endif // STM32H7

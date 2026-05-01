@@ -224,7 +224,7 @@ void PWM_Clock_Disable(hwPWM_Channel ch)
 
                 if(all_off)
                 {
-                        __HAL_RCC_TIM14_CLK_DISABLE();
+                        __HAL_RCC_TIM15_CLK_DISABLE();
                 }
                 break;
 #endif

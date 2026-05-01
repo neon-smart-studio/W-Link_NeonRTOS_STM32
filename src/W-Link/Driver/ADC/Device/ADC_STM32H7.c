@@ -3,7 +3,7 @@
 
 #include "soc.h"
 
-#ifdef STM32H5
+#ifdef STM32H7
 
 #include "ADC/ADC.h"
 #include "ADC_STM32.h"
@@ -38,48 +38,51 @@ static uint32_t ADC_Channel_To_HAL(hwADC_Channel_Index ch)
     }
 }
 
-#if defined(ADC1_BASE)
-void ADC1_IRQHandler(void)
+#if defined(ADC1_BASE) || defined(ADC2_BASE)
+void ADC_IRQHandler(void)
 {
+#if defined(ADC1_BASE)
     HAL_ADC_IRQHandler(&g_adc[hwADC_Instance_1]);
-}
 #endif
 
 #if defined(ADC2_BASE)
-void ADC2_IRQHandler(void)
-{
     HAL_ADC_IRQHandler(&g_adc[hwADC_Instance_2]);
+#endif
 }
 #endif
 
-static void ADC_EnableClock(void)
+#if defined(ADC3_BASE)
+void ADC3_IRQHandler(void)
 {
-    __HAL_RCC_ADC_CLK_ENABLE();
+    HAL_ADC_IRQHandler(&g_adc[hwADC_Instance_3]);
 }
-
-static void ADC_DisableClock(void)
-{
-    __HAL_RCC_ADC_CLK_DISABLE();
-}
+#endif
 
 hwADC_OpStatus ADC_Instance_Init(hwADC_Instance inst)
 {
     if (inst >= hwADC_Instance_MAX)
         return hwADC_InvalidParameter;
 
-    ADC_EnableClock();
-
     switch (inst)
     {
 #if defined(ADC1_BASE)
         case hwADC_Instance_1:
+            __HAL_RCC_ADC12_CLK_ENABLE();
             g_adc[inst].Instance = ADC1;
             break;
 #endif
 
 #if defined(ADC2_BASE)
         case hwADC_Instance_2:
+            __HAL_RCC_ADC12_CLK_ENABLE();
             g_adc[inst].Instance = ADC2;
+            break;
+#endif
+
+#if defined(ADC3_BASE)
+        case hwADC_Instance_3:
+            __HAL_RCC_ADC3_CLK_ENABLE();
+            g_adc[inst].Instance = ADC3;
             break;
 #endif
 
@@ -89,7 +92,6 @@ hwADC_OpStatus ADC_Instance_Init(hwADC_Instance inst)
 
     g_adc[inst].Init.ClockPrescaler        = ADC_CLOCK_ASYNC_DIV4;
     g_adc[inst].Init.Resolution            = ADC_RESOLUTION_12B;
-    g_adc[inst].Init.DataAlign             = ADC_DATAALIGN_RIGHT;
     g_adc[inst].Init.ScanConvMode          = ADC_SCAN_DISABLE;
     g_adc[inst].Init.EOCSelection          = ADC_EOC_SINGLE_CONV;
     g_adc[inst].Init.LowPowerAutoWait      = DISABLE;
@@ -98,13 +100,15 @@ hwADC_OpStatus ADC_Instance_Init(hwADC_Instance inst)
     g_adc[inst].Init.DiscontinuousConvMode = DISABLE;
     g_adc[inst].Init.ExternalTrigConv      = ADC_SOFTWARE_START;
     g_adc[inst].Init.ExternalTrigConvEdge  = ADC_EXTERNALTRIGCONVEDGE_NONE;
-    g_adc[inst].Init.DMAContinuousRequests = DISABLE;
-    g_adc[inst].Init.Overrun = ADC_OVR_DATA_OVERWRITTEN;
+    g_adc[inst].Init.Overrun               = ADC_OVR_DATA_OVERWRITTEN;
+    g_adc[inst].Init.ConversionDataManagement = ADC_CONVERSIONDATA_DR;
+    g_adc[inst].Init.LeftBitShift = ADC_LEFTBITSHIFT_NONE;
+    g_adc[inst].Init.OversamplingMode = DISABLE;
 
     if (HAL_ADC_Init(&g_adc[inst]) != HAL_OK)
         return hwADC_HwError;
 
-    if (HAL_ADCEx_Calibration_Start(&g_adc[inst], ADC_SINGLE_ENDED) != HAL_OK)
+    if (HAL_ADCEx_Calibration_Start(&g_adc[inst], ADC_CALIB_OFFSET, ADC_SINGLE_ENDED) != HAL_OK)
         return hwADC_HwError;
 
     return hwADC_OK;
@@ -117,32 +121,53 @@ hwADC_OpStatus ADC_Instance_DeInit(hwADC_Instance inst)
 
     HAL_ADC_DeInit(&g_adc[inst]);
 
-    ADC_DisableClock();
+    switch (inst)
+    {
+#if defined(ADC1_BASE) || defined(ADC2_BASE)
+#if defined(ADC1_BASE)
+        case hwADC_Instance_1:
+#endif
+#if defined(ADC2_BASE)
+        case hwADC_Instance_2:
+#endif
+            __HAL_RCC_ADC12_CLK_DISABLE();
+            break;
+#endif
+
+#if defined(ADC3_BASE)
+        case hwADC_Instance_3:
+            __HAL_RCC_ADC3_CLK_DISABLE();
+            break;
+#endif
+
+        default:
+            break;
+    }
 
     return hwADC_OK;
 }
 
 void ADC_NVIC_Init(void)
 {
-#if defined(ADC1_BASE)
-    HAL_NVIC_SetPriority(ADC1_IRQn, ADC_IRQ_NVIC_PRIORITY, ADC_IRQ_NVIC_SUB_PRIORITY);
-    HAL_NVIC_EnableIRQ(ADC1_IRQn);
+#if defined(ADC1_BASE) || defined(ADC2_BASE)
+    HAL_NVIC_SetPriority(ADC_IRQn, ADC_IRQ_NVIC_PRIORITY, ADC_IRQ_NVIC_SUB_PRIORITY);
+    HAL_NVIC_EnableIRQ(ADC_IRQn);
 #endif
 
-#if defined(ADC2_BASE)
-    HAL_NVIC_SetPriority(ADC2_IRQn, ADC_IRQ_NVIC_PRIORITY, ADC_IRQ_NVIC_SUB_PRIORITY);
-    HAL_NVIC_EnableIRQ(ADC2_IRQn);
+#if defined(ADC3_BASE)
+    HAL_NVIC_SetPriority(ADC3_IRQn, ADC_IRQ_NVIC_PRIORITY, ADC_IRQ_NVIC_SUB_PRIORITY);
+    HAL_NVIC_EnableIRQ(ADC3_IRQn);
 #endif
 }
 
 void ADC_NVIC_DeInit(void)
 {
-#if defined(ADC1_BASE)
-    HAL_NVIC_DisableIRQ(ADC1_IRQn);
+#if defined(ADC1_BASE) || defined(ADC2_BASE)
+    HAL_NVIC_DisableIRQ(ADC_IRQn);
 #endif
 
-#if defined(ADC2_BASE)
-    HAL_NVIC_DisableIRQ(ADC2_IRQn);
+#if defined(ADC3_BASE)
+    HAL_NVIC_DisableIRQ(ADC3_IRQn);
 #endif
 }
 
@@ -157,8 +182,8 @@ hwADC_OpStatus ADC_ConfigChannel(hwADC_Instance inst, hwADC_Channel_Index ch)
     if (cfg.Channel == 0 && ch != hwADC_Channel_Index_0)
         return hwADC_InvalidParameter;
 
-    cfg.Rank = ADC_REGULAR_RANK_1;
-    cfg.SamplingTime = ADC_SAMPLETIME_640CYCLES_5;
+    cfg.Rank         = ADC_REGULAR_RANK_1;
+    cfg.SamplingTime = ADC_SAMPLETIME_810CYCLES_5;
     cfg.SingleDiff = ADC_SINGLE_ENDED;
     cfg.OffsetNumber = ADC_OFFSET_NONE;
     cfg.Offset = 0;
@@ -169,4 +194,4 @@ hwADC_OpStatus ADC_ConfigChannel(hwADC_Instance inst, hwADC_Channel_Index ch)
     return hwADC_OK;
 }
 
-#endif // STM32H5
+#endif // STM32H7

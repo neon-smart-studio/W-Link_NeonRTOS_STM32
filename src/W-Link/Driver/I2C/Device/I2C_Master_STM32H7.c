@@ -6,7 +6,7 @@
 
 #include "NeonRTOS.h"
 
-#ifdef STM32F7
+#ifdef STM32H7
 
 #include "I2C/I2C_Master.h"
 #include "I2C_Master_STM32.h"
@@ -16,98 +16,32 @@ I2C_HandleTypeDef g_i2c[hwI2C_Index_MAX];
 
 uint32_t I2C_Get_PCLK(hwI2C_Index index)
 {
-    uint32_t clocksource;
-    uint32_t pclk = 0;
-
-    if (index == hwI2C_Index_0) {
-        clocksource = __HAL_RCC_GET_I2C1_SOURCE();
-        switch (clocksource) {
-            case RCC_I2C1CLKSOURCE_PCLK1:
-                pclk = HAL_RCC_GetPCLK1Freq();
-                break;
-
-            case RCC_I2C1CLKSOURCE_SYSCLK:
-                pclk = HAL_RCC_GetSysClockFreq();
-                break;
-
-            case RCC_I2C1CLKSOURCE_HSI:
-                pclk = HSI_VALUE;
-                break;
-        }
-    }
-    else if (index == hwI2C_Index_1) {
-        clocksource = __HAL_RCC_GET_I2C2_SOURCE();
-        switch (clocksource) {
-            case RCC_I2C2CLKSOURCE_PCLK1:
-                pclk = HAL_RCC_GetPCLK1Freq();
-                break;
-
-            case RCC_I2C2CLKSOURCE_SYSCLK:
-                pclk = HAL_RCC_GetSysClockFreq();
-                break;
-
-            case RCC_I2C2CLKSOURCE_HSI:
-                pclk = HSI_VALUE;
-                break;
-        }
-    }
-    else if (index == hwI2C_Index_2) {
-        clocksource = __HAL_RCC_GET_I2C3_SOURCE();
-        switch (clocksource) {
-            case RCC_I2C3CLKSOURCE_PCLK1:
-                pclk = HAL_RCC_GetPCLK1Freq();
-                break;
-
-            case RCC_I2C3CLKSOURCE_SYSCLK:
-                pclk = HAL_RCC_GetSysClockFreq();
-                break;
-
-            case RCC_I2C3CLKSOURCE_HSI:
-                pclk = HSI_VALUE;
-                break;
-        }
-    }
-#if defined (I2C4_BASE)
-    else if (index == hwI2C_Index_3) {
-        clocksource = __HAL_RCC_GET_I2C4_SOURCE();
-        switch (clocksource) {
-            case RCC_I2C4CLKSOURCE_PCLK1:
-                pclk = HAL_RCC_GetPCLK1Freq();
-                break;
-
-            case RCC_I2C4CLKSOURCE_SYSCLK:
-                pclk = HAL_RCC_GetSysClockFreq();
-                break;
-
-            case RCC_I2C4CLKSOURCE_HSI:
-                pclk = HSI_VALUE;
-                break;
-        }
-    }
+    switch (index)
+    {
+#if defined(I2C1_BASE)
+        case hwI2C_Index_0:
 #endif
+#if defined(I2C2_BASE)
+        case hwI2C_Index_1:
+#endif
+#if defined(I2C3_BASE)
+        case hwI2C_Index_2:
+#endif
+            return HAL_RCC_GetPCLK1Freq();
+
+#if defined(I2C4_BASE)
+        case hwI2C_Index_3:
+            return HAL_RCC_GetPCLK2Freq();
+#endif
+
 #if defined(I2C5_BASE)
-    else if (index == hwI2C_Index_4) {
-        clocksource = __HAL_RCC_GET_I2C5_SOURCE();
-        switch (clocksource) {
-            case RCC_I2C5CLKSOURCE_PCLK1:
-                pclk = HAL_RCC_GetPCLK1Freq();
-                break;
-
-            case RCC_I2C5CLKSOURCE_SYSCLK:
-                pclk = HAL_RCC_GetSysClockFreq();
-                break;
-
-            case RCC_I2C5CLKSOURCE_HSI:
-                pclk = HSI_VALUE;
-                break;
-        }
-    }
+        case hwI2C_Index_4:
+            return HAL_RCC_GetPCLK2Freq();
 #endif
-    else {
-        // should not happend
-        UART_Printf("I2C: unknown instance");
+
+        default:
+            return 0;
     }
-    return pclk;
 }
 
 I2C_TypeDef *I2C_Map_Soc_Base(hwI2C_Index index)
@@ -376,4 +310,4 @@ void I2C_NVIC_DeInit(hwI2C_Index index)
     }
 }
 
-#endif // STM32F7
+#endif // STM32H7
