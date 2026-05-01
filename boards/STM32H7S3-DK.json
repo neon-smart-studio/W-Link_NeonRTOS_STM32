@@ -1,0 +1,44 @@
+{
+  "build": {
+    "core": "stm32",
+    "cpu": "cortex-m7",
+    "extra_flags": "-DSTM32H7RS -DSTM32H7RSxx -DSTM32H7S3xx -DUSE_HAL_DRIVER -DSTM32H7S3_DK",
+    "f_cpu": "600000000L",
+    "mcu": "stm32h7s3l8t6",
+    "product_line": "STM32H7S3xx",
+    "variant": "STM32H7S3_DK"
+  },
+  "connectivity": [
+    "can",
+    "ethernet",
+    "usb",
+    "sdio",
+    "ltdc",
+    "camera",
+    "qspi"
+  ],
+  "debug": {
+    "default_tools": ["stlink"],
+    "jlink_device": "STM32H7S3L8",
+    "onboard_tools": ["stlink"],
+    "openocd_target": "stm32h7x",
+    "svd_path": "STM32H7S3.svd"
+  },
+  "frameworks": [
+    "cmsis",
+    "stm32cube"
+  ],
+  "name": "STM32H7S3 Discovery Kit",
+  "upload": {
+    "maximum_ram_size": 1310720,
+    "maximum_size": 2097152,
+    "protocol": "stlink",
+    "protocols": [
+      "stlink",
+      "jlink",
+      "cmsis-dap"
+    ]
+  },
+  "url": "https://www.st.com/en/evaluation-tools/stm32h7s3-dk.html",
+  "vendor": "ST"
+}
