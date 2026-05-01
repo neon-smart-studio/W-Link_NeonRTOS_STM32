@@ -52,6 +52,10 @@ typedef enum {
 #define CONFIG_UART9_PINSET UART_Pinset_DEFAULT
 #endif //CONFIG_UART9_PINSET
 
+#ifndef CONFIG_UART_L1_PINSET
+#define CONFIG_UART_L1_PINSET UART_Pinset_DEFAULT
+#endif
+
 static const UART_Pinset_t UART_Index_Map_Alt[hwUART_Index_MAX] = {
 #if defined(UART1_BASE) || defined(USART1_BASE)
     CONFIG_UART0_PINSET,
@@ -83,7 +87,11 @@ static const UART_Pinset_t UART_Index_Map_Alt[hwUART_Index_MAX] = {
 #if defined(UART10_BASE) || defined(USART10_BASE)
     CONFIG_UART9_PINSET,
 #endif
+#if defined(LPUART1_BASE)
+    CONFIG_UART_L1_PINSET,
+#endif
 };
+
 static const UART_Pin_Def UART_Pin_Def_Table[hwUART_Index_MAX][UART_Pinset_MAX] =
 {
 #if defined(UART1_BASE) || defined(USART1_BASE)
@@ -180,6 +188,15 @@ static const UART_Pin_Def UART_Pin_Def_Table[hwUART_Index_MAX][UART_Pinset_MAX] 
         { hwGPIO_Pin_G12, hwGPIO_Pin_G11, hwGPIO_Pin_G14, hwGPIO_Pin_G13 },
         { hwGPIO_Pin_NC,  hwGPIO_Pin_NC,  hwGPIO_Pin_NC,  hwGPIO_Pin_NC },
         { hwGPIO_Pin_NC,  hwGPIO_Pin_NC,  hwGPIO_Pin_NC,  hwGPIO_Pin_NC },
+    },
+#endif
+#if defined(LPUART1_BASE)
+    /* ================= LPUART1 ================= */
+    {
+        { hwGPIO_Pin_G7, hwGPIO_Pin_G8, hwGPIO_Pin_NC, hwGPIO_Pin_NC },
+        { hwGPIO_Pin_A9, hwGPIO_Pin_A10, hwGPIO_Pin_NC, hwGPIO_Pin_NC },
+        { hwGPIO_Pin_C0, hwGPIO_Pin_C1, hwGPIO_Pin_NC, hwGPIO_Pin_NC },
+        { hwGPIO_Pin_NC, hwGPIO_Pin_NC, hwGPIO_Pin_NC, hwGPIO_Pin_NC },
     },
 #endif
 };
@@ -293,6 +310,17 @@ static const UART_AF_Map UART_Pin_AF_Map[] =
     { hwUART_Index_9, hwGPIO_Pin_G11, GPIO_AF4_USART10 },
     { hwUART_Index_9, hwGPIO_Pin_G14, GPIO_AF4_USART10 },
     { hwUART_Index_9, hwGPIO_Pin_G13, GPIO_AF4_USART10 },
+#endif
+#if defined(LPUART1_BASE)
+    /* ================= LPUART1 ================= */
+#if defined(GPIO_AF8_LPUART1)
+    { hwUART_Index_L1, hwGPIO_Pin_G7, GPIO_AF8_LPUART1 },
+    { hwUART_Index_L1, hwGPIO_Pin_G8, GPIO_AF8_LPUART1 },
+    { hwUART_Index_L1, hwGPIO_Pin_A9, GPIO_AF8_LPUART1 },
+    { hwUART_Index_L1, hwGPIO_Pin_A10, GPIO_AF8_LPUART1 },
+    { hwUART_Index_L1, hwGPIO_Pin_C0, GPIO_AF8_LPUART1 },
+    { hwUART_Index_L1, hwGPIO_Pin_C1, GPIO_AF8_LPUART1 },
+#endif
 #endif
 };
 
