@@ -8,7 +8,7 @@
 #include "Timer/Timer.h"
 #include "PWM/PWM.h"
 
-#ifdef STM32WL
+#ifdef STM32WB
 
 #include "PWM/Pin/PWM_Pin_STM32.h"
 #include "PWM_STM32.h"
@@ -32,21 +32,25 @@ void PWM_Clock_Enable(hwPWM_Channel channel_index)
             __HAL_RCC_TIM1_CLK_ENABLE();
             break;
 #endif
+
 #if defined(TIM2_BASE)
         case hwTimer_Index_1:
             __HAL_RCC_TIM2_CLK_ENABLE();
             break;
 #endif
+
 #if defined(TIM16_BASE)
         case hwTimer_Index_15:
             __HAL_RCC_TIM16_CLK_ENABLE();
             break;
 #endif
+
 #if defined(TIM17_BASE)
         case hwTimer_Index_16:
             __HAL_RCC_TIM17_CLK_ENABLE();
             break;
 #endif
+
         default:
             break;
     }
@@ -119,4 +123,4 @@ void PWM_Clock_Disable(hwPWM_Channel channel_index)
     }
 }
 
-#endif // STM32WL
+#endif // STM32WB

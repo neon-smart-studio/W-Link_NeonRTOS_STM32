@@ -33,6 +33,29 @@ class Ststm32Platform(PlatformBase):
         build_mcu = variables.get("board_build.mcu", board_config.get("build.mcu", ""))
 
         frameworks = variables.get("pioframework", [])
+        if "arduino" in frameworks:
+            if board.startswith(("portenta", "opta", "nicla_vision", "giga")):
+                self.frameworks["arduino"]["package"] = "framework-arduino-mbed"
+                self.frameworks["arduino"][
+                    "script"
+                ] = "builder/frameworks/arduino/mbed-core/arduino-core-mbed.py"
+                self.packages["framework-arduinoststm32"]["optional"] = True
+            elif build_core == "maple":
+                self.frameworks["arduino"]["package"] = "framework-arduinoststm32-maple"
+                self.packages["framework-arduinoststm32-maple"]["optional"] = False
+                self.packages["framework-arduinoststm32"]["optional"] = True
+            elif build_core == "stm32l0":
+                self.frameworks["arduino"]["package"] = "framework-arduinoststm32l0"
+                self.packages["framework-arduinoststm32l0"]["optional"] = False
+                self.packages["framework-arduinoststm32"]["optional"] = True
+            else:
+                self.packages["toolchain-gccarmnoneeabi"]["version"] = "~1.120301.0"
+                self.packages["framework-cmsis"]["version"] = "~2.60300.0"
+                self.packages["framework-cmsis"]["optional"] = False
+                self.packages["framework-cmsis-dsp"]["optional"] = False
+
+        if "mbed" in frameworks:
+            self.packages["toolchain-gccarmnoneeabi"]["version"] = "~1.90201.0"
 
         if "cmsis" in frameworks:
             assert build_mcu, ("Missing MCU field for %s" % board)
@@ -50,6 +73,11 @@ class Ststm32Platform(PlatformBase):
 
             if device_package in self.packages:
                 self.packages[device_package]["optional"] = False
+
+        if "stm32cube" in frameworks:
+            assert build_mcu, ("Missing MCU field for %s" % board)
+            device_package = "framework-stm32cube%s" % build_mcu[5:7]
+            self.frameworks["stm32cube"]["package"] = device_package
 
         if any(f in frameworks for f in ("cmsis", "stm32cube")):
             self.packages["tool-ldscripts-ststm32"]["optional"] = False

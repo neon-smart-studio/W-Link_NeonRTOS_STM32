@@ -8,7 +8,7 @@
 #include "NeonRTOS.h"
 #include "Timer/Timer.h"
 
-#ifdef STM32WL
+#ifdef STM32WB
 
 #include "Timer_STM32.h"
 
@@ -57,11 +57,26 @@ static void Timer_HAL_IRQHandler(hwTimer_Index index)
     HAL_TIM_IRQHandler(&g_timer[index]);
 }
 
+#if defined(STM32WB1Mxx) || defined (STM32WB5Mxx) || defined(STM32WB10xx) || defined(STM32WB15xx)
 #if defined(TIM1_BASE)
 void TIM1_UP_IRQHandler(void)
 {
     Timer_HAL_IRQHandler(hwTimer_Index_0);
 }
+#endif
+#endif
+#if defined(STM32WB30xx) || defined (STM32WB35xx) || defined (STM32WB50xx) || defined (STM32WB55xx)
+#if defined(TIM1_BASE) || defined(TIM16_BASE)
+void TIM1_UP_TIM16_IRQHandler(void)
+{
+#if defined(TIM1_BASE)
+    Timer_HAL_IRQHandler(hwTimer_Index_0);
+#endif
+#if defined(TIM16_BASE)
+    Timer_HAL_IRQHandler(hwTimer_Index_15);
+#endif
+}
+#endif
 #endif
 
 #if defined(TIM2_BASE)
@@ -71,18 +86,13 @@ void TIM2_IRQHandler(void)
 }
 #endif
 
-#if defined(TIM16_BASE)
-void TIM16_IRQHandler(void)
-{
-    Timer_HAL_IRQHandler(hwTimer_Index_15);
-}
-#endif
-
-#if defined(TIM17_BASE)
-void TIM17_IRQHandler(void)
+#if defined(STM32WB30xx) || defined (STM32WB35xx) || defined (STM32WB50xx) || defined (STM32WB55xx)
+#if defined(TIM17_BASE) 
+void TIM1_TRG_COM_TIM17_IRQHandler(void)
 {
     Timer_HAL_IRQHandler(hwTimer_Index_16);
 }
+#endif
 #endif
 
 static void Timer_Enable_Clock(hwTimer_Index index)
@@ -168,11 +178,26 @@ void Timer_NVIC_Enable(hwTimer_Index index)
 {
     switch (index)
     {
+#if defined(STM32WB1Mxx) || defined (STM32WB5Mxx) || defined(STM32WB10xx) || defined(STM32WB15xx)
 #if defined(TIM1_BASE)
         case hwTimer_Index_0:
             HAL_NVIC_SetPriority(TIM1_UP_IRQn, TIMER_IRQ_NVIC_PRIORITY, 0);
             HAL_NVIC_EnableIRQ(TIM1_UP_IRQn);
             break;
+#endif
+#endif
+#if defined(STM32WB30xx) || defined (STM32WB35xx) || defined (STM32WB50xx) || defined (STM32WB55xx)
+#if defined(TIM1_BASE) || defined(TIM16_BASE)
+#if defined(TIM1_BASE)
+        case hwTimer_Index_0:
+#endif
+#if defined(TIM16_BASE)
+        case hwTimer_Index_15:
+#endif
+            HAL_NVIC_SetPriority(TIM1_UP_TIM16_IRQn, TIMER_IRQ_NVIC_PRIORITY, 0);
+            HAL_NVIC_EnableIRQ(TIM1_UP_TIM16_IRQn);
+            break;
+#endif
 #endif
 
 #if defined(TIM2_BASE)
@@ -182,17 +207,12 @@ void Timer_NVIC_Enable(hwTimer_Index index)
             break;
 #endif
 
-#if defined(TIM16_BASE)
-        case hwTimer_Index_15:
-            HAL_NVIC_SetPriority(TIM16_IRQn, TIMER_IRQ_NVIC_PRIORITY, 0);
-            HAL_NVIC_EnableIRQ(TIM16_IRQn);
-            break;
-#endif
-
-#if defined(TIM17_BASE)
+#if defined(STM32WB30xx) || defined (STM32WB35xx) || defined (STM32WB50xx) || defined (STM32WB55xx)
+#if defined(TIM17_BASE) 
         case hwTimer_Index_16:
-            HAL_NVIC_SetPriority(TIM17_IRQn, TIMER_IRQ_NVIC_PRIORITY, 0);
-            HAL_NVIC_EnableIRQ(TIM17_IRQn);
+#endif
+            HAL_NVIC_SetPriority(TIM1_TRG_COM_TIM17_IRQn, TIMER_IRQ_NVIC_PRIORITY, 0);
+            HAL_NVIC_EnableIRQ(TIM1_TRG_COM_TIM17_IRQn);
             break;
 #endif
 
@@ -205,10 +225,29 @@ void Timer_NVIC_Disable(hwTimer_Index index)
 {
     switch (index)
     {
+#if defined(STM32WB1Mxx) || defined (STM32WB5Mxx) || defined(STM32WB10xx) || defined(STM32WB15xx)
 #if defined(TIM1_BASE)
         case hwTimer_Index_0:
             HAL_NVIC_DisableIRQ(TIM1_UP_IRQn);
             break;
+#endif
+#endif
+#if defined(STM32WB30xx) || defined (STM32WB35xx) || defined (STM32WB50xx) || defined (STM32WB55xx)
+#if defined(TIM1_BASE) || defined(TIM16_BASE)
+#if defined(TIM1_BASE)
+        case hwTimer_Index_0:
+#endif
+#if defined(TIM16_BASE)
+        case hwTimer_Index_15:
+#endif
+#if defined(TIM1_BASE) && defined(TIM16_BASE)
+            if(!Timer_Init_Status[hwTimer_Index_0] && !Timer_Init_Status[hwTimer_Index_15])
+#endif
+            {
+                HAL_NVIC_DisableIRQ(TIM1_UP_TIM16_IRQn);
+            }
+            break;
+#endif
 #endif
 
 #if defined(TIM2_BASE)
@@ -217,15 +256,11 @@ void Timer_NVIC_Disable(hwTimer_Index index)
             break;
 #endif
 
-#if defined(TIM16_BASE)
-        case hwTimer_Index_15:
-            HAL_NVIC_DisableIRQ(TIM16_IRQn);
-            break;
-#endif
-
-#if defined(TIM17_BASE)
+#if defined(STM32WB30xx) || defined (STM32WB35xx) || defined (STM32WB50xx) || defined (STM32WB55xx)
+#if defined(TIM17_BASE) 
         case hwTimer_Index_16:
-            HAL_NVIC_DisableIRQ(TIM17_IRQn);
+#endif
+            HAL_NVIC_DisableIRQ(TIM1_TRG_COM_TIM17_IRQn);
             break;
 #endif
 
@@ -234,4 +269,4 @@ void Timer_NVIC_Disable(hwTimer_Index index)
     }
 }
 
-#endif // STM32WL
+#endif // STM32WB

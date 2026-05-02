@@ -318,6 +318,44 @@
 #include "stm32h7xx_hal_dac.h"
 #endif //STM32H7
 
+#if defined (STM32H7R7xx) || defined (STM32H7R3xx) || defined (STM32H7S3xx) || defined (STM32H7S7xx)
+#include "stm32h7rsxx.h"
+#include "stm32h7rsxx_hal_gpio.h"
+#include "stm32h7rsxx_hal_exti.h"
+#include "stm32h7rsxx_hal_uart.h"
+#include "stm32h7rsxx_hal_spi.h"
+#include "stm32h7rsxx_hal_i2c.h"
+#include "stm32h7rsxx_hal_dma.h"
+#include "stm32h7rsxx_hal_rtc.h"
+#include "stm32h7rsxx_hal_adc.h"
+#include "stm32h7rsxx_hal_dac.h"
+#endif //STM32H7RS
+
+#if defined (STM32WB55xx) || defined (STM32WB5Mxx) || defined (STM32WB50xx) || defined (STM32WB35xx) || \
+    defined(STM32WB30xx) || defined(STM32WB15xx) || defined(STM32WB10xx) || defined(STM32WB1Mxx)
+#include "stm32wbxx.h"
+#include "stm32wbxx_hal_gpio.h"
+#include "stm32wbxx_hal_exti.h"
+#include "stm32wbxx_hal_uart.h"
+#include "stm32wbxx_hal_spi.h"
+#include "stm32wbxx_hal_i2c.h"
+#include "stm32wbxx_hal_dma.h"
+#include "stm32wbxx_hal_rtc.h"
+#include "stm32wbxx_hal_adc.h"
+#endif //STM32WB
+
+#if defined(STM32WBA50xx) || defined(STM32WBA52xx) || defined(STM32WBA54xx) || defined(STM32WBA55xx)
+#include "stm32wbaxx.h"
+#include "stm32wbaxx_hal_gpio.h"
+#include "stm32wbaxx_hal_exti.h"
+#include "stm32wbaxx_hal_uart.h"
+#include "stm32wbaxx_hal_spi.h"
+#include "stm32wbaxx_hal_i2c.h"
+#include "stm32wbaxx_hal_dma.h"
+#include "stm32wbaxx_hal_rtc.h"
+#include "stm32wbaxx_hal_adc.h"
+#endif //STM32WBA
+
 #if defined (STM32WL55xx) || defined (STM32WL54xx) || defined (STM32WLE5xx) || defined (STM32WLE4xx) || defined(STM32WL5Mxx)
 #include "stm32wlxx.h"
 #include "stm32wlxx_hal_gpio.h"
