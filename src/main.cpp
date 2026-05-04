@@ -44,7 +44,7 @@ int main(void) {
 #ifdef DEVICE_STM32
     HAL_Init();
 #endif
-    SystemClock_Config();
+    //SystemClock_Config();
 
     //__HAL_RCC_WWDG_CLK_DISABLE();  // 禁用窗口看門狗
     //__HAL_RCC_IWDG_CLK_DISABLE();  // 禁用獨立看門狗

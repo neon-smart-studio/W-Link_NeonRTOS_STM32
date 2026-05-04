@@ -230,6 +230,62 @@ env.AppendUnique(
     ]
 )
 
+boot2_src_rp2040 = os.path.join(sdk_dir, "src/rp2040/boot_stage2/boot2_w25q080.S")
+
+boot2_inc_rp2040 = [
+    os.path.join(sdk_dir, "src/common/pico_base_headers/include"),
+    os.path.join(sdk_dir, "src/rp2_common/cmsis/include"),
+    os.path.join(sdk_dir, "src/rp2_common/pico_platform_compiler/include"),
+    os.path.join(sdk_dir, "src/rp2_common/pico_platform_sections/include"),
+    os.path.join(sdk_dir, "src/rp2_common/pico_platform_panic/include"),
+    os.path.join(sdk_dir, "src/rp2_common/pico_platform_common/include"),
+    os.path.join(sdk_dir, "src/rp2040/boot_stage2/asminclude"),
+    os.path.join(sdk_dir, "src/rp2040/pico_platform/include"),
+    os.path.join(sdk_dir, "src/rp2040/hardware_regs/include"),
+]
+
+inc_flags = " ".join(["-I" + p.replace("\\", "/") for p in boot2_inc_rp2040])
+
+boot2_bin = os.path.join(BUILD_DIR, "boot2.bin")
+boot2_obj = os.path.join(BUILD_DIR, "boot2.o")
+boot2_elf = os.path.join(BUILD_DIR, "boot2_elf.o")
+
+patch_boot2_py = os.path.join(PLATFORM_DIR, "builder", "patch_boot2.py")
+
+boot2_stage2_ld = os.path.join(
+    sdk_dir,
+    "src",
+    "rp2040",
+    "boot_stage2",
+    "boot_stage2.ld"
+).replace("\\", "/")
+
+boot2_elf_tmp = os.path.join(BUILD_DIR, "boot2_tmp.elf").replace("\\", "/")
+
+boot2_bin_node = env.Command(
+    boot2_bin,
+    boot2_src_rp2040,
+    f"$CC -c -mcpu=cortex-m0plus -mthumb -DPICO_BOOT_STAGE2 {inc_flags} $SOURCE -o {boot2_obj} && "
+    f"$CC -nostdlib -Wl,--script={boot2_stage2_ld} -Wl,-Map={BUILD_DIR}/boot2.map "
+    f"{boot2_obj} -o {boot2_elf_tmp} && "
+    f"$OBJCOPY -O binary {boot2_elf_tmp} {boot2_bin} && "
+    f"python {patch_boot2_py} {boot2_bin}"
+)
+
+make_boot2_s_py = os.path.join(PLATFORM_DIR, "builder", "make_boot2_s.py").replace("\\", "/")
+boot2_s = os.path.join(BUILD_DIR, "boot2_padded.S").replace("\\", "/")
+
+boot2_s_node = env.Command(
+    boot2_s,
+    boot2_bin_node,
+    f"python {make_boot2_s_py} $SOURCE $TARGET"
+)
+
+boot2_elf_node = env.Object(
+    target=boot2_elf,
+    source=boot2_s_node
+)
+
 pico_inc = [
     os.path.join(sdk_dir, "src/common/boot_picobin_headers/include"),
     os.path.join(sdk_dir, "src/common/boot_picoboot_headers/include"),
@@ -349,7 +405,7 @@ pico_src = [
     os.path.join(sdk_dir, "src/common/pico_sync/lock_core.c"),
     os.path.join(sdk_dir, "src/common/pico_sync/mutex.c"),
     os.path.join(sdk_dir, "src/common/pico_sync/sem.c"),
-    #os.path.join(sdk_dir, "src/common/pico_time/time.c"),
+    os.path.join(sdk_dir, "src/common/pico_time/time.c"),
     os.path.join(sdk_dir, "src/common/pico_util/datetime.c"),
     os.path.join(sdk_dir, "src/common/pico_util/pheap.c"),
     os.path.join(sdk_dir, "src/common/pico_util/queue.c"),
@@ -400,7 +456,6 @@ pico_src = [
     os.path.join(sdk_dir, "src/rp2_common/pico_platform_common/common.c"),
     os.path.join(sdk_dir, "src/rp2_common/pico_platform_panic/panic.c"),
     os.path.join(sdk_dir, "src/rp2_common/pico_printf/printf.c"),
-    #os.path.join(sdk_dir, "src/rp2_common/pico_printf/printf_none.S"),
     os.path.join(sdk_dir, "src/rp2_common/pico_rand/rand.c"),
     os.path.join(sdk_dir, "src/rp2_common/pico_runtime/runtime.c"),
     os.path.join(sdk_dir, "src/rp2_common/pico_runtime_init/runtime_init.c"),
@@ -426,49 +481,6 @@ pico_rp2350_src = [
     os.path.join(sdk_dir, "src/rp2_common/pico_sha256/sha256.c"),
     os.path.join(sdk_dir, "src/rp2_common/pico_crt0/crt0_riscv.S"),
 ]
-
-boot2_src_rp2040 = os.path.join(sdk_dir, "src/rp2040/boot_stage2/boot2_w25q080.S")
-
-boot2_inc_rp2040 = [
-    os.path.join(sdk_dir, "src/common/pico_base_headers/include"),
-    os.path.join(sdk_dir, "src/rp2_common/pico_platform_compiler/include"),
-    os.path.join(sdk_dir, "src/rp2_common/pico_platform_sections/include"),
-    os.path.join(sdk_dir, "src/rp2_common/pico_platform_panic/include"),
-    os.path.join(sdk_dir, "src/rp2_common/pico_platform_common/include"),
-    os.path.join(sdk_dir, "src/rp2040/boot_stage2/asminclude"),
-    os.path.join(sdk_dir, "src/rp2040/pico_platform/include"),
-    os.path.join(sdk_dir, "src/rp2040/hardware_regs/include"),
-]
-
-inc_flags = " ".join(["-I" + p.replace("\\", "/") for p in boot2_inc_rp2040])
-
-boot2_bin = os.path.join(BUILD_DIR, "boot2.bin")
-boot2_obj = os.path.join(BUILD_DIR, "boot2.o")
-boot2_elf = os.path.join(BUILD_DIR, "boot2_elf.o")
-
-patch_boot2_py = os.path.join(PLATFORM_DIR, "builder", "patch_boot2.py")
-
-boot2_bin_node = env.Command(
-    boot2_bin,
-    boot2_src_rp2040,
-    f"$CC -c -mcpu=cortex-m0plus -mthumb -DPICO_BOOT_STAGE2 {inc_flags} $SOURCE -o {boot2_obj} && "
-    f"$OBJCOPY -O binary {boot2_obj} {boot2_bin} && "
-    f"python {patch_boot2_py} {boot2_bin}"
-)
-
-make_boot2_s_py = os.path.join(PLATFORM_DIR, "builder", "make_boot2_s.py").replace("\\", "/")
-boot2_s = os.path.join(BUILD_DIR, "boot2_padded.S").replace("\\", "/")
-
-boot2_s_node = env.Command(
-    boot2_s,
-    boot2_bin_node,
-    f"python {make_boot2_s_py} $SOURCE $TARGET"
-)
-
-boot2_elf_node = env.Object(
-    target=boot2_elf,
-    source=boot2_s_node
-)
 
 sdk_objects = []
 for src in pico_src:
