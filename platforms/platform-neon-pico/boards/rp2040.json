@@ -2,6 +2,7 @@
   "build": {
     "core": "rp2040",
     "cpu": "cortex-m0plus",
+    "extra_flags": "-DRP2040 -DPICO_RP2040",
     "f_cpu": "125000000L",
     "mcu": "rp2040",
     "variant": "rp2040"

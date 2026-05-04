@@ -12,6 +12,21 @@ import shutil
 
 env = DefaultEnvironment()
 
+board = env.BoardConfig()
+
+mcu = str(board.get("build.mcu", "")).lower()
+extra_flags = str(board.get("build.extra_flags", ""))
+
+IS_RP2040 = (mcu == "rp2040") or ("RP2040" in extra_flags) or ("PICO_RP2040" in extra_flags)
+IS_RP2350 = (mcu == "rp2350") or ("RP2350" in extra_flags) or ("PICO_RP2350" in extra_flags)
+
+if IS_RP2350:
+    cpu_flag = "cortex-m33"
+elif IS_RP2040:
+    cpu_flag = "cortex-m0plus"
+else:
+    raise RuntimeError(f"No RP chip defined, mcu={mcu}, extra_flags={extra_flags}")
+
 PROJECT_DIR = env.subst("$PROJECT_DIR")
 BUILD_DIR = env.subst("$BUILD_DIR")
 PLATFORM_DIR = os.path.join(PROJECT_DIR, "platforms", "platform-neon-pico")
@@ -98,7 +113,6 @@ env.Replace(
 )
 
 env.PrependENVPath("PATH", toolbin)
-
 
 def collect_sources(root, exts=(".c", ".cpp", ".S", ".s")):
     files = []
@@ -189,10 +203,42 @@ apply_ini_build_flags(env)
 board = env.BoardConfig()
 f_cpu = board.get("build.f_cpu", "125000000L")
 
+if IS_RP2040:
+    pico_board = "pico"
+if IS_RP2350:
+    pico_board = "pico2"
+
+chip_defines = []
+
+if IS_RP2040:
+    chip_defines += [
+        "RP2040",
+        "PICO_RP2040",
+        ("PICO_CHIP", 2040),
+    ]
+
+elif IS_RP2350:
+    chip_defines += [
+        "RP2350",
+        "PICO_RP2350",
+        ("PICO_CHIP", 2350),
+    ]
+
+cpu_flags = [
+    f"-mcpu={cpu_flag}",
+    "-mthumb",
+]
+
+if IS_RP2350:
+    cpu_flags += [
+        "-mfpu=fpv5-sp-d16",
+        "-mfloat-abi=hard",
+    ]
+
 env.AppendUnique(
-    CPPDEFINES=[
+    CPPDEFINES=chip_defines+[
         ("F_CPU", f_cpu),
-        ("PICO_BOARD", "\\\"pico\\\""),
+        ("PICO_BOARD", f"\\\"{pico_board}\\\""),
         ("PICO_TARGET_NAME", "\\\"firmware\\\""),
         ("PICO_CMAKE_BUILD_TYPE", "\\\"Release\\\""),
 
@@ -201,9 +247,7 @@ env.AppendUnique(
         ("PICO_BUILD", 1),
         ("PICO_USE_BLOCKED_RAM", 0),
     ],
-    CCFLAGS=[
-        "-mcpu=cortex-m0plus",
-        "-mthumb",
+    CCFLAGS=cpu_flags+[
         "-Os",
         "-ffunction-sections",
         "-fdata-sections",
@@ -216,13 +260,8 @@ env.AppendUnique(
         "-fno-rtti",
         "-fno-exceptions"
     ],
-    ASFLAGS=[
-        "-mcpu=cortex-m0plus",
-        "-mthumb"
-    ],
-    LINKFLAGS=[
-        "-mcpu=cortex-m0plus",
-        "-mthumb",
+    ASFLAGS=cpu_flags,
+    LINKFLAGS=cpu_flags+[
         "-nostartfiles",
         "-Wl,--gc-sections",
         "--specs=nosys.specs",
@@ -230,61 +269,62 @@ env.AppendUnique(
     ]
 )
 
-boot2_src_rp2040 = os.path.join(sdk_dir, "src/rp2040/boot_stage2/boot2_w25q080.S")
+if IS_RP2040:
+    boot2_src_rp2040 = os.path.join(sdk_dir, "src/rp2040/boot_stage2/boot2_w25q080.S")
 
-boot2_inc_rp2040 = [
-    os.path.join(sdk_dir, "src/common/pico_base_headers/include"),
-    os.path.join(sdk_dir, "src/rp2_common/cmsis/include"),
-    os.path.join(sdk_dir, "src/rp2_common/pico_platform_compiler/include"),
-    os.path.join(sdk_dir, "src/rp2_common/pico_platform_sections/include"),
-    os.path.join(sdk_dir, "src/rp2_common/pico_platform_panic/include"),
-    os.path.join(sdk_dir, "src/rp2_common/pico_platform_common/include"),
-    os.path.join(sdk_dir, "src/rp2040/boot_stage2/asminclude"),
-    os.path.join(sdk_dir, "src/rp2040/pico_platform/include"),
-    os.path.join(sdk_dir, "src/rp2040/hardware_regs/include"),
-]
+    boot2_inc_rp2040 = [
+        os.path.join(sdk_dir, "src/common/pico_base_headers/include"),
+        os.path.join(sdk_dir, "src/rp2_common/cmsis/include"),
+        os.path.join(sdk_dir, "src/rp2_common/pico_platform_compiler/include"),
+        os.path.join(sdk_dir, "src/rp2_common/pico_platform_sections/include"),
+        os.path.join(sdk_dir, "src/rp2_common/pico_platform_panic/include"),
+        os.path.join(sdk_dir, "src/rp2_common/pico_platform_common/include"),
+        os.path.join(sdk_dir, "src/rp2040/boot_stage2/asminclude"),
+        os.path.join(sdk_dir, "src/rp2040/pico_platform/include"),
+        os.path.join(sdk_dir, "src/rp2040/hardware_regs/include"),
+    ]
 
-inc_flags = " ".join(["-I" + p.replace("\\", "/") for p in boot2_inc_rp2040])
+    inc_flags = " ".join(["-I" + p.replace("\\", "/") for p in boot2_inc_rp2040])
 
-boot2_bin = os.path.join(BUILD_DIR, "boot2.bin")
-boot2_obj = os.path.join(BUILD_DIR, "boot2.o")
-boot2_elf = os.path.join(BUILD_DIR, "boot2_elf.o")
+    boot2_bin = os.path.join(BUILD_DIR, "boot2.bin")
+    boot2_obj = os.path.join(BUILD_DIR, "boot2.o")
+    boot2_elf = os.path.join(BUILD_DIR, "boot2_elf.o")
 
-patch_boot2_py = os.path.join(PLATFORM_DIR, "builder", "patch_boot2.py")
+    patch_boot2_py = os.path.join(PLATFORM_DIR, "builder", "patch_boot2.py")
 
-boot2_stage2_ld = os.path.join(
-    sdk_dir,
-    "src",
-    "rp2040",
-    "boot_stage2",
-    "boot_stage2.ld"
-).replace("\\", "/")
+    boot2_stage2_ld = os.path.join(
+        sdk_dir,
+        "src",
+        "rp2040",
+        "boot_stage2",
+        "boot_stage2.ld"
+    ).replace("\\", "/")
 
-boot2_elf_tmp = os.path.join(BUILD_DIR, "boot2_tmp.elf").replace("\\", "/")
+    boot2_elf_tmp = os.path.join(BUILD_DIR, "boot2_tmp.elf").replace("\\", "/")
 
-boot2_bin_node = env.Command(
-    boot2_bin,
-    boot2_src_rp2040,
-    f"$CC -c -mcpu=cortex-m0plus -mthumb -DPICO_BOOT_STAGE2 {inc_flags} $SOURCE -o {boot2_obj} && "
-    f"$CC -nostdlib -Wl,--script={boot2_stage2_ld} -Wl,-Map={BUILD_DIR}/boot2.map "
-    f"{boot2_obj} -o {boot2_elf_tmp} && "
-    f"$OBJCOPY -O binary {boot2_elf_tmp} {boot2_bin} && "
-    f"python {patch_boot2_py} {boot2_bin}"
-)
+    boot2_bin_node = env.Command(
+        boot2_bin,
+        boot2_src_rp2040,
+        f"$CC -c -mcpu=cortex-m0plus -mthumb -DPICO_BOOT_STAGE2 {inc_flags} $SOURCE -o {boot2_obj} && "
+        f"$CC -nostdlib -Wl,--script={boot2_stage2_ld} -Wl,-Map={BUILD_DIR}/boot2.map "
+        f"{boot2_obj} -o {boot2_elf_tmp} && "
+        f"$OBJCOPY -O binary {boot2_elf_tmp} {boot2_bin} && "
+        f"python {patch_boot2_py} {boot2_bin}"
+    )
 
-make_boot2_s_py = os.path.join(PLATFORM_DIR, "builder", "make_boot2_s.py").replace("\\", "/")
-boot2_s = os.path.join(BUILD_DIR, "boot2_padded.S").replace("\\", "/")
+    make_boot2_s_py = os.path.join(PLATFORM_DIR, "builder", "make_boot2_s.py").replace("\\", "/")
+    boot2_s = os.path.join(BUILD_DIR, "boot2_padded.S").replace("\\", "/")
 
-boot2_s_node = env.Command(
-    boot2_s,
-    boot2_bin_node,
-    f"python {make_boot2_s_py} $SOURCE $TARGET"
-)
+    boot2_s_node = env.Command(
+        boot2_s,
+        boot2_bin_node,
+        f"python {make_boot2_s_py} $SOURCE $TARGET"
+    )
 
-boot2_elf_node = env.Object(
-    target=boot2_elf,
-    source=boot2_s_node
-)
+    boot2_elf_node = env.Object(
+        target=boot2_elf,
+        source=boot2_s_node
+    )
 
 pico_inc = [
     os.path.join(sdk_dir, "src/common/boot_picobin_headers/include"),
@@ -376,6 +416,8 @@ pico_inc = [
     os.path.join(sdk_dir, "src/rp2_common/pico_unique_id/include"),
     
     os.path.join(sdk_dir, "src/boards/include"),
+    
+    os.path.join(sdk_dir, "src/rp2_common/cmsis/stub/CMSIS/Core/Include"),
 ]
 
 pico_rp2040_inc = [
@@ -383,6 +425,7 @@ pico_rp2040_inc = [
     os.path.join(sdk_dir, "src/rp2040/hardware_structs/include"),
     os.path.join(sdk_dir, "src/rp2040/pico_platform/include"),
     os.path.join(sdk_dir, "src/rp2040/boot_stage2/asminclude"),
+    os.path.join(sdk_dir, "src/rp2_common/cmsis/stub/CMSIS/Device/RP2040/Include"),
 ]
 
 pico_rp2350_inc = [
@@ -390,14 +433,23 @@ pico_rp2350_inc = [
     os.path.join(sdk_dir, "src/rp2350/hardware_regs/include"),
     os.path.join(sdk_dir, "src/rp2350/hardware_structs/include"),
     os.path.join(sdk_dir, "src/rp2350/pico_platform/include"),
+    os.path.join(sdk_dir, "src/rp2_common/cmsis/stub/CMSIS/Device/RP2350/Include"),
 ]
 
-env.AppendUnique(
-    CPPPATH=pico_inc + pico_rp2040_inc + [
-        os.path.join(PROJECT_DIR, "include"),
-        os.path.join(PROJECT_DIR, "src")
-    ]
-)
+if IS_RP2040:
+    env.AppendUnique(
+        CPPPATH=pico_inc + pico_rp2040_inc + [
+            os.path.join(PROJECT_DIR, "include"),
+            os.path.join(PROJECT_DIR, "src")
+        ]
+    )
+if IS_RP2350:
+    env.AppendUnique(
+        CPPPATH=pico_inc + pico_rp2350_inc + [
+            os.path.join(PROJECT_DIR, "include"),
+            os.path.join(PROJECT_DIR, "src")
+        ]
+    )
 
 pico_src = [
     os.path.join(sdk_dir, "src/common/hardware_claim/claim.c"),
@@ -414,7 +466,6 @@ pico_src = [
     os.path.join(sdk_dir, "src/rp2_common/hardware_boot_lock/boot_lock.c"),
     os.path.join(sdk_dir, "src/rp2_common/hardware_clocks/clocks.c"),
     os.path.join(sdk_dir, "src/rp2_common/hardware_divider/divider.c"),
-    os.path.join(sdk_dir, "src/rp2_common/hardware_divider/divider.S"),
     os.path.join(sdk_dir, "src/rp2_common/hardware_dma/dma.c"),
     os.path.join(sdk_dir, "src/rp2_common/hardware_exception/exception.c"),
     os.path.join(sdk_dir, "src/rp2_common/hardware_flash/flash.c"),
@@ -425,7 +476,6 @@ pico_src = [
     os.path.join(sdk_dir, "src/rp2_common/hardware_irq/irq_handler_chain.S"),
     os.path.join(sdk_dir, "src/rp2_common/hardware_pio/pio.c"),
     os.path.join(sdk_dir, "src/rp2_common/hardware_pll/pll.c"),
-    os.path.join(sdk_dir, "src/rp2_common/hardware_rtc/rtc.c"),
     os.path.join(sdk_dir, "src/rp2_common/hardware_spi/spi.c"),
     os.path.join(sdk_dir, "src/rp2_common/hardware_sync/sync.c"),
     os.path.join(sdk_dir, "src/rp2_common/hardware_sync_spin_lock/sync_spin_lock.c"),
@@ -451,7 +501,6 @@ pico_src = [
     os.path.join(sdk_dir, "src/rp2_common/pico_int64_ops/pico_int64_ops_aeabi.S"),
     os.path.join(sdk_dir, "src/rp2_common/pico_malloc/malloc.c"),
     os.path.join(sdk_dir, "src/rp2_common/pico_mem_ops/mem_ops.c"),
-    os.path.join(sdk_dir, "src/rp2_common/pico_mem_ops/mem_ops_aeabi.S"),
     os.path.join(sdk_dir, "src/rp2_common/pico_multicore/multicore.c"),
     os.path.join(sdk_dir, "src/rp2_common/pico_platform_common/common.c"),
     os.path.join(sdk_dir, "src/rp2_common/pico_platform_panic/panic.c"),
@@ -473,13 +522,17 @@ pico_src = [
 ]
 
 pico_rp2040_src = [
+    os.path.join(sdk_dir, "src/rp2_common/hardware_divider/divider.S"),
+    os.path.join(sdk_dir, "src/rp2_common/hardware_rtc/rtc.c"),
+    os.path.join(sdk_dir, "src/rp2_common/cmsis/stub/CMSIS/Device/RP2040/Source/system_RP2040.c"),
 ]
 
 pico_rp2350_src = [
     os.path.join(sdk_dir, "src/rp2_common/hardware_sha256/sha256.c"),
     os.path.join(sdk_dir, "src/rp2_common/hardware_powman/powman.c"),
     os.path.join(sdk_dir, "src/rp2_common/pico_sha256/sha256.c"),
-    os.path.join(sdk_dir, "src/rp2_common/pico_crt0/crt0_riscv.S"),
+    #os.path.join(sdk_dir, "src/rp2_common/pico_crt0/crt0_riscv.S"),
+    os.path.join(sdk_dir, "src/rp2_common/cmsis/stub/CMSIS/Device/RP2350/Source/system_RP2350.c"),
 ]
 
 sdk_objects = []
@@ -492,23 +545,34 @@ for src in pico_src:
         )
         sdk_objects.append(obj)
         
-for src in pico_rp2040_src:
-    if os.path.exists(src):
-        rel = os.path.relpath(src, PROJECT_DIR)
-        obj = env.Object(
-            target=os.path.join(BUILD_DIR, rel + ".o"),
-            source=src
-        )
-        sdk_objects.append(obj)
+if IS_RP2040:
+    for src in pico_rp2040_src:
+        if os.path.exists(src):
+            rel = os.path.relpath(src, PROJECT_DIR)
+            obj = env.Object(
+                target=os.path.join(BUILD_DIR, rel + ".o"),
+                source=src
+            )
+            sdk_objects.append(obj)
+if IS_RP2350:
+    for src in pico_rp2350_src:
+        if os.path.exists(src):
+            rel = os.path.relpath(src, PROJECT_DIR)
+            obj = env.Object(
+                target=os.path.join(BUILD_DIR, rel + ".o"),
+                source=src
+            )
+            sdk_objects.append(obj)
 
-env.AppendUnique(
-    LINKFLAGS=[
-        "-Wl,--undefined=__boot2_start__",
-        "-Wl,--undefined=_entry_point",
-        "-Wl,--undefined=main",
-        "-Wl,--section-start=.boot2=0x10000000"
-    ]
-)
+if IS_RP2040:
+    env.AppendUnique(
+        LINKFLAGS=[
+            "-Wl,--undefined=__boot2_start__",
+            "-Wl,--undefined=_entry_point",
+            "-Wl,--undefined=main",
+            "-Wl,--section-start=.boot2=0x10000000"
+        ]
+    )
 
 include_patterns, exclude_patterns = parse_src_filter(env)
 
@@ -544,14 +608,10 @@ with open(flash_region_ld, "w", encoding="utf-8") as f:
 FLASH(rx) : ORIGIN = 0x10000000, LENGTH = 2M
 """)
     
-ldscript = os.path.join(
-    sdk_dir,
-    "src",
-    "rp2_common",
-    "pico_crt0",
-    "rp2040",
-    "memmap_default.ld"
-).replace("\\", "/")
+if IS_RP2040:
+    ldscript = os.path.join(sdk_dir,"src","rp2_common","pico_crt0","rp2040","memmap_default.ld")
+if IS_RP2350:
+    ldscript = os.path.join(sdk_dir,"src","rp2_common","pico_crt0","rp2350","memmap_default.ld")
 
 mapfile = os.path.join(BUILD_DIR, "firmware.map").replace("\\", "/")
 
@@ -563,7 +623,10 @@ env.AppendUnique(
     ]
 )
 
-objects = boot2_elf_node + sdk_objects + project_objects
+objects = sdk_objects + project_objects
+
+if IS_RP2040:
+    objects = boot2_elf_node + objects
 
 elf = env.Program(
     target=os.path.join(BUILD_DIR, "firmware.elf"),
@@ -584,20 +647,31 @@ env.Replace(
     PROGSUFFIX=".elf"
 )
 
-rp2040tools = env.PioPlatform().get_package_dir("tool-rp2040tools")
-elf2uf2 = os.path.join(rp2040tools, "elf2uf2").replace("\\", "/")
-rp2040load = os.path.join(rp2040tools, "rp2040load").replace("\\", "/")
+uf2_file = env.Command(
+    os.path.join(BUILD_DIR, "firmware.uf2"),
+    elf,
+    f"{picotool} uf2 convert $SOURCE $TARGET"
+)
 
-def upload_with_picotool(source, target, env):
+def upload_with_tool(source, target, env):
     elf_path = os.path.join(BUILD_DIR, "firmware.elf").replace("\\", "/")
 
-    print(">>> Uploading ELF with rp2040load ...")
-    subprocess.check_call([rp2040load, "-v", "-D", elf_path])
+    if IS_RP2040:
+        rp2040tools = env.PioPlatform().get_package_dir("tool-rp2040tools")
+        rp2040load = os.path.join(rp2040tools, "rp2040load").replace("\\", "/")
+
+        print(">>> Uploading ELF with rp2040load ...")
+        subprocess.check_call([rp2040load, "-v", "-D", elf_path])
+
+    elif IS_RP2350:
+        uf2_path = os.path.join(BUILD_DIR, "firmware.uf2").replace("\\", "/")
+        print(">>> Uploading UF2 with picotool ...")
+        subprocess.check_call([picotool, "load", "-x", uf2_path])
 
 upload_target = env.Command(
     "upload",
     [elf, bin_file],
-    upload_with_picotool
+    upload_with_tool
 )
 
 AlwaysBuild(upload_target)

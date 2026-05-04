@@ -2,6 +2,7 @@
   "build": {
     "core": "rp2350",
     "cpu": "cortex-m33",
+    "extra_flags": "-DRP2350 -DPICO_RP2350",
     "f_cpu": "150000000L",
     "mcu": "rp2350",
     "variant": "rp2350"
