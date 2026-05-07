@@ -38,9 +38,9 @@
 
 #define ST77xx_CMD_DISP_INVERSION_OFF           0x20
 #define ST77xx_CMD_DISP_INVERSION_ON            0x21
-#if defined(DISPLAY_ST7789) || defined(DISPLAY_ST7796S) || defined(DISPLAY_ST7796HV)
+#if defined(DISPLAY_ST7789) || defined(DISPLAY_ST7796S)
 #define ST77xx_CMD_GAMSET                       0x26    // Gamma set
-#endif // DISPLAY_ST7789 || DISPLAY_ST7796S || DISPLAY_ST7796HV
+#endif // DISPLAY_ST7789 || DISPLAY_ST7796S
 #define ST77xx_CMD_DISPLAY_OFF                  0x28
 #define ST77xx_CMD_DISPLAY_ON                   0x29
 #define ST77xx_CMD_COLUMN_ADDRESS_SET           0x2A
@@ -54,26 +54,26 @@
 #define ST77xx_CMD_TEARING_EFFECT_LINE_OFF      0x34 // Tearing effect line off
 #define ST77xx_CMD_TEARING_EFFECT_LINE_ON       0x35 // Tearing effect line on
 #define ST77xx_CMD_MEMORY_ACCESS_CONTROL        0x36 // Memory data access control bits 7:3,1:0 only
-#if defined(DISPLAY_ST7789) || defined(DISPLAY_ST7796S) || defined(DISPLAY_ST7796HV)
+#if defined(DISPLAY_ST7789) || defined(DISPLAY_ST7796S)
 #define ST77xx_CMD_VERT_SCROLL_START_ADDRESS    0x37
-#endif // DISPLAY_ST7789 || DISPLAY_ST7796S || DISPLAY_ST7796HV
+#endif // DISPLAY_ST7789 || DISPLAY_ST7796S
 #define ST77xx_CMD_IDLE_MODE_OFF                0x38 // Idle mode off
 #define ST77xx_CMD_IDLE_MODE_ON                 0x39 // Idle mode on
 #define ST77xx_CMD_COLMOD_PIXEL_FORMAT_SET      0x3A
-#if defined(DISPLAY_ST7789) || defined(DISPLAY_ST7796S) || defined(DISPLAY_ST7796HV)
+#if defined(DISPLAY_ST7789) || defined(DISPLAY_ST7796S)
 #define ST77xx_CMD_WRITE_MEMORY_CONTINUE        0x3C // Memory write continue
 #define ST77xx_CMD_READ_MEMORY_CONTINUE         0x3E // Memory read continue
-#endif // DISPLAY_ST7789 || DISPLAY_ST7796S || DISPLAY_ST7796HV
+#endif // DISPLAY_ST7789 || DISPLAY_ST7796S
 
-#if defined(DISPLAY_ST7789) || defined(DISPLAY_ST7796S) || defined(DISPLAY_ST7796HV)
+#if defined(DISPLAY_ST7789) || defined(DISPLAY_ST7796S)
 #define ST77xx_CMD_SET_TEAR_SCANLINE            0x44
 #define ST77xx_CMD_GET_SCANLINE                 0x45
-#endif // DISPLAY_ST7789 || DISPLAY_ST7796S || DISPLAY_ST7796HV
+#endif // DISPLAY_ST7789 || DISPLAY_ST7796S
 
-#if defined(DISPLAY_ST7789) || defined(DISPLAY_ST7796S) || defined(DISPLAY_ST7796HV)
+#if defined(DISPLAY_ST7789) || defined(DISPLAY_ST7796S)
 #define ST77xx_DDB_START                        0xA1
 #define ST77xx_DDB_CONTINUE                     0xA8
-#endif // DISPLAY_ST7789 || DISPLAY_ST7796S || DISPLAY_ST7796HV
+#endif // DISPLAY_ST7789 || DISPLAY_ST7796S
 
 #ifdef DISPLAY_ST7735
 #define ST77xx_CMD_FRAME_RATE_CONTROL_1         0xB1
@@ -143,7 +143,7 @@
 #define ST77xx_CMD_PROGRAM_ACTION                   0xFE    // Program action
 #endif //DISPLAY_ST7789
 
-#if defined(DISPLAY_ST7796S) || defined(DISPLAY_ST7796HV)
+#if defined(DISPLAY_ST7796S)
 #define ST77xx_CMD_INTERFACE_MODE_CONTROL           0xB0
 #define ST77xx_CMD_FRAME_RATE_CONTROL_1             0xB1
 #define ST77xx_CMD_FRAME_RATE_CONTROL_2             0xB2
@@ -172,7 +172,7 @@
 
 #define ST77xx_CMD_COMMAND_SET_CONTROL              0xF0
 #define ST77xx_CMD_SPI_READ_CONTROL                 0xFB
-#endif //DISPLAY_ST7796S || DISPLAY_ST7796HV
+#endif //DISPLAY_ST7796S
 
 #define ST77xx_MADCTL_MY    0x80
 #define ST77xx_MADCTL_MX    0x40
