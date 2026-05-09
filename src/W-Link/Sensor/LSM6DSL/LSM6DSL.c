@@ -58,6 +58,11 @@ static float X_Last_ODR;
 static uint8_t G_isEnabled;
 static float G_Last_ODR;
 
+LSM6DSL_OpStatus LSM6DSL_Set_X_ODR_When_Enabled(float odr);
+LSM6DSL_OpStatus LSM6DSL_Set_X_ODR_When_Disabled(float odr);
+LSM6DSL_OpStatus LSM6DSL_Set_G_ODR_When_Enabled(float odr);
+LSM6DSL_OpStatus LSM6DSL_Set_G_ODR_When_Disabled(float odr);
+
 LSM6DSL_OpStatus LSM6DSL_Init()
 {
   LSM6DSL_OpStatus op_status;

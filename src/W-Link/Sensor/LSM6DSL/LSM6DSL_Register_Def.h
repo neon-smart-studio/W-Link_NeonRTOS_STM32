@@ -38,18 +38,10 @@
  * Based on STMicroelectronics LSM6DSL driver
  * Modified by Neon Smart Studio for W-Link
  */
-
-/* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef LSM6DSL_REGISTER_DEF_H
 #define LSM6DSL_REGISTER_DEF_H
 
-/* Includes ------------------------------------------------------------------*/
 #include <stdint.h>
-/* Exported types ------------------------------------------------------------*/
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /************** Who am I  *******************/
 
@@ -1210,9 +1202,5 @@ typedef enum {
   	LSM6DSL_ACC_GYRO_INT2_SLEEP_DISABLED = 0x00,
   	LSM6DSL_ACC_GYRO_INT2_SLEEP_ENABLED = 0x80,
 } LSM6DSL_ACC_GYRO_INT2_SLEEP_t;
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif // LSM6DSL_REGISTER_DEF_H
