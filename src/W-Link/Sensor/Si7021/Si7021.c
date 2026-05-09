@@ -79,7 +79,7 @@ static Si7021_OpStatus Si7021_Write_Command(Si7021_Command command)
 
     i2c_op_result = I2C_Master_Write(
         SI7021_I2C_INDEX,
-        SI7021_I2C_ADDR,
+        SI7021_I2C_ADDR >> 1,
         &command,
         1,
         true,
@@ -105,7 +105,7 @@ static Si7021_OpStatus Si7021_Write_Command16(Si7021_Command16 command)
 
     i2c_op_result = I2C_Master_Write(
         SI7021_I2C_INDEX,
-        SI7021_I2C_ADDR,
+        SI7021_I2C_ADDR >> 1,
         tx_buf,
         2,
         true,
@@ -131,7 +131,7 @@ static Si7021_OpStatus Si7021_Read(uint8_t* data, uint16_t len)
 
     i2c_op_result = I2C_Master_Read(
         SI7021_I2C_INDEX,
-        SI7021_I2C_ADDR,
+        SI7021_I2C_ADDR >> 1,
         data,
         len,
         true,
