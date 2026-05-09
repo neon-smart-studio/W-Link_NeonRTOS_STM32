@@ -46,9 +46,6 @@
 #include "LSM6DSL_IO.h"
 
 #include "LSM6DSL_Def.h"
-#include "LSM6DSL_Register_Def.h"
-
-#include "LSM6DSL_Register.h"
 
 #define LSM6DSL_ACC_SENSITIVITY_FOR_FS_2G   0.061  /**< Sensitivity value for 2 g full scale [mg/LSB] */
 #define LSM6DSL_ACC_SENSITIVITY_FOR_FS_4G   0.122  /**< Sensitivity value for 4 g full scale [mg/LSB] */

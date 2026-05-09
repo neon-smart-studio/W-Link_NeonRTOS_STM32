@@ -39,14 +39,15 @@
  * Modified by Neon Smart Studio for W-Link
  */
 
-#ifndef __LSM6DSL_ACC_GYRO_DRIVER__H
-#define __LSM6DSL_ACC_GYRO_DRIVER__H
+#ifndef LSM6DSL_REGISTER_H
+#define LSM6DSL_REGISTER_H
 
 #include <stdint.h>
 
 #include "LSM6DSL_IO.h"
 
 #include "LSM6DSL_Def.h"
+
 #include "LSM6DSL_Register_Def.h"
 
 #ifdef __cplusplus
@@ -528,4 +529,4 @@ LSM6DSL_OpStatus LSM6DSL_ACC_GYRO_SH0_WriteByte(uint8_t SlvAddr, uint8_t Reg, ui
 }
 #endif
 
-#endif
+#endif // LSM6DSL_REGISTER_H

@@ -16,6 +16,7 @@ Modifications:
 #include "LSM6DSO_Util.h"
 
 #include "LSM6DSO_Def.h"
+
 #include "LSM6DSO_Register_Def.h"
 
 LSM6DSO_OpStatus LSM6DSO_Read_Register(uint8_t reg, uint8_t* data, uint16_t len);

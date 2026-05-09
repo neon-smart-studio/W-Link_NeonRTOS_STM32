@@ -20,6 +20,9 @@ Modifications:
 
 #include "LSM6DSO.h"
 
+#include "LSM6DSO_Register_Def.h"
+#include "LSM6DSO_Register.h"
+
 static uint8_t acc_is_enabled = false;
 static uint8_t gyro_is_enabled = false;
 static LSM6DSO_ODR_XL acc_odr;

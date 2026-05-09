@@ -16,9 +16,6 @@ Modifications:
 #include "LSM6DSO_Util.h"
 
 #include "LSM6DSO_Def.h"
-#include "LSM6DSO_Register_Def.h"
-
-#include "LSM6DSO_Register.h"
 
 #define LSM6DSO_ACC_SENSITIVITY_FS_2G   0.061f
 #define LSM6DSO_ACC_SENSITIVITY_FS_4G   0.122f

@@ -40,8 +40,8 @@
  */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef LSM6DSL_REGISTER_H
-#define LSM6DSL_REGISTER_H
+#ifndef LSM6DSL_REGISTER_DEF_H
+#define LSM6DSL_REGISTER_DEF_H
 
 /* Includes ------------------------------------------------------------------*/
 #include <stdint.h>
@@ -1215,4 +1215,4 @@ typedef enum {
 }
 #endif
 
-#endif // LSM6DSL_REGISTER_H
+#endif // LSM6DSL_REGISTER_DEF_H

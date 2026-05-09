@@ -18,6 +18,9 @@ Modifications:
 
 #include "I2C/I2C_Master.h"
 
+#include "LSM6DSO_Def.h"
+
+#include "LSM6DSO_Register_Def.h"
 #include "LSM6DSO_Register.h"
 
 #define LSM6DSO_BYTE_COPY_INTERNAL(target, source) if ( (target != NULL) && (source != NULL) ) { *target = *source; }

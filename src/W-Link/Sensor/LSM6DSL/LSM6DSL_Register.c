@@ -48,7 +48,10 @@
 
 #include "I2C/I2C_Master.h"
 
-#include "LSM6DSL_REGister.h"
+#include "LSM6DSL_Def.h"
+
+#include "LSM6DSL_Register_Def.h"
+#include "LSM6DSL_Register.h"
 
 typedef union{
 	int16_t i16bit[3];

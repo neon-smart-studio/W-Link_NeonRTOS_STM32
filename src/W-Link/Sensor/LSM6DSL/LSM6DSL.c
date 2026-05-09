@@ -50,6 +50,9 @@
 
 #include "LSM6DSL.h"
 
+#include "LSM6DSL_Register_Def.h"
+#include "LSM6DSL_Register.h"
+
 static uint8_t X_isEnabled;
 static float X_Last_ODR;
 static uint8_t G_isEnabled;
