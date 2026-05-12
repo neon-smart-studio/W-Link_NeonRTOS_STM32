@@ -51,3 +51,11 @@ Bluetooth/BlueNRG/
 remain the property of STMicroelectronics and retain their original license and copyright notices.
 
 Only W-Link abstraction layers and framework code are licensed under Apache-2.0.
+
+Third-party notice
+
+Some files in this repository are derived from or include middleware/example code from STMicroelectronics, including BlueNRG HCI/ACI related files.
+
+Those files retain their original STMicroelectronics copyright notices and disclaimers.
+
+The Apache-2.0 license of W-Link applies only to original W-Link / NeonRTOS integration code written by Neon Smart Studio, not to third-party STMicroelectronics source files.
