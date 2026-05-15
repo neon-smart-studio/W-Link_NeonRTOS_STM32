@@ -23,6 +23,10 @@ hwSPI_OpResult SPI_Master_WriteByte(hwSPI_Index index, uint8_t dat);
 hwSPI_OpResult SPI_Master_ReadByte(hwSPI_Index index, uint8_t* dat);
 hwSPI_OpResult SPI_Master_TransferByte(hwSPI_Index index, uint8_t wr_dat, uint8_t* rd_dat);
 
+hwSPI_OpResult SPI_Master_Stream_Write(hwSPI_Index index, const uint8_t* buf, uint16_t len);
+hwSPI_OpResult SPI_Master_Stream_Read(hwSPI_Index index, uint8_t* buf, uint16_t len);
+hwSPI_OpResult SPI_Master_Stream_Transfer(hwSPI_Index index, const uint8_t* tx_buf, uint8_t* rx_buf, uint16_t len);
+
 #ifdef  __cplusplus
 }
 #endif // __cplusplus

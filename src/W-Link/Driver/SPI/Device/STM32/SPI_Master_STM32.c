@@ -628,4 +628,122 @@ hwSPI_OpResult SPI_Master_DummyByte(hwSPI_Index index)
     return SPI_Master_WriteByte(index, 0x00);
 }
 
+hwSPI_OpResult SPI_Master_Stream_Write(hwSPI_Index index, const uint8_t* buf, uint16_t len)
+{
+    if (index >= hwSPI_Index_MAX)
+    {
+        return hwSPI_InvalidParameter;
+    }
+
+    if (Spi_Master_Init_Status[index] == false)
+    {
+        return hwSPI_NotInit;
+    }
+
+    SPI_MASTER_MUTEX_LOCK(index, SPI_MASTER_MUTEX_ACCESS_TIMEOUT);
+
+    NeonRTOS_SyncObjClear(&Spi_Master_Send_SyncHandle[index]);
+
+    if (HAL_SPI_Transmit_IT(&g_spi[index], (uint8_t*)buf, len) != HAL_OK)
+    {
+        SPI_MASTER_MUTEX_UNLOCK(index);
+        return hwSPI_HwError;
+    }
+
+    if (NeonRTOS_SyncObjWait(&Spi_Master_Send_SyncHandle[index],
+                             SPI_MASTER_SYNC_TIMEOUT) != NeonRTOS_OK)
+    {
+        SPI_MASTER_MUTEX_UNLOCK(index);
+        return hwSPI_SlaveTimeout;
+    }
+
+    SPI_MASTER_MUTEX_UNLOCK(index);
+    return hwSPI_OK;
+}
+
+hwSPI_OpResult SPI_Master_Stream_Read(hwSPI_Index index, uint8_t* buf, uint16_t len)
+{
+    if (index >= hwSPI_Index_MAX)
+    {
+        return hwSPI_InvalidParameter;
+    }
+
+    if (buf == NULL)
+    {
+        return hwSPI_InvalidParameter;
+    }
+
+    if (Spi_Master_Init_Status[index] == false)
+    {
+        return hwSPI_NotInit;
+    }
+
+    SPI_MASTER_MUTEX_LOCK(index, SPI_MASTER_MUTEX_ACCESS_TIMEOUT);
+
+    NeonRTOS_SyncObjClear(&Spi_Master_Recv_SyncHandle[index]);
+
+    if (HAL_SPI_Receive_IT(&g_spi[index], buf, len) != HAL_OK)
+    {
+        SPI_MASTER_MUTEX_UNLOCK(index);
+        return hwSPI_HwError;
+    }
+
+    if (NeonRTOS_SyncObjWait(&Spi_Master_Recv_SyncHandle[index],
+                             SPI_MASTER_SYNC_TIMEOUT) != NeonRTOS_OK)
+    {
+        SPI_MASTER_MUTEX_UNLOCK(index);
+        return hwSPI_SlaveTimeout;
+    }
+
+    SPI_MASTER_MUTEX_UNLOCK(index);
+    return hwSPI_OK;
+}
+
+hwSPI_OpResult SPI_Master_Stream_Transfer(hwSPI_Index index, const uint8_t* tx_buf, uint8_t* rx_buf, uint16_t len)
+{
+    if (index >= hwSPI_Index_MAX)
+    {
+        return hwSPI_InvalidParameter;
+    }
+
+    if (tx_buf == NULL || rx_buf == NULL || len == 0)
+        return hwSPI_InvalidParameter;
+
+    if (Spi_Master_Init_Status[index] == false)
+    {
+        return hwSPI_NotInit;
+    }
+
+    SPI_MASTER_MUTEX_LOCK(index, SPI_MASTER_MUTEX_ACCESS_TIMEOUT);
+
+    NeonRTOS_SyncObjClear(&Spi_Master_Send_SyncHandle[index]);
+    NeonRTOS_SyncObjClear(&Spi_Master_Recv_SyncHandle[index]);
+
+    if (HAL_SPI_TransmitReceive_IT(&g_spi[index],
+                                   (uint8_t*)tx_buf,
+                                   rx_buf,
+                                   len) != HAL_OK)
+    {
+        SPI_MASTER_MUTEX_UNLOCK(index);
+        return hwSPI_HwError;
+    }
+
+    if (NeonRTOS_SyncObjWait(&Spi_Master_Send_SyncHandle[index],
+                             SPI_MASTER_SYNC_TIMEOUT) != NeonRTOS_OK)
+    {
+        SPI_MASTER_MUTEX_UNLOCK(index);
+        return hwSPI_SlaveTimeout;
+    }
+
+    if (NeonRTOS_SyncObjWait(&Spi_Master_Recv_SyncHandle[index],
+                             SPI_MASTER_SYNC_TIMEOUT) != NeonRTOS_OK)
+    {
+        SPI_MASTER_MUTEX_UNLOCK(index);
+        return hwSPI_SlaveTimeout;
+    }
+
+    SPI_MASTER_MUTEX_UNLOCK(index);
+    return hwSPI_OK;
+}
+
 #endif // DEVICE_STM32

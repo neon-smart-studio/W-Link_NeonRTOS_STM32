@@ -574,4 +574,100 @@ hwSPI_OpResult SPI_Master_DummyByte(hwSPI_Index index)
     return SPI_Master_WriteByte(index, 0x00);
 }
 
+hwSPI_OpResult SPI_Master_Stream_Write(hwSPI_Index index, const uint8_t *buf, uint32_t len)
+{
+    if (index >= hwSPI_Index_MAX)
+    {
+        return hwSPI_InvalidParameter;
+    }
+
+    if (buf == NULL || len == 0)
+    {
+        return hwSPI_InvalidParameter;
+    }
+
+    if (Spi_Master_Init_Status[index] == false)
+    {
+        return hwSPI_NotInit;
+    }
+
+    for (uint32_t i = 0; i < len; i++)
+    {
+        hwSPI_OpResult ret;
+
+        ret = SPI_Master_WriteByte(index, buf[i]);
+
+        if (ret != hwSPI_OK)
+        {
+            return ret;
+        }
+    }
+
+    return hwSPI_OK;
+}
+
+hwSPI_OpResult SPI_Master_Stream_Read(hwSPI_Index index, uint8_t *buf, uint32_t len)
+{
+    if (index >= hwSPI_Index_MAX)
+    {
+        return hwSPI_InvalidParameter;
+    }
+
+    if (buf == NULL || len == 0)
+    {
+        return hwSPI_InvalidParameter;
+    }
+
+    if (Spi_Master_Init_Status[index] == false)
+    {
+        return hwSPI_NotInit;
+    }
+
+    for (uint32_t i = 0; i < len; i++)
+    {
+        hwSPI_OpResult ret;
+
+        ret = SPI_Master_ReadByte(index, &buf[i]);
+
+        if (ret != hwSPI_OK)
+        {
+            return ret;
+        }
+    }
+
+    return hwSPI_OK;
+}
+
+hwSPI_OpResult SPI_Master_Stream_Transfer(hwSPI_Index index, const uint8_t *tx_buf, uint8_t *rx_buf, uint32_t len)
+{
+    if (index >= hwSPI_Index_MAX)
+    {
+        return hwSPI_InvalidParameter;
+    }
+
+    if (tx_buf == NULL || rx_buf == NULL || len == 0)
+    {
+        return hwSPI_InvalidParameter;
+    }
+
+    if (Spi_Master_Init_Status[index] == false)
+    {
+        return hwSPI_NotInit;
+    }
+
+    for (uint32_t i = 0; i < len; i++)
+    {
+        hwSPI_OpResult ret;
+
+        ret = SPI_Master_TransferByte(index, tx_buf[i], &rx_buf[i]);
+
+        if (ret != hwSPI_OK)
+        {
+            return ret;
+        }
+    }
+
+    return hwSPI_OK;
+}
+
 #endif // DEVICE_RP2
