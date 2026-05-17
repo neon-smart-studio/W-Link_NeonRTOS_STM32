@@ -55,7 +55,7 @@ typedef void* NeonRTOS_TaskHandle;
 
 typedef void* NeonRTOS_TimerHandle;
 
-typedef void (*NeonRTOS_TimerCallbackFunction_t)( NeonRTOS_TimerHandle osiTimer );
+typedef void (*NeonRTOS_TimerCallbackFunction_t)( NeonRTOS_TimerHandle neonTimer );
 typedef void (*NeonRTOS_PendingFunction_t)( void * p1, uint32_t p2 );
 
 NeonRTOS_ReturnVal_e NeonRTOS_SyncObjCreate(NeonRTOS_SyncObj_t* pSyncObj);
