@@ -12,9 +12,9 @@
 extern "C" {
 #endif
 
-hwDAC_OpStatus DAC_Channel_Init(hwDAC_Channel_Index channel);
-hwDAC_OpStatus DAC_Channel_DeInit(hwDAC_Channel_Index channel);
-hwDAC_OpStatus DAC_Read_MiniVolt(hwDAC_Channel_Index channel, float* readMv);
+hwDAC_OpResult DAC_Channel_Init(hwDAC_Channel_Index channel);
+hwDAC_OpResult DAC_Channel_DeInit(hwDAC_Channel_Index channel);
+hwDAC_OpResult DAC_Read_MiniVolt(hwDAC_Channel_Index channel, float* readMv);
 
 #ifdef  __cplusplus
 }
